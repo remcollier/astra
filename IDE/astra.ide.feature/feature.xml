@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="astra.ide.feature"
+      label="ASTRA IDE + JDT Compiler"
+      version="3.5.1.qualifier"
+      provider-name="University College Dublin, Ireland">
+
+   <description url="http://www.example.com/description">
+      This is the main implementation of the ASTRA Programming Language IDE
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="www.gnu.org/licenses/gpl.html">
+      Copyright 2014 UCD
+
+ASTRA and its accompanying IDE is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+ASTRA and its accompanying IDE is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with ASTRA and its accompanying IDE. If not, see http://www.gnu.org/licenses/.
+   </license>
+
+   <plugin
+         id="astra.compiler"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="astra.ide"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="astra.ide.compiler"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
