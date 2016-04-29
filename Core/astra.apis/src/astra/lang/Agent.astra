@@ -1,0 +1,4 @@
+package astra.lang;
+
+agent Agent {
+}
