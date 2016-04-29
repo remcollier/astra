@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/agentcontest/!svn/ver/6/ProgContest/src/graph/core
+END
+Parameter.java
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/agentcontest/!svn/ver/6/ProgContest/src/graph/core/Parameter.java
+END
+Graph.java
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/agentcontest/!svn/ver/6/ProgContest/src/graph/core/Graph.java
+END
+InvalidVertexException.java
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/agentcontest/!svn/ver/6/ProgContest/src/graph/core/InvalidVertexException.java
+END
+Edge.java
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/agentcontest/!svn/ver/6/ProgContest/src/graph/core/Edge.java
+END
+GraphAlgorithm.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/agentcontest/!svn/ver/6/ProgContest/src/graph/core/GraphAlgorithm.java
+END
+AbstractGraphAlgorithm.java
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/agentcontest/!svn/ver/6/ProgContest/src/graph/core/AbstractGraphAlgorithm.java
+END
+Vertex.java
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/agentcontest/!svn/ver/6/ProgContest/src/graph/core/Vertex.java
+END
