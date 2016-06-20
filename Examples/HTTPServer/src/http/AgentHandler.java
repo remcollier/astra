@@ -16,7 +16,7 @@ import astra.term.Term;
 
 public class AgentHandler implements HttpHandler {
 	private Agent agent;
-	
+
 	public AgentHandler(Agent agent) {
 		this.agent = agent;
 	}
@@ -26,35 +26,17 @@ public class AgentHandler implements HttpHandler {
 		URI uri = exchange.getRequestURI();
 		String[] path = uri.getPath().substring(1).split("/");
 		if (path.length < 2) {
-			agent.addEvent(
-					new GoalEvent(GoalEvent.ADDITION, 
-							new Goal(
-									new Predicate("http_request", 
-											new Term[] { Primitive.newPrimitive(exchange.getRequestMethod()), Primitive.newPrimitive(exchange) } 
-									)
-							)
-					)
-			);
+			agent.addEvent(new GoalEvent(GoalEvent.ADDITION, new Goal(new Predicate("http_request", new Term[] {
+					Primitive.newPrimitive(exchange.getRequestMethod()), Primitive.newPrimitive(exchange) }))));
 		} else {
 			ListTerm args = new ListTerm();
-			for (int i=2; i < path.length; i++) {
+			for (int i = 2; i < path.length; i++) {
 				args.add(Primitive.newPrimitive(path[i]));
 			}
 
 			Goal gl;
-			agent.addEvent(
-					new GoalEvent(GoalEvent.ADDITION, 
-							gl = new Goal(
-									new Predicate(path[1], 
-											new Term[] { 
-													Primitive.newPrimitive(exchange.getRequestMethod()), 
-													Primitive.newPrimitive(exchange), 
-													args
-											} 
-									)
-							)
-					)
-			);
+			agent.addEvent(new GoalEvent(GoalEvent.ADDITION, gl = new Goal(new Predicate(path[1], new Term[] {
+					Primitive.newPrimitive(exchange.getRequestMethod()), Primitive.newPrimitive(exchange), args }))));
 			System.out.println("Goal: " + gl);
 		}
 	}
