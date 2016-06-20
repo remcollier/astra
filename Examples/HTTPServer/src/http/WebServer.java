@@ -1,6 +1,8 @@
 package http;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 
@@ -97,5 +99,26 @@ public class WebServer extends Module {
         OutputStream os = exchange.getResponseBody();
         os.write(response.getBytes());
         os.close();
+	}
+
+	@ACTION
+	public boolean sendView(HttpExchange exchange, String view) {
+		try {
+			exchange.sendResponseHeaders(200, 0l);
+			
+			BufferedInputStream in = new BufferedInputStream(HttpServer.class.getResourceAsStream("/view"+view));
+			
+	        OutputStream os = exchange.getResponseBody();
+	        while (in.available() > 0) {
+	        	os.write(in.read());
+	        }
+	        
+	        os.close();
+	        in.close();
+			return true;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 }

@@ -16,7 +16,7 @@ import astra.statement.*;
 import astra.term.*;
 import astra.type.*;
 import astra.tr.*;
-import astra.util.*;
+import astra.reasoner.util.*;
 
 public class TestController extends ASTRAClass {
 	public TestController() {
@@ -68,23 +68,17 @@ public class TestController extends ASTRAClass {
 			),
 			Predicate.TRUE,
 			new Block(
-				"http.TestController", new int[] {11,88,14,5},
+				"http.TestController", new int[] {11,88,15,5},
 				new Statement[] {
 					new ModuleCall("ws",
-						"http.TestController", new int[] {12,8,12,92},
-						new Predicate("sendHTML", new Term[] {
+						"http.TestController", new int[] {13,8,13,44},
+						new Predicate("sendView", new Term[] {
 							new Variable(new ObjectType(com.sun.net.httpserver.HttpExchange.class), "exchange"),
-							Operator.newOperator('+',
-								Primitive.newPrimitive("<html><body><h1>Hello World: "),
-								Operator.newOperator('+',
-									new Variable(Type.LIST, "args"),
-									Primitive.newPrimitive("</h1></body></html>")
-								)
-							)
+							Primitive.newPrimitive("/Hello.html")
 						}),
 						new ModuleCallAdaptor() {
 							public boolean invoke(Intention intention, Predicate predicate) {
-								return ((http.WebServer) intention.getModule("http.TestController","ws")).sendHTML(
+								return ((http.WebServer) intention.getModule("http.TestController","ws")).sendView(
 									(com.sun.net.httpserver.HttpExchange) intention.evaluate(predicate.getTerm(0)),
 									(java.lang.String) intention.evaluate(predicate.getTerm(1))
 								);

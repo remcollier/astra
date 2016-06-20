@@ -9,7 +9,8 @@ agent TestController {
 	}
 	
 	rule +!test("GET", object<com.sun.net.httpserver.HttpExchange> exchange, list args) {
-		ws.sendHTML(exchange,"<html><body><h1>Hello World: " + args + "</h1></body></html>");
-//		api.sendJSON(exchange,is(["rem", "bob"]));
+//		ws.sendHTML(exchange,"<html><body><h1>Hello World: " + args + "</h1></body></html>");
+		ws.sendView(exchange, "/Hello.html");
+//		ws.sendJSON(exchange,is(["rem", "bob"]));
 	}
 }
