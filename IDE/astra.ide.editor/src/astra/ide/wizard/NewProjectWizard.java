@@ -105,8 +105,7 @@ public class NewProjectWizard extends Wizard implements INewWizard {
 			entries.add(JavaRuntime.getDefaultJREContainerEntry());
 			entries.add(JavaCore.newSourceEntry(srcPath));
 
-			entries.add(JavaCore.newLibraryEntry(getLibrary("astra-interpreter.jar"), null, null));
-			entries.add(JavaCore.newLibraryEntry(getLibrary("astra-apis.jar"), null, null));
+			entries.add(JavaCore.newLibraryEntry(getLibrary("astra.jar"), null, null));
 			entries.add(JavaCore.newLibraryEntry(getLibrary("mas-acre.jar"), null, null));
 			entries.add(JavaCore.newLibraryEntry(getLibrary("cartago.jar"), null, null));
 			entries.add(JavaCore.newLibraryEntry(getLibrary("json-simple-1.1.1.jar"), null, null));

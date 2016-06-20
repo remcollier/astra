@@ -1,10 +1,10 @@
 package astra.statement;
 
 import astra.core.Intention;
+import astra.reasoner.util.ContextEvaluateVisitor;
 import astra.term.ListTerm;
 import astra.term.Term;
 import astra.term.Variable;
-import astra.util.ContextEvaluateVisitor;
 
 public class ForAll extends AbstractStatement {
 	Variable variable;

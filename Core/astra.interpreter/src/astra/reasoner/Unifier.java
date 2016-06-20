@@ -24,6 +24,7 @@ import astra.reasoner.unifier.BeliefEventUnifier;
 import astra.reasoner.unifier.EISEventUnifier;
 import astra.reasoner.unifier.GoalEventUnifier;
 import astra.reasoner.unifier.MessageEventUnifier;
+import astra.reasoner.util.Utilities;
 import astra.term.FormulaTerm;
 import astra.term.Funct;
 import astra.term.ListSplitter;
@@ -31,7 +32,6 @@ import astra.term.ListTerm;
 import astra.term.Term;
 import astra.term.Variable;
 import astra.type.ObjectType;
-import astra.util.Utilities;
 
 /**
  * This class performs unification of various logical formulae: {@link Predicate},

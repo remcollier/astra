@@ -4,13 +4,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import astra.reasoner.util.StringMapper;
 import astra.term.FormulaTerm;
 import astra.term.Funct;
 import astra.term.ListTerm;
 import astra.term.NullTerm;
 import astra.term.Primitive;
 import astra.term.Term;
-import astra.util.StringMapper;
 
 public class Type implements Serializable {
 	private static StringMapper mapper = new StringMapper();

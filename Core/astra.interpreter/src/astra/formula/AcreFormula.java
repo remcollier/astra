@@ -1,8 +1,8 @@
 package astra.formula;
 
+import astra.reasoner.util.BindingsEvaluateVisitor;
+import astra.reasoner.util.LogicVisitor;
 import astra.term.Term;
-import astra.util.BindingsEvaluateVisitor;
-import astra.util.LogicVisitor;
 
 public class AcreFormula implements Formula {
 	Term cid;

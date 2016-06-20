@@ -1,8 +1,8 @@
 package astra.formula;
 
+import astra.reasoner.util.LogicVisitor;
 import astra.term.Term;
 import astra.term.Variable;
-import astra.util.LogicVisitor;
 
 public class Bind implements Formula {
 	private Variable variable;

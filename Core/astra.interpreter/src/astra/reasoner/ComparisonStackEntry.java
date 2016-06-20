@@ -5,8 +5,8 @@ import java.util.Map;
 import astra.formula.Comparison;
 import astra.formula.Formula;
 import astra.formula.Predicate;
+import astra.reasoner.util.BindingsEvaluateVisitor;
 import astra.term.Term;
-import astra.util.BindingsEvaluateVisitor;
 
 public class ComparisonStackEntry implements ReasonerStackEntry {
 	Comparison comparison;

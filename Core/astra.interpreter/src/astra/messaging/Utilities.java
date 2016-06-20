@@ -4,8 +4,8 @@ import java.io.Serializable;
 
 import astra.formula.Formula;
 import astra.formula.Predicate;
+import astra.reasoner.util.LogicVisitor;
 import astra.term.Term;
-import astra.util.LogicVisitor;
 
 public class Utilities {
 	public static class PredicateState implements Formula, Serializable {

@@ -4,9 +4,9 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import astra.formula.Predicate;
+import astra.reasoner.util.BindingsEvaluateVisitor;
 import astra.term.Primitive;
 import astra.term.Term;
-import astra.util.BindingsEvaluateVisitor;
 import cartago.ArtifactId;
 import cartago.Op;
 

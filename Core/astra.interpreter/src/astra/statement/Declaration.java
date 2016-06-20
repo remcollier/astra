@@ -1,9 +1,9 @@
 package astra.statement;
 
 import astra.core.Intention;
+import astra.reasoner.util.ContextEvaluateVisitor;
 import astra.term.Term;
 import astra.term.Variable;
-import astra.util.ContextEvaluateVisitor;
 
 public class Declaration extends AbstractStatement {
 	Variable variable;

@@ -10,10 +10,10 @@ import astra.core.Intention;
 import astra.core.Plan;
 import astra.formula.Predicate;
 import astra.reasoner.Unifier;
+import astra.reasoner.util.ContextEvaluateVisitor;
+import astra.reasoner.util.VariableVisitor;
 import astra.term.Term;
 import astra.term.Variable;
-import astra.util.ContextEvaluateVisitor;
-import astra.util.VariableVisitor;
 
 public class PlanCall extends AbstractStatement {
 	Predicate id;

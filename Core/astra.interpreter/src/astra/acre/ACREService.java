@@ -10,9 +10,9 @@ import java.util.List;
 
 import astra.formula.Predicate;
 import astra.messaging.AstraMessage;
+import astra.reasoner.util.ContentCodec;
 import astra.term.Primitive;
 import astra.term.Term;
-import astra.util.ContentCodec;
 
 public class ACREService {
 	public static AstraMessage messageWithContent(ACREMessage m, Predicate content) {

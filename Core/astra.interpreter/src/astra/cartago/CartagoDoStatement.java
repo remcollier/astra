@@ -4,6 +4,7 @@ import java.util.LinkedList;
 
 import astra.core.Intention;
 import astra.formula.Predicate;
+import astra.reasoner.util.ContextEvaluateVisitor;
 import astra.statement.AbstractStatement;
 import astra.statement.Statement;
 import astra.term.ListTerm;
@@ -11,7 +12,6 @@ import astra.term.Primitive;
 import astra.term.Term;
 import astra.term.Variable;
 import astra.type.Type;
-import astra.util.ContextEvaluateVisitor;
 import cartago.ArtifactId;
 import cartago.Op;
 import cartago.OpFeedbackParam;

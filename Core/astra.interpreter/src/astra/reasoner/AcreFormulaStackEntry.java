@@ -8,9 +8,9 @@ import java.util.Queue;
 
 import astra.formula.AcreFormula;
 import astra.formula.Formula;
+import astra.reasoner.util.BindingsEvaluateVisitor;
+import astra.reasoner.util.Utilities;
 import astra.term.Term;
-import astra.util.BindingsEvaluateVisitor;
-import astra.util.Utilities;
 
 public class AcreFormulaStackEntry implements ReasonerStackEntry {
 	AcreFormula formula;

@@ -1,8 +1,8 @@
 package astra.term;
 
 import astra.formula.Formula;
+import astra.reasoner.util.LogicVisitor;
 import astra.type.Type;
-import astra.util.LogicVisitor;
 
 public class FormulaTerm implements Term {
 	Formula formula;

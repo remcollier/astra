@@ -5,13 +5,13 @@ import astra.formula.Formula;
 import astra.formula.Predicate;
 import astra.messaging.AstraMessage;
 import astra.messaging.MessageService;
+import astra.reasoner.util.ContentCodec;
+import astra.reasoner.util.ContextEvaluateVisitor;
 import astra.term.Funct;
 import astra.term.ListTerm;
 import astra.term.Performative;
 import astra.term.Primitive;
 import astra.term.Term;
-import astra.util.ContentCodec;
-import astra.util.ContextEvaluateVisitor;
 
 public class Send extends AbstractStatement {
 	Term performative;

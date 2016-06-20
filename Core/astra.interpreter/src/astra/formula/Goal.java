@@ -1,7 +1,7 @@
 package astra.formula;
 
+import astra.reasoner.util.LogicVisitor;
 import astra.term.Variable;
-import astra.util.LogicVisitor;
 
 public class Goal implements Formula {
 	private Predicate predicate;

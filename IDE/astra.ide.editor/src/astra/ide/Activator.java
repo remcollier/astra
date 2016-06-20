@@ -43,11 +43,9 @@ public class Activator extends AbstractUIPlugin {
 		// Create the folder
 		
 		new File(location.toString()).mkdirs();
-		JarCopier.copy(location, "astra-interpreter.jar");
-		JarCopier.copy(location, "astra-apis.jar");
+		JarCopier.copy(location, "astra.jar");
 		JarCopier.copy(location, "eis-0.3.jar");
 		JarCopier.copy(location, "eis-0.5.jar");
-//		JarCopier.copy(location, "eis.jar");
 		JarCopier.copy(location, "cartago.jar");
 		JarCopier.copy(location, "mas-acre.jar");
 		JarCopier.copy(location, "cartago-artifacts.jar");

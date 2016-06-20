@@ -31,10 +31,10 @@ import astra.core.Agent;
 import astra.formula.AcreFormula;
 import astra.formula.Formula;
 import astra.reasoner.Queryable;
+import astra.reasoner.util.LogicUtilities;
 import astra.term.Performative;
 import astra.term.Primitive;
 import astra.term.Variable;
-import astra.util.LogicUtilities;
 
 public class AcreAPI implements Observer,Queryable {
 	private ConversationManager conversationManager;

@@ -2,8 +2,8 @@ package astra.cartago;
 
 import astra.formula.Formula;
 import astra.formula.Predicate;
+import astra.reasoner.util.LogicVisitor;
 import astra.term.Term;
-import astra.util.LogicVisitor;
 
 public class CartagoProperty implements Formula {
 	Term target;

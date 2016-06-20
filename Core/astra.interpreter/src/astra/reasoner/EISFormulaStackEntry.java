@@ -9,9 +9,9 @@ import java.util.Queue;
 import astra.eis.EISFormula;
 import astra.formula.Formula;
 import astra.formula.Predicate;
+import astra.reasoner.util.BindingsEvaluateVisitor;
+import astra.reasoner.util.Utilities;
 import astra.term.Term;
-import astra.util.BindingsEvaluateVisitor;
-import astra.util.Utilities;
 
 public class EISFormulaStackEntry implements ReasonerStackEntry {
 	EISFormula formula;

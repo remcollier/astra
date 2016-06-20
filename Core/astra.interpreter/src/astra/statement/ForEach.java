@@ -6,10 +6,10 @@ import java.util.Map;
 
 import astra.core.Intention;
 import astra.formula.Formula;
+import astra.reasoner.util.ContextEvaluateVisitor;
+import astra.reasoner.util.VariableVisitor;
 import astra.term.Term;
 import astra.term.Variable;
-import astra.util.ContextEvaluateVisitor;
-import astra.util.VariableVisitor;
 
 public class ForEach extends AbstractStatement {
 	Formula guard;

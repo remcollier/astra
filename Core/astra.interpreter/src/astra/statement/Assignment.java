@@ -2,9 +2,9 @@ package astra.statement;
 
 import astra.core.Intention;
 import astra.core.UnboundVariableException;
+import astra.reasoner.util.ContextEvaluateVisitor;
 import astra.term.Term;
 import astra.term.Variable;
-import astra.util.ContextEvaluateVisitor;
 
 public class Assignment extends AbstractStatement {
 	Variable variable;

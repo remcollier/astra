@@ -162,7 +162,7 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 				.append("import astra.term.*;\n")
 				.append("import astra.type.*;\n")
 				.append("import astra.tr.*;\n")
-				.append("import astra.util.*;\n\n");
+				.append("import astra.reasoner.util.*;\n\n");
 
 		qualifiedName = element.getClassDeclaration().name();
 		fullName += qualifiedName;

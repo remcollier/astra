@@ -3,12 +3,12 @@ package astra.eis;
 import astra.core.AbstractTask;
 import astra.core.Intention;
 import astra.formula.Predicate;
+import astra.reasoner.util.ContextEvaluateVisitor;
 import astra.statement.AbstractStatement;
 import astra.statement.Statement;
 import astra.statement.StatementHandler;
 import astra.term.Primitive;
 import astra.term.Term;
-import astra.util.ContextEvaluateVisitor;
 
 public class EISCall extends AbstractStatement {
 	private Term id;

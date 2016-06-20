@@ -4,8 +4,8 @@ import java.util.Map;
 
 import astra.core.Intention;
 import astra.formula.Formula;
+import astra.reasoner.util.ContextEvaluateVisitor;
 import astra.term.Term;
-import astra.util.ContextEvaluateVisitor;
 
 public class While extends AbstractStatement {
 	Formula guard;

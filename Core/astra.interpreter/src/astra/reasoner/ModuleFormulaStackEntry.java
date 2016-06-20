@@ -4,8 +4,8 @@ import java.util.Map;
 
 import astra.formula.Formula;
 import astra.formula.ModuleFormula;
+import astra.reasoner.util.BindingsEvaluateVisitor;
 import astra.term.Term;
-import astra.util.BindingsEvaluateVisitor;
 
 public class ModuleFormulaStackEntry implements ReasonerStackEntry {
 	private ModuleFormula formula;

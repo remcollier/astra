@@ -13,9 +13,9 @@ import astra.eis.EISAgent;
 import astra.formula.Formula;
 import astra.formula.Predicate;
 import astra.reasoner.Unifier;
+import astra.reasoner.util.BindingsEvaluateVisitor;
 import astra.term.Primitive;
 import astra.term.Term;
-import astra.util.BindingsEvaluateVisitor;
 
 public class TRContext {
 	List<Predicate> trace = new LinkedList<Predicate>();

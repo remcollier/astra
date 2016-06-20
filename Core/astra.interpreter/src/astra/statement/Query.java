@@ -5,9 +5,9 @@ import java.util.Map.Entry;
 
 import astra.core.Intention;
 import astra.formula.Formula;
+import astra.reasoner.util.ContextEvaluateVisitor;
 import astra.term.Term;
 import astra.term.Variable;
-import astra.util.ContextEvaluateVisitor;
 
 public class Query extends AbstractStatement {
 	Formula guard;

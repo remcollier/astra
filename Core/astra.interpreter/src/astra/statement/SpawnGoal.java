@@ -3,7 +3,7 @@ package astra.statement;
 import astra.core.Intention;
 import astra.event.GoalEvent;
 import astra.formula.Goal;
-import astra.util.ContextEvaluateVisitor;
+import astra.reasoner.util.ContextEvaluateVisitor;
 
 public class SpawnGoal extends AbstractStatement {
 	Goal goal;

@@ -2,7 +2,7 @@ package astra.term;
 
 import astra.core.Intention;
 import astra.formula.Predicate;
-import astra.util.BindingsEvaluateVisitor;
+import astra.reasoner.util.BindingsEvaluateVisitor;
 
 public abstract class ModuleTermAdaptor {
 	public abstract Object invoke(Intention context, Predicate atom);

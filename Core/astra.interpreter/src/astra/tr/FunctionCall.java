@@ -3,8 +3,8 @@ package astra.tr;
 import java.util.Map;
 
 import astra.formula.Predicate;
+import astra.reasoner.util.BindingsEvaluateVisitor;
 import astra.term.Term;
-import astra.util.BindingsEvaluateVisitor;
 
 public class FunctionCall extends AbstractAction {
 	Predicate call;

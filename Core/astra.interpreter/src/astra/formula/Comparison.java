@@ -1,7 +1,7 @@
 package astra.formula;
 
+import astra.reasoner.util.LogicVisitor;
 import astra.term.Term;
-import astra.util.LogicVisitor;
 
 
 public class Comparison implements Formula {

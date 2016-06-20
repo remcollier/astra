@@ -25,6 +25,7 @@ import astra.messaging.AstraMessage;
 import astra.messaging.MessageEvent;
 import astra.reasoner.Reasoner;
 import astra.reasoner.ResolutionBasedReasoner;
+import astra.reasoner.util.ContentCodec;
 import astra.term.Funct;
 import astra.term.ListTerm;
 import astra.term.Performative;
@@ -32,7 +33,6 @@ import astra.term.Primitive;
 import astra.term.Term;
 import astra.tr.Function;
 import astra.tr.TRContext;
-import astra.util.ContentCodec;
 import is.lill.acre.message.ACREMessage;
 import is.lill.acre.protocol.ProtocolManager;
 

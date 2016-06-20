@@ -2,8 +2,8 @@ package astra.term;
 
 import java.io.Serializable;
 
+import astra.reasoner.util.LogicVisitor;
 import astra.type.Type;
-import astra.util.LogicVisitor;
 
 public interface Term extends Serializable {
 

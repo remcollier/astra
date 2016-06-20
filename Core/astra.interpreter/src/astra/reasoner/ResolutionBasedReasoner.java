@@ -19,9 +19,9 @@ import astra.formula.ModuleFormula;
 import astra.formula.NOT;
 import astra.formula.OR;
 import astra.formula.Predicate;
+import astra.reasoner.util.Utilities;
+import astra.reasoner.util.VariableVisitor;
 import astra.term.Term;
-import astra.util.Utilities;
-import astra.util.VariableVisitor;
 
 public class ResolutionBasedReasoner implements Reasoner {
 	public static final int MAX_DEPTH 										= 200;

@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import astra.formula.Bind;
+import astra.reasoner.util.BindingsEvaluateVisitor;
+import astra.reasoner.util.Utilities;
 import astra.term.Term;
-import astra.util.BindingsEvaluateVisitor;
-import astra.util.Utilities;
 
 public class BindStackEntry implements ReasonerStackEntry {
 	Map<Integer, Term> bindings;

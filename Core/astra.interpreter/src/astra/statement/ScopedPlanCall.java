@@ -6,8 +6,8 @@ import astra.core.Intention;
 import astra.core.Plan;
 import astra.formula.Predicate;
 import astra.reasoner.Unifier;
+import astra.reasoner.util.ContextEvaluateVisitor;
 import astra.term.Term;
-import astra.util.ContextEvaluateVisitor;
 
 public class ScopedPlanCall extends AbstractStatement {
 	String scope;

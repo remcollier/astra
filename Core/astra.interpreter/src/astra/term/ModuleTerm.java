@@ -2,10 +2,10 @@ package astra.term;
 
 import astra.core.Intention;
 import astra.formula.Predicate;
+import astra.reasoner.util.BindingsEvaluateVisitor;
+import astra.reasoner.util.ContextEvaluateVisitor;
+import astra.reasoner.util.LogicVisitor;
 import astra.type.Type;
-import astra.util.BindingsEvaluateVisitor;
-import astra.util.ContextEvaluateVisitor;
-import astra.util.LogicVisitor;
 
 
 

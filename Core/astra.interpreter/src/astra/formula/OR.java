@@ -1,6 +1,6 @@
 package astra.formula;
 
-import astra.util.LogicVisitor;
+import astra.reasoner.util.LogicVisitor;
 
 public class OR implements Formula {
 	Formula left;

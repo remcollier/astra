@@ -3,7 +3,7 @@ package astra.statement;
 import astra.core.AbstractTask;
 import astra.core.Intention;
 import astra.formula.Predicate;
-import astra.util.VariableVisitor;
+import astra.reasoner.util.VariableVisitor;
 
 
 

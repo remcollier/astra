@@ -1,8 +1,8 @@
 package astra.term;
 
+import astra.reasoner.util.LogicVisitor;
+import astra.reasoner.util.StringMapper;
 import astra.type.Type;
-import astra.util.LogicVisitor;
-import astra.util.StringMapper;
 
 public class Performative implements Term {
 	private static StringMapper mapper = new StringMapper();

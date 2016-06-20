@@ -5,7 +5,7 @@ import astra.event.GoalEvent;
 import astra.event.ScopedGoalEvent;
 import astra.formula.Goal;
 import astra.formula.ScopedGoal;
-import astra.util.ContextEvaluateVisitor;
+import astra.reasoner.util.ContextEvaluateVisitor;
 
 public class ScopedSpawnGoal extends AbstractStatement {
 	String scope;

@@ -2,7 +2,7 @@ package astra.statement;
 
 import astra.core.Intention;
 import astra.formula.Predicate;
-import astra.util.ContextEvaluateVisitor;
+import astra.reasoner.util.ContextEvaluateVisitor;
 
 public class TRStop extends AbstractStatement {
 	Predicate function;

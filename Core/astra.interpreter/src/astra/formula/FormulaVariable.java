@@ -1,7 +1,7 @@
 package astra.formula;
 
+import astra.reasoner.util.LogicVisitor;
 import astra.term.Variable;
-import astra.util.LogicVisitor;
 
 public class FormulaVariable implements Formula {
 	private Variable variable;

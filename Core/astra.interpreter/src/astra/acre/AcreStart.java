@@ -15,6 +15,7 @@ import astra.core.Intention;
 import astra.formula.Predicate;
 import astra.messaging.AstraMessage;
 import astra.messaging.MessageService;
+import astra.reasoner.util.ContextEvaluateVisitor;
 import astra.statement.AbstractStatement;
 import astra.statement.Statement;
 import astra.statement.StatementHandler;
@@ -22,7 +23,6 @@ import astra.term.Performative;
 import astra.term.Primitive;
 import astra.term.Term;
 import astra.term.Variable;
-import astra.util.ContextEvaluateVisitor;
 
 public class AcreStart extends AbstractStatement {
 	private Term protocol;

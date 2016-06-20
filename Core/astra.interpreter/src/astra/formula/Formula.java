@@ -2,7 +2,7 @@ package astra.formula;
 
 import java.io.Serializable;
 
-import astra.util.LogicVisitor;
+import astra.reasoner.util.LogicVisitor;
 
 public interface Formula extends Serializable {
 

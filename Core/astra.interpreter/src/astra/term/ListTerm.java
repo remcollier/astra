@@ -7,8 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import astra.reasoner.util.LogicVisitor;
 import astra.type.Type;
-import astra.util.LogicVisitor;
 
 public class ListTerm implements Term, List<Term> {
 	/**

@@ -1,7 +1,7 @@
 package astra.term;
 
+import astra.reasoner.util.LogicVisitor;
 import astra.type.Type;
-import astra.util.LogicVisitor;
 
 public class Operator implements Term {
 	public static final char PLUS							= '+'; 

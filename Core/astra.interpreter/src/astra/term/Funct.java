@@ -2,9 +2,9 @@ package astra.term;
 
 import astra.formula.Formula;
 import astra.formula.Predicate;
+import astra.reasoner.util.LogicVisitor;
+import astra.reasoner.util.StringMapper;
 import astra.type.Type;
-import astra.util.LogicVisitor;
-import astra.util.StringMapper;
 
 public class Funct implements Term {
 	private static StringMapper mapper;

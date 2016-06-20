@@ -2,8 +2,8 @@ package astra.statement;
 
 import astra.core.Intention;
 import astra.formula.Predicate;
+import astra.reasoner.util.ContextEvaluateVisitor;
 import astra.term.Term;
-import astra.util.ContextEvaluateVisitor;
 
 public class ScopedBeliefUpdate extends AbstractStatement {
 	String scope;

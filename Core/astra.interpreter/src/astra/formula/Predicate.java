@@ -1,8 +1,8 @@
 package astra.formula;
 
+import astra.reasoner.util.LogicVisitor;
+import astra.reasoner.util.StringMapper;
 import astra.term.Term;
-import astra.util.LogicVisitor;
-import astra.util.StringMapper;
 
 public class Predicate implements Formula {
 	public static final Predicate TRUE = new Predicate("true");

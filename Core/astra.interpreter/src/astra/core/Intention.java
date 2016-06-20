@@ -16,6 +16,8 @@ import astra.formula.Formula;
 import astra.formula.Goal;
 import astra.formula.Predicate;
 import astra.formula.ScopedGoal;
+import astra.reasoner.util.ContextEvaluateVisitor;
+import astra.reasoner.util.VariableVisitor;
 import astra.statement.Block;
 import astra.statement.PlanCall;
 import astra.statement.StatementHandler;
@@ -26,8 +28,6 @@ import astra.term.Operator;
 import astra.term.Primitive;
 import astra.term.Term;
 import astra.term.Variable;
-import astra.util.ContextEvaluateVisitor;
-import astra.util.VariableVisitor;
 
 public class Intention {
 	class Entry<T> {

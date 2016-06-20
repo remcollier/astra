@@ -1,6 +1,6 @@
 package astra.formula;
 
-import astra.util.LogicVisitor;
+import astra.reasoner.util.LogicVisitor;
 
 public class ScopedGoal implements Formula {
 	private String scope;

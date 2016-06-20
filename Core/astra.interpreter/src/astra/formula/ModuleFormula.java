@@ -1,7 +1,7 @@
 package astra.formula;
 
-import astra.util.BindingsEvaluateVisitor;
-import astra.util.LogicVisitor;
+import astra.reasoner.util.BindingsEvaluateVisitor;
+import astra.reasoner.util.LogicVisitor;
 
 public class ModuleFormula implements Formula {
 	String module;

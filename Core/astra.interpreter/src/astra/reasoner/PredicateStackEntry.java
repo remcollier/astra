@@ -9,10 +9,10 @@ import java.util.Queue;
 import astra.formula.Formula;
 import astra.formula.Inference;
 import astra.formula.Predicate;
+import astra.reasoner.util.BindingsEvaluateVisitor;
+import astra.reasoner.util.RenameVisitor;
+import astra.reasoner.util.Utilities;
 import astra.term.Term;
-import astra.util.BindingsEvaluateVisitor;
-import astra.util.RenameVisitor;
-import astra.util.Utilities;
 
 public class PredicateStackEntry implements ReasonerStackEntry {
 	private static long counter 											= 0;

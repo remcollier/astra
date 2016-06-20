@@ -17,9 +17,9 @@ import astra.formula.Inference;
 import astra.formula.Predicate;
 import astra.reasoner.Queryable;
 import astra.reasoner.Unifier;
+import astra.reasoner.util.VariableVisitor;
 import astra.term.Term;
 import astra.tr.Function;
-import astra.util.VariableVisitor;
 
 public abstract class ASTRAClass implements Queryable {
 	Map<String, List<Rule>> rules = new HashMap<String, List<Rule>>();

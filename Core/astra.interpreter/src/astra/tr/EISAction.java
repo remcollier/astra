@@ -5,9 +5,9 @@ import java.util.Map;
 import astra.core.AbstractTask;
 import astra.eis.EISAgent;
 import astra.formula.Predicate;
+import astra.reasoner.util.BindingsEvaluateVisitor;
 import astra.term.Primitive;
 import astra.term.Term;
-import astra.util.BindingsEvaluateVisitor;
 import eis.exceptions.ActException;
 import eis.exceptions.NoEnvironmentException;
 
