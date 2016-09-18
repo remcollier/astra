@@ -189,7 +189,7 @@ public class ContentCodec {
 		System.out.println(json);
 
 		Formula f = ContentCodec.getInstance().decode(json);
-		System.out.println("predicate: " + f);
+		System.out.println("predicate: " + f.toString());
 	}
 
 }

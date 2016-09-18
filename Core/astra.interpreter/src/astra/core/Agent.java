@@ -1,5 +1,6 @@
 package astra.core;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -23,6 +24,7 @@ import astra.formula.Predicate;
 import astra.formula.ScopedGoal;
 import astra.messaging.AstraMessage;
 import astra.messaging.MessageEvent;
+import astra.reasoner.Queryable;
 import astra.reasoner.Reasoner;
 import astra.reasoner.ResolutionBasedReasoner;
 import astra.reasoner.util.ContentCodec;
@@ -33,6 +35,8 @@ import astra.term.Primitive;
 import astra.term.Term;
 import astra.tr.Function;
 import astra.tr.TRContext;
+import astra.trace.TraceEvent;
+import astra.trace.TraceManager;
 import is.lill.acre.message.ACREMessage;
 import is.lill.acre.protocol.ProtocolManager;
 
@@ -86,17 +90,11 @@ public class Agent {
 	
 	private List<SensorAdaptor> sensorArray = new LinkedList<SensorAdaptor>();
 
-	// CARTAGO Interface
-	private CartagoAPI cartagoAPI;
-	
 	// ACRE Interface
 	private AcreAPI acreAPI;
 	public static final ProtocolManager protocolManager = new ProtocolManager();
 	private boolean useAcre = false; 
 
-	// EIS Interface
-	private Map<String, EISAgent> eisAgents = new HashMap<String, EISAgent>();
-	private String defaultEnvironment;
 	private boolean debugging = false;
 	
 	/**
@@ -108,26 +106,26 @@ public class Agent {
 	 *
 	 */
 	public static class Notification {
-		Intention Intention;
+		Intention intention;
 		String message;
 		Throwable th;
 
-		public Notification(Intention Intention, String message) {
-			this.Intention = Intention;
+		public Notification(Intention intention, String message) {
+			this.intention = intention;
 			this.message = message;
 		}
 
 		public Notification(Intention Intention, String message, Throwable th) {
-			this.Intention = Intention;
+			this.intention = Intention;
 			this.message = message;
 			this.th = th;
 		}
 		
 		public void evaluate() {
 			if (message != null) {
-				Intention.failed(message, th);
+				intention.failed(message, th);
 			}
-			Intention.resume();
+			intention.resume();
 		}
 	}
 	
@@ -140,23 +138,11 @@ public class Agent {
 		
 		acreAPI = new AcreAPI(this);
 		reasoner.addSource(acreAPI);
+		TraceManager.getInstance().recordEvent(new TraceEvent(TraceEvent.NEW_AGENT, Calendar.getInstance().getTime(), this));
 	}
 	
-	public boolean linkToEISService(String id, EISService service) {
-		if (eisAgents.containsKey(id)) return false;
-		
-		EISAgent agt = new EISAgent(this, service);
-		synchronized (reasoner) {
-			reasoner.addSource(agt);
-			eisAgents.put(id, agt);
-			defaultEnvironment = id;
-		}
-		return true;
-	}
-	
-	public void linkToCartago() {
-		cartagoAPI = new CartagoAPI();
-		cartagoAPI.start(this);
+	public void addSource(Queryable source) {
+		reasoner.addSource(source);
 	}
 	
 	public String name() {
@@ -270,6 +256,8 @@ public class Agent {
 		for (Predicate predicate : activeFunctions) {
 			new TRContext(this, predicate).execute();
 		}
+		
+		TraceManager.getInstance().recordEvent(new TraceEvent(TraceEvent.END_OF_CYCLE, Calendar.getInstance().getTime(), this));
 	}
 	
 	private synchronized Intention getNextIntention() {
@@ -438,7 +426,7 @@ public class Agent {
 	}
 	
 	public synchronized boolean isActive() {
-		if (!clazz.hasFunctions() && eisAgents.isEmpty()) {
+		if (!clazz.hasFunctions()) {
 			return !eventQueue.isEmpty() || !intentions.isEmpty() || (!sensorArray.isEmpty()) || beliefManager.hasUpdates() || !activeFunctions.isEmpty();
 		}
 		return true;
@@ -477,10 +465,6 @@ public class Agent {
 		}
 		return null;
 	}
-		
-	public CartagoAPI getCartagoAPI() {
-		return cartagoAPI;
-	}
 
 	public Plan getPlan(String scope, Predicate id) {
 		Plan plan;
@@ -514,22 +498,6 @@ public class Agent {
 
 	public AcreAPI getAcreAPI() {
 		return acreAPI;
-	}
-
-	public Map<String, EISAgent> eisAgents() {
-		return eisAgents;
-	}
-
-	public EISAgent defaultEISAgent() {
-		return eisAgents.get(defaultEnvironment);
-	}
-	
-	public void defaultEnvironment(String defaultEnvironment) {
-		this.defaultEnvironment = defaultEnvironment;
-	}
-
-	public String defaultEnvironment() {
-		return defaultEnvironment;
 	}
 
 	public Intention intention() {

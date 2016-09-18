@@ -4,13 +4,14 @@ import astra.formula.Formula;
 import astra.formula.Predicate;
 import astra.reasoner.util.LogicVisitor;
 import astra.term.Term;
+import cartago.ArtifactId;
 
 public class CartagoProperty implements Formula {
-	Term target;
+	ArtifactId aid;
 	Predicate content;
 	
-	public CartagoProperty(Term target, Predicate content) {
-		this.target = target;
+	public CartagoProperty(ArtifactId aid, Predicate content) {
+		this.aid = aid;
 		this.content = content;
 	}
 
@@ -27,16 +28,20 @@ public class CartagoProperty implements Formula {
 		return content;
 	}
 
-	public Term target() {
-		return target;
+	public ArtifactId target() {
+		return aid;
 	}
 
 	@Override
 	public boolean matches(Formula formula) {
 		if (formula instanceof CartagoProperty) {
 			CartagoProperty p = (CartagoProperty) formula;
-			return target.matches(p.target) && content.matches(p.content);
+			return aid.equals(p.aid) && content.matches(p.content);
 		}
 		return false;
+	}
+	
+	public String toString() {
+		return "CARTAGO."+content.toString();
 	}
 }

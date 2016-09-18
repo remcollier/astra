@@ -3,6 +3,7 @@ package astra.tr;
 import java.util.LinkedList;
 import java.util.Map;
 
+import astra.cartago.CartagoAPI;
 import astra.formula.Predicate;
 import astra.reasoner.util.BindingsEvaluateVisitor;
 import astra.term.Primitive;
@@ -36,7 +37,7 @@ public class CartagoAction extends AbstractAction {
 			public boolean execute(final TRContext context, final Map<Integer, Term> bindings) {
 				Predicate activity = (Predicate) action.accept(new BindingsEvaluateVisitor(bindings,context.agent));
 				// ATTEMPT CARTAGO ACTION...
-				LinkedList<Object> list = context.getCartagoAPI().getArguments(activity);
+				LinkedList<Object> list = CartagoAPI.get(context.agent).getArguments(activity);
 				
 				Op operation = null;
 				if (list.isEmpty()) {
@@ -54,9 +55,9 @@ public class CartagoAction extends AbstractAction {
 							Object o = ((Primitive<?>) obj).value();
 							if (o instanceof ArtifactId) {
 								ArtifactId artId = (ArtifactId) o;
-								context.getCartagoAPI().getSession().doAction(artId, operation, null, -1);
+								CartagoAPI.get(context.agent).getSession().doAction(artId, operation, null, -1);
 							} else if (o instanceof String) {
-								context.getCartagoAPI().getSession().doAction(o.toString(), operation, null, -1);
+								CartagoAPI.get(context.agent).getSession().doAction(o.toString(), operation, null, -1);
 							} else {
 								System.err.println("Could not handle artifact id type: " + obj.getClass().getName());
 								return false;
@@ -66,7 +67,7 @@ public class CartagoAction extends AbstractAction {
 							return false;
 						}
 					} else {
-						context.getCartagoAPI().getSession().doAction(operation, null, -1);
+						CartagoAPI.get(context.agent).getSession().doAction(operation, null, -1);
 					}
 				} catch (Throwable th) {
 					th.printStackTrace();

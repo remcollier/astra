@@ -18,8 +18,6 @@ import astra.ast.element.RuleElement;
 import astra.ast.element.TypesElement;
 import astra.ast.event.AdvancedAcreEvent;
 import astra.ast.event.BasicAcreEvent;
-import astra.ast.event.CartagoEvent;
-import astra.ast.event.EISEvent;
 import astra.ast.event.MessageEvent;
 import astra.ast.event.ModuleEvent;
 import astra.ast.event.UpdateEvent;
@@ -27,9 +25,7 @@ import astra.ast.formula.AcreFormula;
 import astra.ast.formula.AndFormula;
 import astra.ast.formula.BindFormula;
 import astra.ast.formula.BracketFormula;
-import astra.ast.formula.CartagoFormula;
 import astra.ast.formula.ComparisonFormula;
-import astra.ast.formula.EISFormula;
 import astra.ast.formula.FormulaVariable;
 import astra.ast.formula.GoalFormula;
 import astra.ast.formula.ModuleFormula;
@@ -44,9 +40,7 @@ import astra.ast.statement.AcreDenyCancelStatement;
 import astra.ast.statement.AcreStartStatement;
 import astra.ast.statement.AssignmentStatement;
 import astra.ast.statement.BlockStatement;
-import astra.ast.statement.CartagoStatement;
 import astra.ast.statement.DeclarationStatement;
-import astra.ast.statement.EISStatement;
 import astra.ast.statement.ForAllStatement;
 import astra.ast.statement.ForEachStatement;
 import astra.ast.statement.IfStatement;
@@ -76,7 +70,6 @@ import astra.ast.term.ModuleTerm;
 import astra.ast.term.Operator;
 import astra.ast.term.QueryTerm;
 import astra.ast.term.Variable;
-import astra.ast.tr.EISAction;
 import astra.ast.tr.FunctionCallAction;
 import astra.ast.tr.TRModuleCallAction;
 import astra.ast.tr.TRRuleElement;
@@ -287,34 +280,34 @@ public class ASTRAParser {
 			} else {
 				return new FunctionCallAction(createPredicate(tokens), first, last,tokenizer.getSource(first,last));
 			}
-		} else if (first.type == Token.EIS) {
-			ITerm id = null;
-			ITerm entity = null;
-			if (last.type != Token.RIGHT_BRACKET) throw new ParseException("Malformed Formula: EIS(<env-id>[,<entity>])->predicate(...)", first, last);
-			
-			List<Token> list = splitAt(tokens, new int[] {Token.PERIOD});
-			Token tok2 = list.get(0);
-			if (tok2.type == Token.LEFT_BRACKET) {
-				List<ITerm> terms = getTermList(list.subList(1, list.size()-2), false);
-				if (terms.size() > 2) throw new ParseException("Malformed Formula: EIS(<env-id>[,<entity>])->predicate(...)", first, last);
-
-				if (terms.get(0) instanceof Variable || (terms.get(0) instanceof Literal && terms.get(0).type().type() == Token.STRING)) {
-					id = terms.get(0);
-				} else {
-					throw new ParseException("Malformed Formula: EIS(<env-id>[,<entity>])->predicate(...)", first, last);
-				}
-				
-				if (terms.size() == 2) {
-					if (terms.get(1) instanceof Variable || (terms.get(1) instanceof Literal && terms.get(1).type().type() == Token.STRING)) {
-						entity = terms.get(1);
-					} else {
-						new ParseException("Second argument of the EIS formula must be a bound Variable or a String", first, last);
-					}
-				}
-			}
-			
-			return new EISAction(id, entity, createPredicate(tokens), 
-					first, last, tokenizer.getSource(first, last));
+//		} else if (first.type == Token.EIS) {
+//			ITerm id = null;
+//			ITerm entity = null;
+//			if (last.type != Token.RIGHT_BRACKET) throw new ParseException("Malformed Formula: EIS(<env-id>[,<entity>])->predicate(...)", first, last);
+//			
+//			List<Token> list = splitAt(tokens, new int[] {Token.PERIOD});
+//			Token tok2 = list.get(0);
+//			if (tok2.type == Token.LEFT_BRACKET) {
+//				List<ITerm> terms = getTermList(list.subList(1, list.size()-2), false);
+//				if (terms.size() > 2) throw new ParseException("Malformed Formula: EIS(<env-id>[,<entity>])->predicate(...)", first, last);
+//
+//				if (terms.get(0) instanceof Variable || (terms.get(0) instanceof Literal && terms.get(0).type().type() == Token.STRING)) {
+//					id = terms.get(0);
+//				} else {
+//					throw new ParseException("Malformed Formula: EIS(<env-id>[,<entity>])->predicate(...)", first, last);
+//				}
+//				
+//				if (terms.size() == 2) {
+//					if (terms.get(1) instanceof Variable || (terms.get(1) instanceof Literal && terms.get(1).type().type() == Token.STRING)) {
+//						entity = terms.get(1);
+//					} else {
+//						new ParseException("Second argument of the EIS formula must be a bound Variable or a String", first, last);
+//					}
+//				}
+//			}
+//			
+//			return new EISAction(id, entity, createPredicate(tokens), 
+//					first, last, tokenizer.getSource(first, last));
 		} else if (first.type == Token.PLUS || first.type == Token.MINUS) {
 			tokens.remove(0);
 			return new UpdateAction(first.token, createPredicate(tokens),
@@ -613,41 +606,7 @@ public class ASTRAParser {
 				list.add(0, tok);
 				return new SubGoalStatement(createGoal(list),
 						first, last, tokenizer.getSource(first, last));
-			}			
-		case Token.EIS:
-			ITerm id = null;
-			ITerm entity = null;
-			
-			t_list = splitAt(tokens, new int[] {Token.SEMI_COLON});
-			semiColonCheck(t_list);
-			
-			list = splitAt(t_list, new int[] {Token.PERIOD});
-			tok2 = list.get(0);
-			if (tok2.type == Token.LEFT_BRACKET && list.get(list.size()-2).type == Token.RIGHT_BRACKET) {
-				terms = getTermList(list.subList(1, list.size()-2), false);
-				if (terms.size() > 2) throw new ParseException("Malformed Formula: EIS([<env-id>,]<entity>).predicate(...)", first, last);
-
-				if (terms.get(0) instanceof Variable || (terms.get(0) instanceof Literal && terms.get(0).type().type() == Token.STRING)) {
-					entity = terms.get(0);
-				} else {
-					throw new ParseException("Malformed Formula: EIS([<env-id>,]<entity>).predicate(...)", first, last);
-				}
-				
-				if (terms.size() == 2) {
-					if (terms.get(1) instanceof Variable || (terms.get(1) instanceof Literal && terms.get(1).type().type() == Token.STRING)) {
-						id = entity;
-						entity = terms.get(1);
-					} else {
-						new ParseException("Second argument of the EIS formula must be a bound Variable or a String", first, last);
-					}
-				}
-			} else if (tok2.type != Token.PERIOD) {
-				throw new ParseException("Malformed Formula: EIS([<env-id>,]<entity>).predicate(...)", first, last);
 			}
-			
-			if (t_list.get(0).type != Token.IDENTIFIER) throw new ParseException("Malformed Formula: EIS([<env-id>,]<entity>).predicate(...)", first, last);
-			return new EISStatement(id, entity, createPredicate(t_list), 
-					first, last, tokenizer.getSource(first, last));
 		case Token.ACRE_START:
 			tok2 = tokens.remove(0);
 			if (tok2.type != Token.LEFT_BRACKET) {
@@ -736,32 +695,6 @@ public class ASTRAParser {
 			
 			return new AcreDenyCancelStatement(createTerm(tokens.subList(1, tokens.size()-1)),
 					tok, tok2, tokenizer.getSource(tok, tok2));
-		case Token.CARTAGO:
-			ITerm artifact = null;
-			
-			t_list = splitAt(tokens, new int[] {Token.SEMI_COLON});
-			last = getLast(t_list);
-			
-			if (last.type != Token.SEMI_COLON) throw new ParseException("Missing Semi-colon", first, last);
-			t_list.remove(t_list.size()-1);
-			
-			list = splitAt(t_list, new int[] {Token.PERIOD});
-			
-			tok2 = list.get(0);
-			if (tok2.type == Token.LEFT_BRACKET) {
-				terms = getTermList(list.subList(1, list.size()-2), false);
-				if (terms.size() > 1) 
-					throw new ParseException("Malformed Statement: CARTAGO[(<env-id>[,<entity>])].action(...)", first, last);
-
-				if (terms.get(0) instanceof Variable || 
-						(terms.get(0) instanceof Literal && (terms.get(0).type().type() == Token.STRING || terms.get(0).type().type() == Token.OBJECT))) {
-					artifact = terms.get(0);
-				} else {
-					throw new ParseException("Malformed Statement: CARTAGO[(<env-id>[,<entity>])].action(...)", first, last);
-				}
-			}
-			return new CartagoStatement(artifact, createPredicate(t_list), 
-					first, last, tokenizer.getSource(first, last));
 		case Token.PLUS:
 		case Token.MINUS:
 			list = splitAt(tokens, new int[] {Token.SEMI_COLON});
@@ -862,36 +795,20 @@ public class ASTRAParser {
 		Token last = tokens.get(tokens.size() - 1);
 
 		Token tok = tokens.remove(0);
+		if (tokens.get(0).type == Token.DOLLAR) {
+			// We have a symbol prefixing an event token....
+			// first refers to this prefix, so update tok to refer to
+			// the dollar token so the switch goes to the correct section...
+			tok = tokens.remove(0);
+		}
+		
 		switch ( tok.type ) {
 		case Token.PLUS:
 		case Token.MINUS:
-			Token tok2 = tokens.get(0);
-			if (tok2.type == Token.EIS_EVT) {
-				tok2 = tokens.get(1);
-				if (tok2.type != Token.LEFT_BRACKET) {
-					throw new ParseException("Malformed EIS Event: <op>@eis(<id>, <entity>, <formula>)", first, last);
-				}
-				if (last.type != Token.RIGHT_BRACKET) {
-					throw new ParseException("Malformed EIS Event: <op>@eis(<id>, <entity>, <formula>)", first, last);
-				}
-				
-				tokens.remove(0);
-				tokens.remove(0);
-				List<ITerm> terms = getTermList(tokens.subList(0, tokens.size()-1), true);
-				if (terms.size() != 2) {
-					throw new ParseException("Malformed EIS Event: <op>@eis(<id>, <entity>, <formula>)", first, last);
-				}
-
-				return new EISEvent(tok.type == Token.PLUS ? EISEvent.ADDITION:EISEvent.RETRACTION,
-						terms.get(0), terms.get(1),
-						createPredicateOrVariableFormula(tokens.subList(0, tokens.size()-1)), 
-						first, last, tokenizer.getSource(first, last));
-			} else {
-				return new UpdateEvent(tok.token, createPredicateOrBelief(tokens), 
-						first, last, tokenizer.getSource(first, last));
-			}
+			return new UpdateEvent(tok.token, createPredicateOrBelief(tokens), 
+					first, last, tokenizer.getSource(first, last));
 		case Token.MESSAGE:
-			tok2 = tokens.get(0);
+			Token tok2 = tokens.get(0);
 			if (tok2.type != Token.LEFT_BRACKET) {
 				throw new ParseException("Malformed Message Event: @message(<performative>, <sender>, <formula>)", first, last);
 			}
@@ -912,42 +829,6 @@ public class ASTRAParser {
 			if (terms.size() == 4) params = terms.get(3);
 			return new MessageEvent(terms.get(0), terms.get(1), content, params, 
 					first, last, tokenizer.getSource(first, last));		
-		case Token.EIS_EVT:
-			tok2 = tokens.get(0);
-			if (tok2.type != Token.LEFT_BRACKET) {
-				throw new ParseException("Malformed EIS Environment Event: @eis(<id>, <formula>)", first, last);
-			}
-			if (last.type != Token.RIGHT_BRACKET) {
-				throw new ParseException("Malformed EIS Environment Event: @eis(<id>, <formula>)", first, last);
-			}
-
-			tokens.remove(0);
-			terms = getTermList(tokens.subList(0, tokens.size()-1), true);
-			if (terms.size() != 1) {
-				throw new ParseException("Malformed EIS Environment Event: @eis(<id>, <formula>)", first, last);
-			}
-
-			return new EISEvent(EISEvent.ENVIRONMENT, terms.get(0), null,
-					createPredicateOrVariableFormula(tokens.subList(0, tokens.size()-1)), 
-					first, last, tokenizer.getSource(first, last));
-		case Token.CARTAGO_EVT:
-			tok2 = tokens.get(0);
-			if (tok2.type != Token.LEFT_BRACKET) {
-				throw new ParseException("Missing left bracket\n\tExpected: @cartago(<type>, <aid>, <formula>)", first, last);
-			}
-			if (last.type != Token.RIGHT_BRACKET) {
-				throw new ParseException("Missing right bracket\n\tExpected: @cartago(<type>, <aid>, <formula>)", first, last);
-			}
-
-			tokens.remove(0);
-			terms = getTermList(tokens.subList(0, tokens.size()-1), true);
-			if (terms.size() != 2) {
-				throw new ParseException("Incorrect number of tokens\n\tExpected: @cartago(<type>, <aid>, <formula>)", first, last);
-			}
-
-			return new CartagoEvent(terms.get(0), terms.get(1),
-					createPredicateOrVariableFormula(tokens.subList(0, tokens.size()-1)), 
-					first, last, tokenizer.getSource(first, last));
 		case Token.ACRE_EVT:
 			tok2 = tokens.get(0);
 			if (tok2.type != Token.LEFT_BRACKET) {
@@ -978,10 +859,11 @@ public class ASTRAParser {
 		case Token.DOLLAR:
 			tok2 = tokens.remove(0);
 			if (tokens.remove(0).type != Token.PERIOD) {
-				throw new ParseException("Invalid Module Event format expected: $<module>.<predicate>", first, last);
+				throw new ParseException("Invalid Module Event format expected: [<symbol>]$<module>.<predicate>", first, last);
 			}
+			
 			PredicateFormula evt = this.createPredicate(tokens);
-			return new ModuleEvent(tok2.token, evt, tok, last, tokenizer.getSource(first, last));
+			return new ModuleEvent(first.equals(tok) ? null:first.token,tok2.token, evt, tok, last, tokenizer.getSource(first, last));
 		}
 		throw new ParseException("Unexpected Event: " + first.token, first, last);
 	}
@@ -1026,37 +908,9 @@ public class ASTRAParser {
 			}
 		}
 
-		int i = 0;
-		while (i < tokens.size()) {
-			if ((tokens.get(i).type == Token.MINUS) && i < tokens.size()) {
-				if (tokens.get(i+1).type == Token.GREATER_THAN) {
-					Token tok = tokens.remove(0);
-					if (tok.type == Token.CARTAGO) {
-						ITerm artifact = null;
-						Token tok2 = tokens.get(0);
-						if (tok2.type == Token.LEFT_BRACKET) {
-							List<ITerm> list = getTermList(tokens.subList(1, i-2), false);
-							if (list.size() > 1) throw new ParseException("Malformed CARTAGO formula: CARTAGO(<artifact-id>)->predicate(...)", first, last);
-			
-							if (list.get(0) instanceof Variable || (list.get(0) instanceof Literal && list.get(0).type().type() == Token.STRING)) {
-								artifact = list.get(0);
-							} else {
-								throw new ParseException("First argument of the CARTAGO formula must be a bound Variable or a String", first, last);
-							}
-						} else {
-							i++;
-						}
-						return new CartagoFormula(artifact, createFormula(tokens.subList(i, tokens.size())), 
-								first, last, tokenizer.getSource(first, last));
-						}
-				}
-			}
-			i++;
-		}
-		
 		// AND / OR discounted...
 		for (int[] types : COMPARISON_OPERATOR_PRECEDENCE) {
-			i = 0;
+			int i = 0;
 			Stack<Token> bracketStack = new Stack<Token>();
 			while (i < tokens.size()) {
 				String op = "";
@@ -1105,40 +959,6 @@ public class ASTRAParser {
 					throw new ParseException("First argument of bind should be a variable", first, last);
 				return new BindFormula((Variable) list.get(0), list.get(1), first, last, tokenizer.getSource(first, last));
 			}
-		} else if (tok.type == Token.EIS) {
-			ITerm id = null;
-			ITerm entity = null;
-			Token tok2 = tokens.remove(0);
-			if (tok2.type == Token.LEFT_BRACKET) {
-				List<Token> t_list = splitAt(tokens, new int[] {Token.RIGHT_BRACKET});
-				tokens.remove(0);
-				List<ITerm> list = getTermList(t_list, false);
-				if (list.size() > 2) throw new ParseException("Malformed EIS formula: EIS(<env-id>[,<entity>])->predicate(...)", first, last);
-	
-				if ( list.get(0) instanceof Variable || (list.get(0) instanceof Literal && list.get(0).type().type() == Token.STRING)) {
-					entity = list.get(0);
-				} else {
-					throw new ParseException("First argument of the EIS formula must be a bound Variable or a String", first, last);
-				}
-				
-				if (list.size() == 2) {
-					if (list.get(1) instanceof Variable || (list.get(1) instanceof Literal && list.get(1).type().type() == Token.STRING)) {
-						id = entity;
-						entity = list.get(1);
-					} else {
-						throw new ParseException("Second argument of the EIS formula must be a bound Variable or a String", first, last);
-					}
-				}
-				tok2 = tokens.remove(0);
-			}
-
-			if (tok2.type != Token.PERIOD) {
-				throw new ParseException("Malformed EIS formula: EIS(<env-id>[,<entity>]).predicate(...)", first, last);
-			}
-			
-			return new EISFormula(id, entity, createPredicate(tokens), 
-					first, last, tokenizer.getSource(first, last));
-			
 		} else if (tok.type == Token.LEFT_BRACKET) {
 			if (last.type != Token.RIGHT_BRACKET) {
 				throw new ParseException("Malformed brackets", first, last);

@@ -10,35 +10,29 @@ public class EISEvent implements Event {
 	public static final char ENVIRONMENT = ' ';
 	
 	private char type;
-	private Term id;
 	private Term entity;
 	private Formula formula;
 
-	public EISEvent(char type, Term id, Formula event) {
-		this(type, id, null, event);
+	public EISEvent(char type, Formula event) {
+		this(type, null, event);
 	}
 	
-	public EISEvent(char type, Term id, Term entity, Formula event) {
+	public EISEvent(char type, Term entity, Formula event) {
 		this.type = type;
-		this.id = id;
 		this.entity = entity;
 		this.formula = event;
 	}
 
 	public String signature() {
-		return type + "@eis:";
+		return "$eis";
 	}
 	
 	public String toString() {
-		return type + "@eis(" + id + (entity == null ? "":"," + entity) + "," + formula + ")";
+		return type + "$eis(" + (entity == null ? "":entity+",") + formula + ")";
 	}
 	
 	public char type() {
 		return type;
-	}
-	
-	public Term id() {
-		return id;
 	}
 	
 	public Term entity() {

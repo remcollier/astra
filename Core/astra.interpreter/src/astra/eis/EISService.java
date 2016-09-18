@@ -44,22 +44,22 @@ public class EISService {
 	private class EISEnvironmentListener implements EnvironmentListener {
 		@Override
 		public void handleNewEntity(String entity) {
-			broadcastEvent(new EISEvent(EISEvent.ENVIRONMENT, pid, new Predicate("newEntity", new Term[] { Primitive.newPrimitive(entity) })));
+			broadcastEvent(new EISEvent(EISEvent.ENVIRONMENT, new Predicate("newEntity", new Term[] { Primitive.newPrimitive(entity) })));
 		}
 
 		@Override
 		public void handleDeletedEntity(String entity, Collection<String> EISAgents) {
-			broadcastEvent(new EISEvent(EISEvent.ENVIRONMENT, pid, new Predicate("deletedEntity", new Term[] { Primitive.newPrimitive(entity) })));
+			broadcastEvent(new EISEvent(EISEvent.ENVIRONMENT, new Predicate("deletedEntity", new Term[] { Primitive.newPrimitive(entity) })));
 		}
 
 		@Override
 		public void handleFreeEntity(String entity, Collection<String> EISAgents) {
-			broadcastEvent(new EISEvent(EISEvent.ENVIRONMENT, pid, new Predicate("freedEntity", new Term[] { Primitive.newPrimitive(entity) })));
+			broadcastEvent(new EISEvent(EISEvent.ENVIRONMENT, new Predicate("freedEntity", new Term[] { Primitive.newPrimitive(entity) })));
 		}
 
 		@Override
 		public void handleStateChange(EnvironmentState newState) {
-			broadcastEvent(new EISEvent(EISEvent.ENVIRONMENT, pid, new Predicate("state", new Term[] { Primitive.newPrimitive(newState.toString()) })));
+			broadcastEvent(new EISEvent(EISEvent.ENVIRONMENT, new Predicate("state", new Term[] { Primitive.newPrimitive(newState.toString()) })));
 		}
 	}
 	
@@ -88,12 +88,13 @@ public class EISService {
 	}
 	
 	public boolean reset(Map<String, Parameter> parameters) {
-		try {
-			ei.reset(parameters);
-		} catch (ManagementException e) {
-			e.printStackTrace();
-			return false;
-		}
+		// TODO: Uncomment for 0.5 support
+//		try {
+//			ei.reset(parameters);
+//		} catch (ManagementException e) {
+//			e.printStackTrace();
+//			return false;
+//		}
 		return true;
 	}
 	

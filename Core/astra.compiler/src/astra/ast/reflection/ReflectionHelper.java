@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,12 +17,17 @@ import astra.ast.core.ASTRAClassElement;
 import astra.ast.core.AbstractHelper;
 import astra.ast.core.BuildContext;
 import astra.ast.core.IJavaHelper;
+import astra.ast.core.ITerm;
 import astra.ast.core.ImportElement;
 import astra.ast.core.NoSuchASTRAClassException;
 import astra.ast.core.ParseException;
+import astra.ast.core.Token;
 import astra.ast.element.PackageElement;
 import astra.ast.formula.MethodSignature;
 import astra.ast.formula.MethodType;
+import astra.ast.formula.PredicateFormula;
+import astra.ast.term.Variable;
+import astra.ast.type.ObjectType;
 import astra.core.ActionParam;
 import astra.core.Module.EVENT;
 
@@ -106,65 +112,42 @@ public class ReflectionHelper extends AbstractHelper {
 		return new ASTRAClassElement(clazz,in);
 	}
 
-	@Override
-	public boolean validate(String moduleClass, MethodSignature signature) {
+	private Method getMatchingMethod(String moduleClass, MethodSignature signature) {
 		Class<?> cls = resolveClass(moduleClass);
-//		 System.out.println("signature: "+ signature.name() + " / " + signature.termCount());
 
 		while (cls.getSuperclass() != null) {
 			for (Method mthd : cls.getMethods()) {
-//				 System.out.println("mthd: " + mthd.getName() + " / " + mthd.getParameterTypes().length);
 				if (mthd.getName().equals(signature.name())
-						&& signature.termCount() == mthd.getParameterTypes().length) {
-//					 System.out.println("signature-annot: " + annotations.get(signature.type()));
-					for (Annotation ann : mthd.getAnnotations()) {
-//						 System.out.println("\ttype: " + ann.annotationType().getCanonicalName());
-						if (ann.annotationType().getCanonicalName().equals(annotations.get(signature.type()))) {
-//							 System.out.println("signature type: " + signature.type());
-							if (signature.type() == IJavaHelper.EVENT) {
-								if (ann instanceof EVENT) {
-									String[] params = ((EVENT) ann).types();
-									int i = 0;
-									boolean match = true;
-									while (match && i < params.length) {
-//										System.out.println("param: " + params[i]);
-//										System.out.println("sig: " + signature.type(i).type());
-										match = params[i].equals(signature.type(i).type());
-										i++;
+						&& signature.termCount() == (mthd.getParameterTypes().length-(signature.symbol() ? 1:0))) {
+					if (signature.type() == -1) {
+						return validate(signature, mthd) ? mthd:null;
+					} else {
+						for (Annotation ann : mthd.getAnnotations()) {
+							if (ann.annotationType().getCanonicalName().equals(annotations.get(signature.type()))) {
+								if (signature.type() == IJavaHelper.EVENT) {
+									if (ann instanceof EVENT) {
+										String[] params = ((EVENT) ann).types();
+										int i = 0;
+										boolean match = true;
+										while (match && i < params.length) {
+											match = params[i].equals(signature.type(i).type());
+											i++;
+										}
+										if (match) {
+											signature.signature(((EVENT) ann).signature());
+											String retType = mthd.getReturnType().getCanonicalName();
+											String t = MethodType.resolveType(retType);
+											if (t == null)
+												signature.returnType(retType);
+											else
+												signature.returnType(t);
+											return mthd;
+										}
 									}
-//									System.out.println("\tmatch: " + match);
-									if (match) {
-										signature.signature(((EVENT) ann).signature());
-										String retType = mthd.getReturnType().getCanonicalName();
-										String t = MethodType.resolveType(retType);
-//										System.out.println("\treturn type: " + t);
-										if (t == null)
-											signature.returnType(retType);
-										else
-											signature.returnType(t);
-										return true;
+								} else {
+									if (validate(signature, mthd)) {
+										return mthd;
 									}
-								}
-							} else {
-								Type[] params = mthd.getGenericParameterTypes();
-								int i = 0;
-								boolean match = true;
-								while (match && i < params.length) {
-//									System.out.println("param: " + params[i]);
-//									System.out.println("sig: " + signature.type(i));
-									match = matchType(params[i], signature.type(i));
-									i++;
-								}
-//								System.out.println("\tmatch: " + match);
-								if (match) {
-									String retType = mthd.getReturnType().getCanonicalName();
-									String t = MethodType.resolveType(retType);
-//									System.out.println("\treturn type: " + t);
-									if (t == null)
-										signature.returnType(retType);
-									else
-										signature.returnType(t);
-									return true;
 								}
 							}
 						}
@@ -172,6 +155,32 @@ public class ReflectionHelper extends AbstractHelper {
 				}
 			}
 			cls = cls.getSuperclass();
+		}
+		return null;
+	}
+
+	@Override
+	public boolean validate(String moduleClass, MethodSignature signature) {
+		return getMatchingMethod(moduleClass, signature) != null;
+	}
+
+	private boolean validate(MethodSignature signature, Method mthd) {
+		Type[] params = mthd.getGenericParameterTypes();
+		int i = 0;
+		boolean match = true;
+		while (match && i < params.length) {
+			match = matchType(params[i], signature.type(i));
+			i++;
+		}
+
+		if (match) {
+			String retType = mthd.getReturnType().getCanonicalName();
+			String t = MethodType.resolveType(retType);
+			if (t == null)
+				signature.returnType(retType);
+			else
+				signature.returnType(t);
+			return true;
 		}
 		return false;
 	}
@@ -240,5 +249,72 @@ public class ReflectionHelper extends AbstractHelper {
 		} catch (IOException e) {
 			return 0;
 		}
+	}
+
+	@Override
+	public boolean hasAutoAction(String className) {
+		return validate(className, getAutoMethodSignature()); 
+	}
+
+	private MethodSignature getAutoMethodSignature() {
+		Variable V = new Variable("X",null,null,null);
+		V.setType(new ObjectType(Token.OBJECT_TYPE, "astra.formula.Predicate"));
+		Variable V2 = new Variable("Y",null,null,null);
+		V2.setType(new ObjectType(Token.OBJECT_TYPE, "astra.core.Intention"));
+		return new MethodSignature(
+				new PredicateFormula("auto_action", 
+						Arrays.asList((ITerm) V2, (ITerm) V),
+						null, null, null
+				),
+				-1
+		);
+	}
+	
+	@Override
+	public boolean hasAutoFormula(String className) {
+		Variable V = new Variable("X",null,null,null);
+		V.setType(new ObjectType(Token.OBJECT_TYPE, "astra.formula.Predicate"));
+		return validate(className, 
+				new MethodSignature(
+						new PredicateFormula("auto_formula", 
+								Arrays.asList((ITerm) V),
+								null, null, null
+						),
+						-1
+				)
+		);
+	}
+
+	@Override
+	public boolean getEventSymbols(String className, MethodSignature signature, String symbol) {
+		Class<?> cls = resolveClass(className);
+
+		while (cls.getSuperclass() != null) {
+			for (Method mthd : cls.getMethods()) {
+				if (mthd.getName().equals(signature.name())) {
+					if (signature.termCount() != (mthd.getParameterTypes().length-(signature.symbol() ? 1:0))) continue;
+					
+					for (Annotation ann : mthd.getAnnotations()) {
+						if (ann.annotationType().getCanonicalName().equals(annotations.get(signature.type()))) {
+							String[] params = ((EVENT) ann).symbols();
+							for (int i = 0; i < params.length; i++) {
+								if (params[i].equals(symbol)) return true;
+							}
+						}
+					}
+				}
+			}
+			cls = cls.getSuperclass();
+		}
+		return false;
+	}
+
+	@Override
+	public boolean suppressAutoActionNotifications(String className) {
+		Method mthd = getMatchingMethod(className, getAutoMethodSignature());
+		for (Annotation ann : mthd.getAnnotations()) {
+			if (ann.annotationType().getCanonicalName().equals("astra.core.Module.SUPPRESS_NOTIFICATIONS")) return true;
+		}
+		return false;
 	}
 }

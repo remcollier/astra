@@ -3,6 +3,7 @@ package astra.reasoner.util;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import astra.cartago.CartagoAPI;
 import astra.cartago.CartagoProperty;
 import astra.core.Intention;
 import astra.formula.AcreFormula;
@@ -54,14 +55,14 @@ public class ContextEvaluateVisitor extends AbstractEvaluateVisitor {
 	public Object visit(CartagoProperty property) {
 		Predicate obs_prop = null;
 		if (property.target() != null) {
-			obs_prop = context.getCartagoAPI().store().getObservableProperty(((Primitive<String>) property.target().accept(this)).value(), property.content().predicate());
+			obs_prop = CartagoAPI.get(context.agent).store().getObservableProperty(property.target(), property.content().predicate());
 		} else {
-			obs_prop = context.getCartagoAPI().store().getObservableProperty(property.content().predicate());
+			obs_prop = CartagoAPI.get(context.agent).store().getObservableProperty(property.content().predicate());
 		}
 		
 		if (obs_prop == null) return property;
 		
-		Map<Integer, Term> b = Unifier.unify(obs_prop, property.content());
+		Map<Integer, Term> b = Unifier.unify(obs_prop, property.content(), context.agent);
 		for (Entry<Integer, Term> entry : b.entrySet()) {
 			context.addVariable(new Variable(entry.getValue().type(), entry.getKey()), entry.getValue());
 		}

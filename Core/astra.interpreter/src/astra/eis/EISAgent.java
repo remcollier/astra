@@ -85,10 +85,10 @@ public class EISAgent implements Queryable {
 				// Step 1b: Check if it was in the old percepts
 				list = current.get(percept.getName());
 				if (list == null) {
-					if (agent != null) agent.addEvent(new EISEvent(EISEvent.ADDED, service.pid(), pid, convertPercept(percept)));
+					if (agent != null) agent.addEvent(new EISEvent(EISEvent.ADDED, pid, convertPercept(percept)));
 				} else {
 					if (!list.remove(percept)) {
-						if (agent != null) agent.addEvent(new EISEvent(EISEvent.ADDED, service.pid(), pid, convertPercept(percept)));
+						if (agent != null) agent.addEvent(new EISEvent(EISEvent.ADDED, pid, convertPercept(percept)));
 					}
 				}
 			}
@@ -96,7 +96,7 @@ public class EISAgent implements Queryable {
 			// Step 2: identify what it left and generate removed EIS percepts events
 			for (Entry<String,List<Percept>> entry : current.entrySet()) {
 				while (!entry.getValue().isEmpty()) {
-					agent.addEvent(new EISEvent(EISEvent.REMOVED, service.pid(), pid, convertPercept(entry.getValue().remove(0))));
+					agent.addEvent(new EISEvent(EISEvent.REMOVED, pid, convertPercept(entry.getValue().remove(0))));
 				}
 			}
 			

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Core ASTRA Compiler
 Bundle-SymbolicName: astra.compiler
-Bundle-Version: 3.5.1.qualifier
+Bundle-Version: 3.5.2.qualifier
 Export-Package: astra.ast.core,
  astra.ast.element,
  astra.ast.event,

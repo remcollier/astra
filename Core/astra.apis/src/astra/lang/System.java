@@ -18,11 +18,13 @@ import astra.core.Module;
 import astra.core.ModuleException;
 import astra.core.Scheduler;
 import astra.formula.Formula;
+import astra.formula.Goal;
 import astra.formula.Predicate;
 import astra.messaging.Utilities;
 import astra.messaging.Utilities.PredicateState;
 import astra.term.ListTerm;
 import astra.term.Primitive;
+import astra.term.Term;
 
 /**
  * The System API contains a number of actions, terms and formulae that help you to 
@@ -109,13 +111,25 @@ public class System extends Module {
 			
 			final Agent agt = cl.newInstance(name);
 			agents.put(name, new AgentEntry(agent.name(), agt));
-
 			Scheduler.schedule(agt);
 		} catch (AgentCreationException e) {
 			throw new ModuleException(e);
 		} catch (ASTRAClassNotFoundException e) {
 			throw new ModuleException(e);
 		}
+		return true;
+	}
+
+	/**
+	 * This method can be used to set the main goal of an agent. It has been added
+	 * to support the basic debugger...
+	 * @param name
+	 * @param args
+	 * @return
+	 */
+	@ACTION
+	public boolean setMainGoal(String name, ListTerm args) {
+		agents.get(name).agent.initialize(new Goal(new Predicate("main", new Term[] {args})));
 		return true;
 	}
 	
@@ -146,6 +160,20 @@ public class System extends Module {
 		return true;
 	}
 
+	@ACTION
+	public boolean suspendAgent(String name) {
+		AgentEntry entry = agents.get(name);
+		entry.agent.state(Agent.INACTIVE);
+		return true;
+	}
+
+	@ACTION
+	public boolean resumeAgent(String name) {
+		AgentEntry entry = agents.get(name);
+		entry.agent.state(Agent.ACTIVE);
+		return true;
+	}
+	
 	/**
 	 * Term that returns a list of all the agents on the platform.
 	 * 

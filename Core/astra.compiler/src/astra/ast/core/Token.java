@@ -63,8 +63,6 @@ public class Token {
 	public static final int LESS_THAN = 50;
 	public static final int GREATER_THAN = 51;
 	public static final int MESSAGE = 52;
-	public static final int CARTAGO_EVT = 53;
-	public static final int EIS_EVT = 54;
 	public static final int LEFT_SQ_BRACKET = 55;
 	public static final int RIGHT_SQ_BRACKET = 56;
 	public static final int MODULO = 57;
@@ -94,10 +92,8 @@ public class Token {
 	public static final int WAIT = 77;
 	public static final int TRY = 78;
 	public static final int RECOVER = 79;
-	public static final int EIS = 80;
 	public static final int TR_START = 81;
 	public static final int TR_STOP = 82;
-	public static final int CARTAGO = 83;
 	public static final int SYNCHRONIZED = 84;
 	public static final int FORALL = 85;
 	public static final int BIND = 86;
@@ -170,8 +166,6 @@ public class Token {
 		typeMap.put("wait", WAIT);
 		typeMap.put("try", TRY);
 		typeMap.put("recover", RECOVER);
-		typeMap.put("EIS", EIS);
-		typeMap.put("CARTAGO", CARTAGO);
 		typeMap.put("start", TR_START);
 		typeMap.put("stop", TR_STOP);
 		typeMap.put("synchronized", SYNCHRONIZED);
@@ -200,9 +194,7 @@ public class Token {
 		typeMap.put(">", GREATER_THAN);
 		typeMap.put("<", LESS_THAN);
 		typeMap.put("@message", MESSAGE);
-		typeMap.put("@cartago", CARTAGO_EVT);
 		typeMap.put("@acre", ACRE_EVT);
-		typeMap.put("@eis", EIS_EVT);
 		typeMap.put("[", LEFT_SQ_BRACKET);
 		typeMap.put("]", RIGHT_SQ_BRACKET);
 		typeMap.put("%", MODULO);

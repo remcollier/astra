@@ -10,14 +10,12 @@ import astra.ast.element.FunctionElement;
 import astra.ast.element.InferenceElement;
 import astra.ast.element.InitialElement;
 import astra.ast.element.ModuleElement;
-import astra.ast.element.TypesElement;
 import astra.ast.element.PackageElement;
 import astra.ast.element.PlanElement;
 import astra.ast.element.RuleElement;
+import astra.ast.element.TypesElement;
 import astra.ast.event.AdvancedAcreEvent;
 import astra.ast.event.BasicAcreEvent;
-import astra.ast.event.CartagoEvent;
-import astra.ast.event.EISEvent;
 import astra.ast.event.MessageEvent;
 import astra.ast.event.ModuleEvent;
 import astra.ast.event.UpdateEvent;
@@ -25,9 +23,7 @@ import astra.ast.formula.AcreFormula;
 import astra.ast.formula.AndFormula;
 import astra.ast.formula.BindFormula;
 import astra.ast.formula.BracketFormula;
-import astra.ast.formula.CartagoFormula;
 import astra.ast.formula.ComparisonFormula;
-import astra.ast.formula.EISFormula;
 import astra.ast.formula.FormulaVariable;
 import astra.ast.formula.GoalFormula;
 import astra.ast.formula.ModuleFormula;
@@ -42,9 +38,7 @@ import astra.ast.statement.AcreDenyCancelStatement;
 import astra.ast.statement.AcreStartStatement;
 import astra.ast.statement.AssignmentStatement;
 import astra.ast.statement.BlockStatement;
-import astra.ast.statement.CartagoStatement;
 import astra.ast.statement.DeclarationStatement;
-import astra.ast.statement.EISStatement;
 import astra.ast.statement.ForAllStatement;
 import astra.ast.statement.ForEachStatement;
 import astra.ast.statement.IfStatement;
@@ -76,7 +70,6 @@ import astra.ast.term.QueryTerm;
 import astra.ast.term.Variable;
 import astra.ast.tr.BlockAction;
 import astra.ast.tr.CartagoAction;
-import astra.ast.tr.EISAction;
 import astra.ast.tr.FunctionCallAction;
 import astra.ast.tr.TRAction;
 import astra.ast.tr.TRModuleCallAction;
@@ -172,12 +165,6 @@ public class AbstractVisitor implements IElementVisitor {
 	}
 
 	@Override
-	public Object visit(EISAction action, Object data) throws ParseException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public Object visit(TRAction action, Object data) throws ParseException {
 		// TODO Auto-generated method stub
 		return null;
@@ -209,18 +196,6 @@ public class AbstractVisitor implements IElementVisitor {
 
 	@Override
 	public Object visit(MessageEvent event, Object data) throws ParseException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(CartagoEvent cartagoEvent, Object data) throws ParseException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(EISEvent eisEvent, Object data) throws ParseException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -275,18 +250,6 @@ public class AbstractVisitor implements IElementVisitor {
 
 	@Override
 	public Object visit(OrFormula formula, Object data) throws ParseException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(EISFormula formula, Object data) throws ParseException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(CartagoFormula cartagoFormula, Object data) throws ParseException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -418,19 +381,7 @@ public class AbstractVisitor implements IElementVisitor {
 	}
 
 	@Override
-	public Object visit(EISStatement statement, Object data) throws ParseException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public Object visit(TRStatement statement, Object data) throws ParseException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(CartagoStatement cartagoStatement, Object data) throws ParseException {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -46,6 +46,7 @@ public class DependencyManager {
 			if (!node.loaded) {
 				for (ParseException pe: node.getErrorList()) {
 					System.out.println(pe.getMessage());
+					pe.printStackTrace();
 				}
 				throw new ParseException("Unknown class: " + cls, 1, 1, 1);
 			}

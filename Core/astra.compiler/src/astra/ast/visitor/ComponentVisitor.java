@@ -17,8 +17,6 @@ import astra.ast.element.RuleElement;
 import astra.ast.element.TypesElement;
 import astra.ast.event.AdvancedAcreEvent;
 import astra.ast.event.BasicAcreEvent;
-import astra.ast.event.CartagoEvent;
-import astra.ast.event.EISEvent;
 import astra.ast.event.MessageEvent;
 import astra.ast.event.ModuleEvent;
 import astra.ast.event.UpdateEvent;
@@ -26,9 +24,7 @@ import astra.ast.formula.AcreFormula;
 import astra.ast.formula.AndFormula;
 import astra.ast.formula.BindFormula;
 import astra.ast.formula.BracketFormula;
-import astra.ast.formula.CartagoFormula;
 import astra.ast.formula.ComparisonFormula;
-import astra.ast.formula.EISFormula;
 import astra.ast.formula.FormulaVariable;
 import astra.ast.formula.GoalFormula;
 import astra.ast.formula.MethodSignature;
@@ -41,9 +37,7 @@ import astra.ast.statement.AcreAdvanceStatement;
 import astra.ast.statement.AcreStartStatement;
 import astra.ast.statement.AssignmentStatement;
 import astra.ast.statement.BlockStatement;
-import astra.ast.statement.CartagoStatement;
 import astra.ast.statement.DeclarationStatement;
-import astra.ast.statement.EISStatement;
 import astra.ast.statement.ForAllStatement;
 import astra.ast.statement.ForEachStatement;
 import astra.ast.statement.IfStatement;
@@ -73,7 +67,6 @@ import astra.ast.term.Operator;
 import astra.ast.term.QueryTerm;
 import astra.ast.term.Variable;
 import astra.ast.tr.BlockAction;
-import astra.ast.tr.EISAction;
 import astra.ast.tr.FunctionCallAction;
 import astra.ast.tr.TRModuleCallAction;
 import astra.ast.tr.TRRuleElement;
@@ -102,7 +95,6 @@ public class ComponentVisitor extends AbstractVisitor {
 			String qualifiedName = helper.resolveModule(module.className());
 			if (qualifiedName == null)
 				throw new ParseException("Unknown module declaration: " + module.className(), module);
-//			System.out.println("[SRV] Map: " + module.className() + " = " + qualifiedName);
 			module.setQualifiedName(qualifiedName);
 			store.modules.put(module.name(), module);
 		}
@@ -259,22 +251,6 @@ public class ComponentVisitor extends AbstractVisitor {
 	}
 
 	@Override
-	public Object visit(EISEvent event, Object data) throws ParseException {
-		event.id().accept(this,data);
-		if (event.entity() != null) event.entity().accept(this, data);
-		event.content().accept(this, data);
-		return null;
-	}
-
-	@Override
-	public Object visit(CartagoEvent event, Object data) throws ParseException {
-		event.type().accept(this, data);
-		if (event.evt() != null) event.evt().accept(this, data);
-		event.content().accept(this, data);
-		return null;
-	}
-
-	@Override
 	public Object visit(BasicAcreEvent event, Object data)
 			throws ParseException {
 		event.type().accept(this, data);
@@ -312,29 +288,12 @@ public class ComponentVisitor extends AbstractVisitor {
 	}
 
 	@Override
-	public Object visit(EISFormula formula, Object data)
-			throws ParseException {
-		if (formula.id() != null) formula.id().accept(this, data);
-		if (formula.entity() != null) formula.entity().accept(this, data);
-		formula.formula().accept(this, data);
-		return null;
-	}
-	
-	@Override
 	public Object visit(AcreFormula formula, Object data) throws ParseException {
 		formula.cid().accept(this, data);
 		formula.index().accept(this, data);
 		formula.type().accept(this, data);
 		formula.performative().accept(this, data);
 		formula.content().accept(this, data);
-		return null;
-	}
-
-	@Override
-	public Object visit(CartagoFormula formula, Object data)
-			throws ParseException {
-		if (formula.artifact() != null) formula.artifact().accept(this, data);
-		formula.formula().accept(this, data);
 		return null;
 	}
 
@@ -359,12 +318,6 @@ public class ComponentVisitor extends AbstractVisitor {
 		((VariableTypeStack) data).addScope();
 		formula.formula().accept(this, data);
 		((VariableTypeStack) data).removeScope();		
-		return null;
-	}
-	
-	@Override
-	public Object visit(EISAction action, Object data) throws ParseException {
-		action.call().accept(this, data);
 		return null;
 	}
 	
@@ -478,7 +431,9 @@ public class ComponentVisitor extends AbstractVisitor {
 
 		MethodSignature signature = new MethodSignature(statement.method(), IJavaHelper.ACTION);
 		if (!helper.validate(element.className(), signature)) {
-			throw new ParseException("Could not find matching module call method: " + statement.toString(), statement);
+			if (!helper.hasAutoAction(element.className())) {
+				throw new ParseException("Could not find matching module call method: " + statement.toString(), statement);
+			}
 		}
 		
 		return null;
@@ -495,7 +450,12 @@ public class ComponentVisitor extends AbstractVisitor {
 
 		MethodSignature signature = new MethodSignature((PredicateFormula) formula.method(), IJavaHelper.FORMULA);
 		if (!helper.validate(element.className(), signature))
-			throw new ParseException("Could not match formula to a method: " + formula.method() + " for module: "+formula.module(), formula);
+			if (!helper.hasAutoFormula(element.className())) {
+				throw new ParseException("Could not match formula to a method: " + formula.method() + " for module: "+formula.module(), formula);
+			} else {
+				System.out.println("AutoFormula: " + element.className()+"."+signature);
+				// Should do a check on the types...
+			}
 
 		return null;
 	}
@@ -576,15 +536,6 @@ public class ComponentVisitor extends AbstractVisitor {
 	}
 
 	@Override
-	public Object visit(EISStatement statement, Object data)
-			throws ParseException {
-		if (statement.id() != null) statement.id().accept(this,data);
-		if (statement.entity() != null) statement.entity().accept(this,data);
-		statement.call().accept(this,data);
-		return null;
-	}
-
-	@Override
 	public Object visit(AcreStartStatement statement, Object data)
 			throws ParseException {
 		statement.protocol().accept(this, data);
@@ -604,15 +555,6 @@ public class ComponentVisitor extends AbstractVisitor {
 		return null;
 	}
 
-	@Override
-	public Object visit(CartagoStatement statement, Object data)
-			throws ParseException {
-		if (statement.artifact() != null) statement.artifact().accept(this, data);
-		statement.call().accept(this,data);
-		return null;
-	}
-
-	
 	@Override
 	public Object visit(InlineVariableDeclaration term, Object data) throws ParseException {
 		if (((VariableTypeStack) data).exists(term.identifier())) {

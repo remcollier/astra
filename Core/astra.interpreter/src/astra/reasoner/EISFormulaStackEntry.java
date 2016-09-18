@@ -56,7 +56,7 @@ public class EISFormulaStackEntry implements ReasonerStackEntry {
 //		System.out.println("eis next:" + nextFormula);
 //		System.out.println("match formula: " + (Predicate) formula.predicate().accept(visitor));
 		if (Predicate.class.isInstance(nextFormula)) {
-			Map<Integer, Term> bindings = Unifier.unify((Predicate) formula.predicate().accept(visitor), (Predicate) nextFormula, new HashMap<Integer, Term>(initial));
+			Map<Integer, Term> bindings = Unifier.unify((Predicate) formula.predicate().accept(visitor), (Predicate) nextFormula, new HashMap<Integer, Term>(initial), reasoner.agent);
 			if (bindings != null) {
 //				System.out.println("\tmatch: "+ formula.predicate().accept(visitor));
 				solved = true;

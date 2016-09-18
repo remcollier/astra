@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import astra.cartago.CartagoProperty;
 import astra.core.Agent;
 import astra.eis.EISFormula;
 import astra.formula.AND;
@@ -44,6 +45,7 @@ public class ResolutionBasedReasoner implements Reasoner {
 		ResolutionBasedReasoner.register(NOT.class, new NOTStackEntryFactory());
 		ResolutionBasedReasoner.register(OR.class, new ORStackEntryFactory());
 		ResolutionBasedReasoner.register(Predicate.class, new PredicateStackEntryFactory());
+		ResolutionBasedReasoner.register(CartagoProperty.class, new CartagoPropertyStackEntryFactory());
 	}
 	
 	List<Queryable> sources = Collections.synchronizedList(new LinkedList<Queryable>());

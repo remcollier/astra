@@ -1,0 +1,64 @@
+package astra.debugger;
+
+import astra.gui.GuiModule;
+
+agent Debugger {
+	module Console C;
+	module Prelude P;
+	module System S;
+	module GuiModule gui;
+	
+	types test {
+		formula light(string);
+		formula debugger_state(string);
+	}
+	
+	initial light("off");
+	initial !init();
+	
+	rule +!main(list args) {
+		wait(debugger_state("initialized"));
+		if (P.size(args) == 2) {
+			string name = P.valueAsString(args, 0);
+			string type = P.valueAsString(args, 1);
+			S.createAgent(name, type);
+			S.setMainGoal(name, []);
+		}
+		!!turn("on");
+	}
+	
+
+	
+	rule +!init() {
+		C.println("launching gui");
+		gui.launch("astra.debugger.DebuggerUI");
+		+debugger_state("initialized");
+	}
+	
+//	rule $gui.event("pushed", []) {
+//		C.println("yipee");
+//		gui.updateGui("hello world!", []);
+//	}
+
+	rule $gui.event("suspend", [string name]) : name ~= S.name() {
+		C.println("suspending: " + name);
+		S.suspendAgent(name);
+	}
+	
+	rule $gui.event("resume", [string name]) : name ~= S.name() {
+		C.println("resuming: " + name);
+		S.resumeAgent(name);
+	}
+	
+	rule +!turn("on") : light("off") {
+		-light("off");
+		+light("on");
+		!!turn("off");
+	}
+	
+	rule +!turn("off") : light("on") {
+		-light("on");
+		+light("off");
+		!!turn("on");
+	}
+}

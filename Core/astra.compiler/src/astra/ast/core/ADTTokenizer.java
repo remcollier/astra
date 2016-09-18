@@ -36,15 +36,21 @@ public class ADTTokenizer {
 	}
 
 	public static void main(String[] args) throws ParseException {
-		String input = "test2(text) ";
+		String input = "test2(\"hello\", \"\\\"text\\\"\")";
 		ADTTokenizer tokenizer = new ADTTokenizer(new ByteArrayInputStream(input.getBytes()));
+
+		List<Token> list = new ArrayList<Token>();
 		Token token = tokenizer.nextToken();
-		while (token != null) {
-			System.out.println("'" + token.token + "' / type: " + token.type + " (" + token.beginColumn +":" + token.beginLine + ", " + token.endColumn + ":" + token.endLine + ")");
-			System.out.println("\t'" + tokenizer.getSource(token, token) + "'");
+		while (token != Token.EOF_TOKEN) {
+			list.add(token);
+//			System.out.println("'" + token.token + "' / type: " + token.type + " (" + token.beginColumn +":" + token.beginLine + ", " + token.endColumn + ":" + token.endLine + ")");
+//			System.out.println("\t'" + tokenizer.getSource(token, token) + "'");
 			token = tokenizer.nextToken();
 		}
+		ASTRAParser parser = new ASTRAParser(tokenizer);
+		System.out.println(parser.createFormula(list));
 	}
+	
 	public ADTTokenizer(InputStream in) {
 		this.in = in;
 		lines.add("IGNORE");
@@ -154,6 +160,12 @@ public class ADTTokenizer {
 					ch2 = readCharacter();
 					tokenBuffer.append(ch2);
 					column++;
+					
+					if (ch2 == '\\') {
+						char ch3 = readCharacter();
+						tokenBuffer.append(ch3);
+						column++;
+					}
 				}
 				while (ch2 != ch);
 				break;

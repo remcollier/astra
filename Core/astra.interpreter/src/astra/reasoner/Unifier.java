@@ -6,8 +6,7 @@ import java.util.Map;
 import javax.script.Bindings;
 
 import astra.acre.AcreEvent;
-import astra.cartago.CartagoASTRAEvent;
-import astra.cartago.CartagoEventUnifier;
+import astra.core.Agent;
 import astra.eis.EISEvent;
 import astra.event.BeliefEvent;
 import astra.event.Event;
@@ -24,14 +23,16 @@ import astra.reasoner.unifier.BeliefEventUnifier;
 import astra.reasoner.unifier.EISEventUnifier;
 import astra.reasoner.unifier.GoalEventUnifier;
 import astra.reasoner.unifier.MessageEventUnifier;
+import astra.reasoner.util.BindingsEvaluateVisitor;
 import astra.reasoner.util.Utilities;
 import astra.term.FormulaTerm;
 import astra.term.Funct;
 import astra.term.ListSplitter;
 import astra.term.ListTerm;
+import astra.term.ModuleTerm;
+import astra.term.Primitive;
 import astra.term.Term;
 import astra.term.Variable;
-import astra.type.ObjectType;
 
 /**
  * This class performs unification of various logical formulae: {@link Predicate},
@@ -53,13 +54,13 @@ public class Unifier {
 		eventFactory.put(AcreEvent.class, new AcreEventUnifier());
 	}
 	
-	public static Map<Integer, Term> unify(Event source, Event target) {
+	public static Map<Integer, Term> unify(Event source, Event target, Agent agent) {
 //		System.out.println("in unify: event: " +event.getClass().getName());
 //		System.out.println("in unify: event2: " +event2.getClass().getName());
 
 		EventUnifier unifier = eventFactory.get(source.getClass());
 		if (unifier != null) {
-			return unifier.unify(source, target);
+			return unifier.unify(source, target, agent);
 		}
 
 		return null;
@@ -72,8 +73,8 @@ public class Unifier {
 	 * @param target second predicate
 	 * @return a {@link Bindings} object or null
 	 */
-	public static Map<Integer, Term> unify(Predicate source, Predicate target) {
-		return unify(source, target, new HashMap<Integer, Term>());
+	public static Map<Integer, Term> unify(Predicate source, Predicate target, Agent agent) {
+		return unify(source, target, new HashMap<Integer, Term>(), agent);
 	}
 	
 	/**
@@ -84,18 +85,18 @@ public class Unifier {
 	 * @param target the existing bindings (if any exist)
 	 * @return a {@link Bindings} object or null
 	 */
-	public static Map<Integer, Term> unify(Predicate source, Predicate target, Map<Integer, Term> bindings) {
+	public static Map<Integer, Term> unify(Predicate source, Predicate target, Map<Integer, Term> bindings, Agent agent) {
 		if  (source.id() == target.id() && source.size() == target.size()) {
-			return unify(source.terms(), target.terms(), bindings);
+			return unify(source.terms(), target.terms(), bindings, agent);
 		}
 		return null;
 	}
 
-	public static Map<Integer, Term> unify(AcreFormula source, AcreFormula target, Map<Integer, Term> bindings) {
-		Map<Integer, Term> b = unify(new Term[] {source.cid(), source.index(), source.type(), source.performative()}, new Term[] {target.cid(), target.index(), target.type(), target.performative()}, bindings);
+	public static Map<Integer, Term> unify(AcreFormula source, AcreFormula target, Map<Integer, Term> bindings, Agent agent) {
+		Map<Integer, Term> b = unify(new Term[] {source.cid(), source.index(), source.type(), source.performative()}, new Term[] {target.cid(), target.index(), target.type(), target.performative()}, bindings, agent);
 //		System.out.println("source: " + source + " / target: " + target + " bindings: " + b);
 		if (b != null) {
-			b = unify(source.content(), target.content(), b);
+			b = unify(source.content(), target.content(), b, agent);
 //			System.out.println("bindings: " + b);
 			if (b != null) {
 				return b;
@@ -112,14 +113,21 @@ public class Unifier {
 	 * @param target second goal
 	 * @return a {@link Bindings} object or null
 	 */
-	public static Map<Integer, Term> unify(Goal source, Goal target) {
-		return unify(source.formula(), target.formula());
+	public static Map<Integer, Term> unify(Goal source, Goal target, Agent agent) {
+		return unify(source.formula(), target.formula(), agent);
 	}
 
-	public static Map<Integer, Term> unify(Term[] source, Term[] target, Map<Integer, Term> bindings) {
+	public static Map<Integer, Term> unify(Term[] source, Term[] target, Map<Integer, Term> bindings, Agent agent) {
 		for (int i=0; i < source.length; i++) {
 			Term sourceTerm = source[i];
 			Term targetTerm = target[i];
+			if (sourceTerm instanceof ModuleTerm) {
+				sourceTerm = Primitive.newPrimitive(((ModuleTerm) sourceTerm).evaluate(new BindingsEvaluateVisitor(bindings, agent)));
+			}
+			if (targetTerm instanceof ModuleTerm) {
+				targetTerm = Primitive.newPrimitive(((ModuleTerm) targetTerm).evaluate(new BindingsEvaluateVisitor(bindings, agent)));
+			}
+			
 //			System.out.println("\n\n--------------------\nsourceTerm: " + sourceTerm + " / " +sourceTerm.type());
 //			System.out.println("targetTerm: " + targetTerm+ " / " +targetTerm.type());
 			
@@ -166,14 +174,14 @@ public class Unifier {
 			} else if (ListTerm.class.isInstance(sourceTerm)) {
 				if (ListTerm.class.isInstance(targetTerm)) {
 					if (((ListTerm) sourceTerm).size() != ((ListTerm) targetTerm).size()) return null;
-					if (unify(((ListTerm) sourceTerm).terms(), ((ListTerm) targetTerm).terms(),bindings) == null) return null;
+					if (unify(((ListTerm) sourceTerm).terms(), ((ListTerm) targetTerm).terms(),bindings,agent) == null) return null;
 				} else if (ListSplitter.class.isInstance(targetTerm)) {
 					ListTerm list = (ListTerm) sourceTerm;
 					if (list.size() < 2) return null;
 					ListTerm tail = new ListTerm(list.subList(1, list.size()).toArray(new Term[list.size()-1]));
 					if (unify(
 							new Term[] {((ListTerm) sourceTerm).get(0), tail}, 
-							new Term[] {((ListSplitter) targetTerm).head(), ((ListSplitter) targetTerm).tail()}, bindings) == null) return null;
+							new Term[] {((ListSplitter) targetTerm).head(), ((ListSplitter) targetTerm).tail()}, bindings, agent) == null) return null;
 				} else 
 					return null;
 			} else if (ListTerm.class.isInstance(targetTerm)) {
@@ -183,7 +191,7 @@ public class Unifier {
 						ListTerm tail = new ListTerm(list.subList(1, list.size()).toArray(new Term[list.size()-1]));
 						if (unify(
 								new Term[] {((ListTerm) targetTerm).get(0), tail}, 
-								new Term[] {((ListSplitter) sourceTerm).head(), ((ListSplitter) sourceTerm).tail()}, bindings) == null) return null;
+								new Term[] {((ListSplitter) sourceTerm).head(), ((ListSplitter) sourceTerm).tail()}, bindings, agent) == null) return null;
 					}
 				} else 
 					return null;
@@ -193,7 +201,7 @@ public class Unifier {
 				if (sf.id() != tf.id() || sf.size() != tf.size()) return null;
 				System.out.println("in funct comparison: " + sourceTerm + " / " + targetTerm);
 //				System.out.println("\tWE HAVE AN ID MATCH");
-				if (unify(((Funct) sourceTerm).terms(), ((Funct) targetTerm).terms(), bindings) == null) return null;
+				if (unify(((Funct) sourceTerm).terms(), ((Funct) targetTerm).terms(), bindings, agent) == null) return null;
 //				System.out.println("\tWE HAVE A TERM MATCH");
 			} else if (!sourceTerm.equals(targetTerm)) {
 //				System.out.println("terms are not equal: " + sourceTerm + " / " + targetTerm);
@@ -206,7 +214,7 @@ public class Unifier {
 	}
 
 	
-	public static Map<Integer, Term> unify(Formula source, Formula target, Map<Integer,Term> bindings) {
+	public static Map<Integer, Term> unify(Formula source, Formula target, Map<Integer,Term> bindings, Agent agent) {
 		if (source instanceof FormulaVariable) {
 			Variable variable = ((FormulaVariable) source).variable();
 			bindings.put(variable.id(), new FormulaTerm(target));
@@ -216,17 +224,17 @@ public class Unifier {
 			bindings.put(variable.id(), new FormulaTerm(source));
 			return bindings;
 		} else if (source instanceof Predicate && target instanceof Predicate) {
-			return unify((Predicate) source, (Predicate) target, bindings);
+			return unify((Predicate) source, (Predicate) target, bindings, agent);
 		} else if (source instanceof AcreFormula && target instanceof AcreFormula) {
-			return unify((AcreFormula) source, (AcreFormula) target, bindings);
+			return unify((AcreFormula) source, (AcreFormula) target, bindings, agent);
 		} else if (source instanceof AND && target instanceof AND) {
 			AND s = (AND) source;
 			AND t = (AND) target;
 			
-			Map<Integer, Term> temp = unify(s.left(), t.left(), bindings);
+			Map<Integer, Term> temp = unify(s.left(), t.left(), bindings, agent);
 			if (temp == null) return null;
 			
-			temp = unify(s.right(), t.right(), Utilities.merge(temp, bindings));
+			temp = unify(s.right(), t.right(), Utilities.merge(temp, bindings), agent);
 			if (temp == null) return null;
 			
 			return temp;

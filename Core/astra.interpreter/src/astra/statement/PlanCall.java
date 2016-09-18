@@ -47,7 +47,7 @@ public class PlanCall extends AbstractStatement {
 						return false;
 					}
 					
-					bindings = Unifier.unify(plan.id(), call);
+					bindings = Unifier.unify(plan.id(), call, intention.agent);
 					if (bindings == null) {
 						intention.failed("Plan call: " + call + " does not match expected types: " + plan.id(), null);
 						return false;

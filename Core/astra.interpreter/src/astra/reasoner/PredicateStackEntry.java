@@ -67,7 +67,7 @@ public class PredicateStackEntry implements ReasonerStackEntry {
 		
 		nextFormula = (Formula) options.remove();
 		if (Predicate.class.isInstance(nextFormula)) {
-			Map<Integer, Term> bindings = Unifier.unify((Predicate) predicate.accept(visitor), (Predicate) nextFormula.accept(visitor), new HashMap<Integer, Term>(initial));
+			Map<Integer, Term> bindings = Unifier.unify((Predicate) predicate.accept(visitor), (Predicate) nextFormula.accept(visitor), new HashMap<Integer, Term>(initial),reasoner.agent);
 			if (bindings != null) {
 				solved = true;
 				reasoner.propagateBindings(Utilities.mgu(Utilities.merge(initial, bindings)));
@@ -81,7 +81,7 @@ public class PredicateStackEntry implements ReasonerStackEntry {
 			RenameVisitor rvisitor = new RenameVisitor("rn_" + (counter++) + "_");
 			inference = (Inference) inference.accept(rvisitor);
 //			System.out.println("\tinference: " + inference);
-			Map<Integer, Term> bindings = Unifier.unify((Predicate) predicate.accept(visitor), inference.head(), new HashMap<Integer, Term>(initial));
+			Map<Integer, Term> bindings = Unifier.unify((Predicate) predicate.accept(visitor), inference.head(), new HashMap<Integer, Term>(initial),reasoner.agent);
 //			System.out.println("\tbindings: " + bindings);
 			if (bindings != null) {
 //				System.out.println("SOLVED - " + toString());

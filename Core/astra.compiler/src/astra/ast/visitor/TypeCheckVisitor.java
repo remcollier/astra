@@ -20,8 +20,6 @@ import astra.ast.element.RuleElement;
 import astra.ast.element.TypesElement;
 import astra.ast.event.AdvancedAcreEvent;
 import astra.ast.event.BasicAcreEvent;
-import astra.ast.event.CartagoEvent;
-import astra.ast.event.EISEvent;
 import astra.ast.event.MessageEvent;
 import astra.ast.event.ModuleEvent;
 import astra.ast.event.UpdateEvent;
@@ -29,9 +27,7 @@ import astra.ast.formula.AcreFormula;
 import astra.ast.formula.AndFormula;
 import astra.ast.formula.BindFormula;
 import astra.ast.formula.BracketFormula;
-import astra.ast.formula.CartagoFormula;
 import astra.ast.formula.ComparisonFormula;
-import astra.ast.formula.EISFormula;
 import astra.ast.formula.FormulaVariable;
 import astra.ast.formula.GoalFormula;
 import astra.ast.formula.ModuleFormula;
@@ -46,9 +42,7 @@ import astra.ast.statement.AcreDenyCancelStatement;
 import astra.ast.statement.AcreStartStatement;
 import astra.ast.statement.AssignmentStatement;
 import astra.ast.statement.BlockStatement;
-import astra.ast.statement.CartagoStatement;
 import astra.ast.statement.DeclarationStatement;
-import astra.ast.statement.EISStatement;
 import astra.ast.statement.ForAllStatement;
 import astra.ast.statement.ForEachStatement;
 import astra.ast.statement.IfStatement;
@@ -80,7 +74,6 @@ import astra.ast.term.QueryTerm;
 import astra.ast.term.Variable;
 import astra.ast.tr.BlockAction;
 import astra.ast.tr.CartagoAction;
-import astra.ast.tr.EISAction;
 import astra.ast.tr.FunctionCallAction;
 import astra.ast.tr.TRAction;
 import astra.ast.tr.TRModuleCallAction;
@@ -202,22 +195,6 @@ public class TypeCheckVisitor implements IElementVisitor {
 	}
 
 	@Override
-	public Object visit(EISEvent event, Object data) throws ParseException {
-		event.id().accept(this,data);
-		if (event.entity() != null) event.entity().accept(this, data);
-		event.content().accept(this, data);
-		return null;
-	}
-
-	@Override
-	public Object visit(CartagoEvent event, Object data) throws ParseException {
-		event.type().accept(this, data);
-		if (event.evt() != null) event.evt().accept(this, data);
-//		event.content().accept(this, data);
-		return null;
-	}
-
-	@Override
 	public Object visit(BasicAcreEvent event, Object data)
 			throws ParseException {
 		event.type().accept(this, data);
@@ -254,22 +231,10 @@ public class TypeCheckVisitor implements IElementVisitor {
 	}
 
 	@Override
-	public Object visit(EISFormula formula, Object data) throws ParseException {
-		formula.formula().accept(this, data);
-		return null;
-	}
-	
-	@Override
 	public Object visit(AcreFormula formula, Object data) throws ParseException {
 		return null;
 	}
 
-	@Override
-	public Object visit(CartagoFormula formula, Object data)
-			throws ParseException {
-		return null;
-	}
-	
 	@Override
 	public Object visit(PredicateFormula formula, Object data) throws ParseException {
 		if (!skipOntology && !((ComponentStore) data).signatures.contains(formula.toSignature()))
@@ -352,7 +317,7 @@ public class TypeCheckVisitor implements IElementVisitor {
 
 	@Override
 	public Object visit(ModuleFormula formula, Object data) throws ParseException {
-		skipOntology = true;
+		skipOntology = true;	
 		formula.method().accept(this, data);
 		skipOntology = false;
 		return null;
@@ -425,12 +390,6 @@ public class TypeCheckVisitor implements IElementVisitor {
 	}
 
 	@Override
-	public Object visit(EISStatement statement, Object data)
-			throws ParseException {
-		return null;
-	}
-
-	@Override
 	public Object visit(AcreStartStatement statement, Object data)
 			throws ParseException {
 		statement.protocol().accept(this, data);
@@ -450,15 +409,6 @@ public class TypeCheckVisitor implements IElementVisitor {
 		return null;
 	}
 
-	@Override
-	public Object visit(CartagoStatement statement, Object data)
-			throws ParseException {
-		if (statement.artifact() != null) statement.artifact().accept(this, data);
-		//statement.call().accept(this,data);
-		return null;
-	}
-
-	
 	@Override
 	public Object visit(InlineVariableDeclaration term, Object data) throws ParseException {
 		return null;
@@ -623,12 +573,6 @@ public class TypeCheckVisitor implements IElementVisitor {
 
 	@Override
 	public Object visit(CartagoAction action, Object data) throws ParseException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(EISAction action, Object data) throws ParseException {
 		// TODO Auto-generated method stub
 		return null;
 	}

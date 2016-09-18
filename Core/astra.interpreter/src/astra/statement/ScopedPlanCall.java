@@ -39,7 +39,7 @@ public class ScopedPlanCall extends AbstractStatement {
 						intention.failed("No such plan: " + call, null);
 						return false;
 					}
-					Map<Integer, Term> bindings = Unifier.unify(plan.id(), call);
+					Map<Integer, Term> bindings = Unifier.unify(plan.id(), call, intention.agent);
 					if (bindings == null) {
 						intention.failed("Plan call: " + call + " does not match expected types: " + plan.id(), null);
 						return false;

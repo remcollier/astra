@@ -8,6 +8,7 @@ public class MethodSignature {
 	private String returnType;
 	private int type;
 	private String signature;
+	boolean symbol;
 	
 	public MethodSignature(PredicateFormula formula, int type) {
 		this.type = type;
@@ -16,6 +17,11 @@ public class MethodSignature {
 		for (int i=0; i < formula.termCount(); i++) {
 			types[i] = new MethodType(formula.terms().get(i));
 		}
+	}
+
+	public MethodSignature(PredicateFormula formula, int type, boolean symbol) {
+		this(formula, type);
+		this.symbol = symbol;
 	}
 	
 	public String name() {
@@ -62,5 +68,9 @@ public class MethodSignature {
 
 	public String signature() {
 		return signature;
+	}
+	
+	public boolean symbol() {
+		return symbol;
 	}
 }

@@ -1,0 +1,9 @@
+package astra.fipa;
+
+agent FIPARequestProtocol {
+	rule +!start_fipa_request(string receiver, funct action, int timeout, string id) {
+		!get_conversation_id(id);
+		send(request, receiver, content(id, action));
+		!!fipa_timeout(id, timeout);
+	}
+}

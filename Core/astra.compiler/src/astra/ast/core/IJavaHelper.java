@@ -31,4 +31,11 @@ public interface IJavaHelper {
 	public BuildContext getBuildContext();
 
 	public long lastModified(String clazz);
+
+	public boolean hasAutoAction(String className);
+	public boolean hasAutoFormula(String className);
+
+	public boolean getEventSymbols(String className, MethodSignature signature, String symbol);
+
+	public boolean suppressAutoActionNotifications(String className);
 }

@@ -149,7 +149,6 @@ public class VariableVisitor implements LogicVisitor {
 
 	@Override
 	public Object visit(CartagoProperty property) {
-		property.target().accept(this);
 		property.content().accept(this);
 		return null;
 	}

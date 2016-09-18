@@ -51,7 +51,7 @@ public class AcreFormulaStackEntry implements ReasonerStackEntry {
 		nextFormula = (Formula) options.remove().accept(visitor);
 //		System.out.println("acre next:" + nextFormula);
 		if (nextFormula instanceof AcreFormula) {
-			Map<Integer, Term> bindings = Unifier.unify((AcreFormula) formula.accept(visitor), (AcreFormula) nextFormula, new HashMap<Integer, Term>(initial));
+			Map<Integer, Term> bindings = Unifier.unify((AcreFormula) formula.accept(visitor), (AcreFormula) nextFormula, new HashMap<Integer, Term>(initial),reasoner.agent);
 			if (bindings != null) {
 //				System.out.println("bound: "+ formula.accept(visitor));
 				solved = true;

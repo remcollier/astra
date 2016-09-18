@@ -2,6 +2,7 @@ package astra.ast.jdt;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -32,11 +33,16 @@ import astra.ast.core.ASTRAClassElement;
 import astra.ast.core.AbstractHelper;
 import astra.ast.core.BuildContext;
 import astra.ast.core.IJavaHelper;
+import astra.ast.core.ITerm;
 import astra.ast.core.ImportElement;
 import astra.ast.core.ParseException;
+import astra.ast.core.Token;
 import astra.ast.element.PackageElement;
 import astra.ast.formula.MethodSignature;
 import astra.ast.formula.MethodType;
+import astra.ast.formula.PredicateFormula;
+import astra.ast.term.Variable;
+import astra.ast.type.ObjectType;
 
 
 public class JDTHelper extends AbstractHelper {
@@ -44,7 +50,7 @@ public class JDTHelper extends AbstractHelper {
 	public static Map<Integer, String> ANNOTATIONS = new HashMap<Integer, String>();
 	private static Map<String, String> PRIMITIVE_MAP = new HashMap<String, String>();
 	private static Set<String> PRIMITIVES = new HashSet<String>();
-
+	
 	static {
 		ANNOTATIONS.put(ACTION, "ACTION");
 		ANNOTATIONS.put(TERM, "TERM");
@@ -184,6 +190,7 @@ public class JDTHelper extends AbstractHelper {
 			if (!file.exists()) {
 				for(IClasspathEntry entry : javaProject.getRawClasspath()) {
 					IPath path = entry.getPath();
+					System.out.println("jar: " + path);
 					if ("jar".equalsIgnoreCase(path.getFileExtension())) {
 						JarFile jf = null;
 						try {
@@ -218,110 +225,44 @@ public class JDTHelper extends AbstractHelper {
 
 	@Override
 	public boolean validate(String moduleClass, MethodSignature signature) {
-		org.eclipse.jdt.core.IType cls = getType(moduleClass);
-		
-//		System.out.println("signature: " + signature.name() + " / " + signature.termCount());
-		try {
-			while (cls != null) {
-//				System.out.println("cls methods : " + cls.getMethods().length);
-				for (IMethod mthd : cls.getMethods()) {
-//					System.out.println("method: " + mthd.getElementName() + " / " + mthd.getParameterTypes().length);
-					if (mthd.getElementName().equals(signature.name()) && signature.termCount() == mthd.getParameterTypes().length) {
-						for (IAnnotation ann : mthd.getAnnotations()) {
-							String annot = ANNOTATIONS.get(signature.type());
-//							System.out.println("\tAnnotation: " + annot);
-							try {
-								if (ann.getElementName().equals(annot) || ann.getElementName().equals(ALTERNATE.get(signature.type()))) {
-//									System.out.println("variable matching...");
-									if (signature.type() == IJavaHelper.EVENT) {
-										String sig = null;
-										String[] params = null;
-										for (IMemberValuePair mvp : ann.getMemberValuePairs()) {
-											if (mvp.getMemberName().equals("signature")) {
-												sig = mvp.getValue().toString();
-											} else if (mvp.getMemberName().equals("types")) {
-												Object[] objs = (Object[]) mvp.getValue();
-												params = new String[objs.length];
-												for (int i=0; i < objs.length; i++) {
-													params[i] = objs[i].toString();
-												}
-											}
-										}
+		return getMatchingMethod(moduleClass, signature) != null;
+	}
 
-										int i = 0;
-										boolean match = true;
-										while (match && i < params.length) {
-//											System.out.println("param: " + params[i]);
-//											System.out.println("sig: " + signature.type(i).type());
-											match = params[i].equals(signature.type(i).type());
-											i++;
-										}
-//										System.out.println("\tmatch: " + match);
-										if (match) {
-											signature.signature(sig);
-											return true;
-										}
-									} else {
-										ILocalVariable[] params = mthd.getParameters();
-										int i = 0;
-										boolean match = true;
-										while (match && i < params.length) {
-											match = matchType(params[i].getTypeSignature(), signature.type(i));
-	//										System.out.println("\t\tmatched: " + i + " / " + match + " / " + params[i].getTypeSignature() + " = "  +signature.type(i));
-											i++;
-										}
-										
-										if (match) {
-	//										System.out.println("\tmatch: " + mthd.getReturnType());
-											String retType = null;
-											if (mthd.getReturnType().startsWith("[")) {
-												retType = Signature.toString(mthd.getReturnType());
-											} else {
-												String cl = mthd.getReturnType();
-												if (isSignature(cl)) {
-													cl = Signature.toString(cl);
-												}
-												IType type = getType(cl);
-												if (type == null) {
-													retType = cl;
-												} else {
-													retType = type.getFullyQualifiedName();
-												}
-											}
-											
-											String t = MethodType.resolveType(retType);
-	//										System.out.println("retType: " + retType);
-	//										System.out.println("ret: " + t);
-											if (t == null) 
-												signature.returnType(retType);
-											else
-												signature.returnType(t);
-											return true;
-	//									} else {
-	//										System.out.println("\tno match...");
-										}
-									}
-								}
-							} catch (Throwable th) {
-								th.printStackTrace();
-							}
-						}
-					}
+	private boolean validate(MethodSignature signature, IMethod mthd) throws JavaModelException {
+		ILocalVariable[] params = mthd.getParameters();
+		int i = 0;
+		boolean match = true;
+		while (match && i < params.length) {
+			match = matchType(params[i].getTypeSignature(), signature.type(i));
+			i++;
+		}
+		
+		if (match) {
+			String retType = null;
+			if (mthd.getReturnType().startsWith("[")) {
+				retType = Signature.toString(mthd.getReturnType());
+			} else {
+				String cl = mthd.getReturnType();
+				if (isSignature(cl)) {
+					cl = Signature.toString(cl);
 				}
-				if (cls.getSuperclassName() == null) {
-					return false;
+				IType type = getType(cl);
+				if (type == null) {
+					retType = cl;
+				} else {
+					retType = type.getFullyQualifiedName();
 				}
-				
-				cls = getType(cls.getSuperclassName());
 			}
-//			System.out.println("finished and failed...");
-		} catch (JavaModelException e) {
-			e.printStackTrace();
-			return false;
+			
+			String t = MethodType.resolveType(retType);
+			if (t == null) 
+				signature.returnType(retType);
+			else
+				signature.returnType(t);
+			return true;
 		}
 		return false;
 	}
-
 
 	private boolean matchType(String cls, MethodType methodType) {
 //		System.out.println("cls: " + cls);
@@ -419,5 +360,150 @@ public class JDTHelper extends AbstractHelper {
 	@Override
 	public long lastModified(String clazz) {
 		return 0;
+	}
+
+	@Override
+	public boolean hasAutoAction(String className) {
+		return validate(className, getAutoMethodSignature()); 
+	}
+
+	private MethodSignature getAutoMethodSignature() {
+		Variable V = new Variable("X",null,null,null);
+		V.setType(new ObjectType(Token.OBJECT_TYPE, "astra.formula.Predicate"));
+		Variable V2 = new Variable("Y",null,null,null);
+		V2.setType(new ObjectType(Token.OBJECT_TYPE, "astra.core.Intention"));
+		return new MethodSignature(
+				new PredicateFormula("auto_action", 
+						Arrays.asList((ITerm) V2, (ITerm) V),
+						null, null, null
+				),
+				-1
+		);
+	}
+	
+	@Override
+	public boolean hasAutoFormula(String className) {
+		Variable V = new Variable("X",null,null,null);
+		V.setType(new ObjectType(Token.OBJECT_TYPE, "astra.formula.Predicate"));
+		return validate(className, 
+				new MethodSignature(
+						new PredicateFormula("auto_formula", 
+								Arrays.asList((ITerm) V),
+								null, null, null
+						),
+						-1
+				)
+		);
+	}
+
+	@Override
+	public boolean getEventSymbols(String className, MethodSignature signature, String symbol) {
+		org.eclipse.jdt.core.IType cls = getType(className);
+
+		try {
+			while (cls != null) {
+				for (IMethod mthd : cls.getMethods()) {
+					if (mthd.getElementName().equals(signature.name())) {
+						if (signature.termCount() != (mthd.getParameterTypes().length-(signature.symbol() ? 1:0))) continue;
+						
+						for (IAnnotation ann : mthd.getAnnotations()) {
+							if (ann.getElementName().equals(ANNOTATIONS.get(EVENT)) || ann.getElementName().equals(ALTERNATE.get(EVENT))) {
+								for (IMemberValuePair mvp : ann.getMemberValuePairs()) {
+									if (mvp.getMemberName().equals("symbols")) {
+										Object[] objs = (Object[]) mvp.getValue();
+										for (int i=0; i < objs.length; i++) {
+											if (objs[i].toString().equals(symbol)) return true;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				cls = getType(cls.getSuperclassName());
+			}
+		} catch (JavaModelException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean suppressAutoActionNotifications(String className) {
+		IMethod mthd = getMatchingMethod(className, getAutoMethodSignature());
+		try {
+			for (IAnnotation ann : mthd.getAnnotations()) {
+				if (ann.getElementName().equals("astra.core.Module.SUPPRESS_NOTIFICATIONS")) return true;
+			}
+		} catch (JavaModelException e) {
+			return false;
+		}
+		return false;
+	}
+
+	private IMethod getMatchingMethod(String moduleClass, MethodSignature signature) {
+		org.eclipse.jdt.core.IType cls = getType(moduleClass);
+		
+		try {
+			while (cls != null) {
+				for (IMethod mthd : cls.getMethods()) {
+					if (mthd.getElementName().equals(signature.name()) && signature.termCount() == mthd.getParameterTypes().length-(signature.symbol() ? 1:0)) {
+						if (signature.type() == -1) {
+							return validate(signature, mthd) ? mthd:null;
+						} else {
+							for (IAnnotation ann : mthd.getAnnotations()) {
+								String annot = ANNOTATIONS.get(signature.type());
+								try {
+									if (ann.getElementName().equals(annot) || ann.getElementName().equals(ALTERNATE.get(signature.type()))) {
+										if (signature.type() == IJavaHelper.EVENT) {
+											String sig = null;
+											String[] params = null;
+											for (IMemberValuePair mvp : ann.getMemberValuePairs()) {
+												if (mvp.getMemberName().equals("signature")) {
+													sig = mvp.getValue().toString();
+												} else if (mvp.getMemberName().equals("types")) {
+													Object[] objs = (Object[]) mvp.getValue();
+													params = new String[objs.length];
+													for (int i=0; i < objs.length; i++) {
+														params[i] = objs[i].toString();
+													}
+												}
+											}
+	
+											int i = 0;
+											boolean match = true;
+											while (match && i < params.length) {
+												match = params[i].equals(signature.type(i).type());
+												i++;
+											}
+											
+											if (match) {
+												signature.signature(sig);
+												return mthd;
+											}
+										} else {
+											if (validate(signature,mthd)) return mthd;
+										}
+									}
+								} catch (Throwable th) {
+									th.printStackTrace();
+								}
+							}
+						}
+					}
+				}
+				if (cls.getSuperclassName() == null) {
+					return null;
+				}
+				
+				cls = getType(cls.getSuperclassName());
+			}
+//			System.out.println("finished and failed...");
+		} catch (JavaModelException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return null;
 	}
 }

@@ -471,28 +471,12 @@ public class Intention {
 		return agent.queryAll(formula);
 	}
 
-	public EISAgent getEISAgent(String id) {
-		if (id == null) {
-			return agent.defaultEISAgent();
-		}
-		if (agent.eisAgents().isEmpty()) {
-			System.err.println("No connected environment");
-			return null;
-		}
-		
-		return agent.eisAgents().get(id);
-	}
-
 	public void startFunction(Predicate function) {
 		agent.startFunction(function);
 	}
 
 	public StatementHandler getNextStatement() {
 		return statements.peek();
-	}
-
-	public CartagoAPI getCartagoAPI() {
-		return agent.getCartagoAPI();
 	}
 
 	public void addEvent(Event event) {

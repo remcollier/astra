@@ -47,6 +47,11 @@ public class MethodType {
 		if (t == null) t = ((ObjectType) term.type()).getClazz();
 		type = t;		
 	}
+
+	public MethodType(String type) {
+		variable = false;
+		this.type = type;		
+	}
 	
 	public String toString() {
 		return type + (variable ? " [var]":"[val]");

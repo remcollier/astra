@@ -17,6 +17,7 @@ import astra.formula.Inference;
 import astra.formula.Predicate;
 import astra.reasoner.Queryable;
 import astra.reasoner.Unifier;
+import astra.reasoner.util.BindingsEvaluateVisitor;
 import astra.reasoner.util.VariableVisitor;
 import astra.term.Term;
 import astra.tr.Function;
@@ -184,14 +185,10 @@ public abstract class ASTRAClass implements Queryable {
 			}
 			
 			if (_event != null) {
-				Map<Integer, Term> bindings = Unifier.unify(_event, event);
+				Map<Integer, Term> bindings = Unifier.unify(_event, event, agent);
 //				System.out.println("Event Bindings: " + bindings);
 				if (bindings != null) {
 					List<Map<Integer, Term>> results = agent.query(rule.context, bindings);
-//					VariableVisitor visitor = new VariableVisitor();
-//					rule.context.accept(visitor);
-//					System.out.println("visit: " + visitor.variables());
-//					System.out.println("Context bindings: " + results);
 					if (results != null) {
 						if (!results.isEmpty()) {
 							bindings.putAll(results.get(0));

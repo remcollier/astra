@@ -20,8 +20,6 @@ import astra.ast.element.PlanElement;
 import astra.ast.element.RuleElement;
 import astra.ast.event.AdvancedAcreEvent;
 import astra.ast.event.BasicAcreEvent;
-import astra.ast.event.CartagoEvent;
-import astra.ast.event.EISEvent;
 import astra.ast.event.MessageEvent;
 import astra.ast.event.ModuleEvent;
 import astra.ast.event.UpdateEvent;
@@ -29,9 +27,7 @@ import astra.ast.formula.AcreFormula;
 import astra.ast.formula.AndFormula;
 import astra.ast.formula.BindFormula;
 import astra.ast.formula.BracketFormula;
-import astra.ast.formula.CartagoFormula;
 import astra.ast.formula.ComparisonFormula;
-import astra.ast.formula.EISFormula;
 import astra.ast.formula.FormulaVariable;
 import astra.ast.formula.GoalFormula;
 import astra.ast.formula.MethodSignature;
@@ -47,9 +43,7 @@ import astra.ast.statement.AcreDenyCancelStatement;
 import astra.ast.statement.AcreStartStatement;
 import astra.ast.statement.AssignmentStatement;
 import astra.ast.statement.BlockStatement;
-import astra.ast.statement.CartagoStatement;
 import astra.ast.statement.DeclarationStatement;
-import astra.ast.statement.EISStatement;
 import astra.ast.statement.ForAllStatement;
 import astra.ast.statement.ForEachStatement;
 import astra.ast.statement.IfStatement;
@@ -81,7 +75,6 @@ import astra.ast.term.QueryTerm;
 import astra.ast.term.Variable;
 import astra.ast.tr.BlockAction;
 import astra.ast.tr.CartagoAction;
-import astra.ast.tr.EISAction;
 import astra.ast.tr.FunctionCallAction;
 import astra.ast.tr.TRAction;
 import astra.ast.tr.TRModuleCallAction;
@@ -399,16 +392,6 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 		return null;
 	}
 
-	public Object visit(EISAction action, Object data) throws ParseException {
-		code.append(data + "new EISAction(\n");
-		code.append(data + "\t" + locationData(action));
-		code.append(",\n");
-		action.call().accept(this, data + "\t");
-		code.append("\n" + data + ")\n");
-
-		return null;
-	}
-
 	public Object visit(CartagoAction action, Object data)
 			throws ParseException {
 		code.append(data + "new CartagoAction(\n");
@@ -583,17 +566,39 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 		MethodSignature signature = new MethodSignature(statement.method(), IJavaHelper.ACTION);
 		
 		if (!helper.validate(element.qualifiedName(), signature)) {
-			throw new ParseException(
-					"Could not find matching method for action call: "
-							+ statement.method() + " on module: "
-							+ statement.module(), statement);
+			if (helper.hasAutoAction(element.className())) {
+				code.append(data + "new ModuleCall(\"" + statement.module() + "\",\n\t"
+						+ data + locationData(statement) + ",\n");
+				statement.method().accept(this, data + "\t");
+
+				code.append(",\n\t" + data + "new DefaultModuleCallAdaptor() {\n");
+				code.append(data + "\t\tpublic boolean invoke(Intention intention, Predicate predicate) {\n");
+				code.append(data + "\t\t\treturn ((" + element.qualifiedName());
+				code.append(") intention.getModule(\"" + fullName + "\",\"");
+				code.append(statement.module() + "\")).auto_action(intention,predicate);\n");
+				code.append(data + "\t\t}\n");
+				
+				if (helper.suppressAutoActionNotifications(element.className())) {
+					code.append(data + "\t\tpublic boolean suppressNotification() {\n");
+					code.append(data + "\t\t\treturn true;\n");
+					code.append(data + "\t\t}\n");
+				}
+					
+				code.append(data + "\t}\n" + data + ")");
+				return null;
+			} else {
+				throw new ParseException(
+						"Could not find matching method for action call: "
+								+ statement.method() + " on module: "
+								+ statement.module(), statement);
+			}
 		}
 
 		code.append(data + "new ModuleCall(\"" + statement.module() + "\",\n\t"
 				+ data + locationData(statement) + ",\n");
 		statement.method().accept(this, data + "\t");
 
-		code.append(",\n\t" + data + "new ModuleCallAdaptor() {\n")
+		code.append(",\n\t" + data + "new DefaultModuleCallAdaptor() {\n")
 				.append(data
 						+ "\t\tpublic boolean invoke(Intention intention, Predicate predicate) {\n")
 				.append(data + "\t\t\treturn ((" + element.qualifiedName()
@@ -796,23 +801,6 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 	}
 
 	@Override
-	public Object visit(EISStatement statement, Object data)
-			throws ParseException {
-		code.append(data + "new EISCall(\n\t" + data + locationData(statement) + ",\n");
-		if (statement.id() != null) {
-			statement.id().accept(this, data + "\t");
-			code.append(",\n");
-		}
-		if (statement.entity() != null) {
-			statement.entity().accept(this, data + "\t");
-			code.append(",\n");
-		}
-		statement.call().accept(this, data + "\t");
-		code.append("\n" + data + ")");
-		return null;
-	}
-
-	@Override
 	public Object visit(AcreStartStatement statement, Object data)
 			throws ParseException {
 		code.append(data + "new AcreStart(\n\t" + data + locationData(statement)
@@ -870,20 +858,6 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 		code.append(data + "new AcreDenyCancel(\n\t" + data + locationData(statement)
 				+ ",\n");
 		statement.cid().accept(this, data + "\t");
-		code.append("\n" + data + ")");
-		return null;
-	}
-
-	@Override
-	public Object visit(CartagoStatement statement, Object data)
-			throws ParseException {
-		code.append(data + "new CartagoDoStatement(\n\t" + data
-				+ locationData(statement) + ",\n");
-		if (statement.artifact() != null) {
-			statement.artifact().accept(this, data + "\t");
-			code.append(",\n");
-		}
-		statement.call().accept(this, data + "\t");
 		code.append("\n" + data + ")");
 		return null;
 	}
@@ -964,29 +938,14 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 	}
 
 	@Override
-	public Object visit(EISEvent event, Object data) throws ParseException {
-		String type = (event.type() == EISEvent.ENVIRONMENT ? "EISEvent.ENVIRONMENT":(event.type() == EISEvent.ADDITION ? "EISEvent.ADDED":"EISEvent.REMOVED"));
-		code.append(data + "new EISEvent(" + type + ",\n");
-		event.id().accept(this, data + "\t");
-		code.append(",\n");
-		if (event.entity() != null) {
-			event.entity().accept(this, data + "\t");
-			code.append(",\n");
-		}
-		event.content().accept(this, data + "\t");
-		code.append("\n" + data + ")");
-
-		return null;
-	}
-
-	@Override
 	public Object visit(ModuleEvent event, Object data) throws ParseException {
 		ModuleElement element = store.modules.get(event.module());
 		if (element == null) {
 			throw new ParseException("Could not locate declaration for module: " + event.module(), event);
 		}
 
-		MethodSignature signature = new MethodSignature(event.event(), IJavaHelper.EVENT);
+		MethodSignature signature = new MethodSignature(event.event(), IJavaHelper.EVENT, event.symbol() != null);
+		
 		if (!helper.validate(element.qualifiedName(), signature)) {
 			throw new ParseException(
 					"Could not find matching method for event call: "
@@ -1006,6 +965,19 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 						+ event.module() + "\"))."
 						+ event.event().predicate() + "(");
 
+		if (event.symbol() != null) {
+			if (helper.getEventSymbols(element.qualifiedName(), signature, event.symbol())) {
+				code.append("\n" + data + "\t\t\t\t\""+event.symbol()+"\",");
+			} else {
+				throw new ParseException(
+						"Invalid eveny symbol: " 
+								+ event.symbol() + " for event: "
+								+ event.event() + " on module: "
+								+ event.module(), event);
+				
+			}
+		}
+		
 		for (int i = 0; i < signature.types().length; i++) {
 			if (i > 0)
 				code.append(",");
@@ -1016,18 +988,6 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 		code.append("\n" + data + "\t\t\t);\n").append(data + "\t\t}\n")
 				.append(data + "\t}").append("\n" + data + ")");
 
-		return null;
-	}
-
-	@Override
-	public Object visit(CartagoEvent event, Object data) throws ParseException {
-		code.append(data + "new CartagoASTRAEvent(\n");
-		event.type().accept(this, data + "\t");
-		code.append(",\n");
-		event.evt().accept(this, data + "\t");
-		code.append(",\n");
-		event.content().accept(this, data + "\t");
-		code.append("\n" + data + ")");
 		return null;
 	}
 
@@ -1167,35 +1127,6 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 	}
 
 	@Override
-	public Object visit(EISFormula formula, Object data) throws ParseException {
-		code.append(data + "new EISFormula(\n");
-		if (formula.id() != null) {
-			formula.id().accept(this, data + "\t");
-			code.append(",\n");
-		}
-		if (formula.entity() != null) {
-			formula.entity().accept(this, data + "\t");
-			code.append(",\n");
-		}
-		formula.formula().accept(this, data + "\t");
-		code.append("\n" + data + ")");
-		return null;
-	}
-
-	@Override
-	public Object visit(CartagoFormula formula, Object data)
-			throws ParseException {
-		code.append(data + "new CartagoProperty(\n");
-		if (formula.artifact() != null) {
-			formula.artifact().accept(this, data + "\t");
-			code.append(",\n");
-		}
-		formula.formula().accept(this, data + "\t");
-		code.append("\n" + data + ")");
-		return null;
-	}
-
-	@Override
 	public Object visit(AcreFormula formula, Object data) throws ParseException {
 		code.append(data + "new AcreFormula(\n");
 		formula.cid().accept(this, data + "\t");
@@ -1225,12 +1156,27 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 		if (element == null) {
 			throw new ParseException("Could not locate declaration for module: " + formula.module(), formula);
 		}
+		
 		MethodSignature signature = new MethodSignature(formula.method(), IJavaHelper.FORMULA);
 		if (!helper.validate(element.qualifiedName(), signature)) {
-			throw new ParseException(
-					"Could not find matching method for formula call: "
-							+ formula.method() + " on module: "
-							+ formula.module(), formula);
+			if (helper.hasAutoFormula(element.className())) {
+				code.append(data + "new ModuleFormula(\"" + formula.module() + "\",\n");
+				formula.method().accept(this, data + "\t");
+
+				code.append(",\n\t" + data + "new ModuleFormulaAdaptor() {\n")
+						.append(data + "\t\tpublic Formula invoke(BindingsEvaluateVisitor visitor, Predicate predicate) {\n")
+						.append(data + "\t\t\treturn ((" + element.qualifiedName())
+						.append(") visitor.agent().getModule(\"" + fullName + "\",\"")
+						.append(formula.module() + "\")).auto_formula(predicate);\n")
+						.append(data + "\t\t}\n" + data + "\t}")
+						.append("\n" + data + ")");
+				return null;
+			} else {
+				throw new ParseException(
+						"Could not find matching method for formula call: "
+								+ formula.method() + " on module: "
+								+ formula.module(), formula);
+			}
 		}
 
 		code.append(data + "new ModuleFormula(\"" + formula.module() + "\",\n");

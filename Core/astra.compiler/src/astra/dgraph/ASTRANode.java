@@ -18,8 +18,12 @@ public class ASTRANode {
 		compiled = false;
 		try {
 			this.element = helper.loadAST(name);
-			loaded = element.getErrorList().isEmpty();
-			lastModified = helper.lastModified(name);
+			if (element == null) {
+				loaded=false;
+			} else {
+				loaded = element.getErrorList().isEmpty();
+				lastModified = helper.lastModified(name);
+			}
 		} catch (ParseException e) {
 			loaded = false;
 			throw e;

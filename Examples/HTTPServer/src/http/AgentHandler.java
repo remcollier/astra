@@ -34,10 +34,8 @@ public class AgentHandler implements HttpHandler {
 				args.add(Primitive.newPrimitive(path[i]));
 			}
 
-			Goal gl;
-			agent.addEvent(new GoalEvent(GoalEvent.ADDITION, gl = new Goal(new Predicate(path[1], new Term[] {
+			agent.addEvent(new GoalEvent(GoalEvent.ADDITION, new Goal(new Predicate(path[1], new Term[] {
 					Primitive.newPrimitive(exchange.getRequestMethod()), Primitive.newPrimitive(exchange), args }))));
-			System.out.println("Goal: " + gl);
 		}
 	}
 

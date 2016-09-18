@@ -2,14 +2,18 @@ package astra.cartago;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import astra.formula.Formula;
 import astra.formula.Predicate;
+import astra.reasoner.Queryable;
 import cartago.ArtifactId;
 
-public class ArtifactStore {
+public class ArtifactStore implements Queryable {
     private Map<String, Predicate> observableProperties = new HashMap<String, Predicate>();
     private Map<String, Set<String>> artifactProperties = new HashMap<String, Set<String>>();
     
@@ -79,5 +83,26 @@ public class ArtifactStore {
 
 	public void removeArtifactProperties(ArtifactId artifactId) {
 		artifactProperties.remove(artifactId.getName());
+	}
+
+	@Override
+	public List<Formula> getMatchingFormulae(Formula formula) {
+		List<Formula> formulae = new LinkedList<Formula>();
+		
+		if (CartagoProperty.class.isInstance(formula)) {
+			
+			CartagoProperty property = (CartagoProperty) formula;
+			if (property.target() != null) {
+				Set<String> ids = artifactProperties.get( property.target().getName());
+				if (ids != null) {
+					for (String id : ids) {
+						formulae.add(observableProperties.get(id));
+					}
+				}
+			} else {
+				formulae.addAll(observableProperties.values());
+			}
+		}
+		return formulae;
 	}
 }

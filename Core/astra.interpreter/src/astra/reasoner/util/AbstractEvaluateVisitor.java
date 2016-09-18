@@ -251,7 +251,7 @@ public abstract class AbstractEvaluateVisitor implements LogicVisitor {
 
 	@Override
 	public Object visit(CartagoProperty property) {
-		return new CartagoProperty((Term) property.target().accept(this), (Predicate) property.content().accept(this));
+		return new CartagoProperty((Predicate) property.content().accept(this));
 	}
 
 	@Override

@@ -31,12 +31,12 @@ public class TestController extends ASTRAClass {
 			),
 			Predicate.TRUE,
 			new Block(
-				"http.TestController", new int[] {6,27,9,5},
+				"http.TestController", new int[] {9,27,12,5},
 				new Statement[] {
 					new ModuleCall("ws",
-						"http.TestController", new int[] {7,8,7,18},
+						"http.TestController", new int[] {10,8,10,18},
 						new Predicate("setup", new Term[] {}),
-						new ModuleCallAdaptor() {
+						new DefaultModuleCallAdaptor() {
 							public boolean invoke(Intention intention, Predicate predicate) {
 								return ((http.WebServer) intention.getModule("http.TestController","ws")).setup(
 								);
@@ -44,9 +44,9 @@ public class TestController extends ASTRAClass {
 						}
 					),
 					new ModuleCall("ws",
-						"http.TestController", new int[] {8,8,8,21},
+						"http.TestController", new int[] {11,8,11,21},
 						new Predicate("register", new Term[] {}),
-						new ModuleCallAdaptor() {
+						new DefaultModuleCallAdaptor() {
 							public boolean invoke(Intention intention, Predicate predicate) {
 								return ((http.WebServer) intention.getModule("http.TestController","ws")).register(
 								);
@@ -68,19 +68,96 @@ public class TestController extends ASTRAClass {
 			),
 			Predicate.TRUE,
 			new Block(
-				"http.TestController", new int[] {11,88,15,5},
+				"http.TestController", new int[] {14,88,16,5},
 				new Statement[] {
 					new ModuleCall("ws",
-						"http.TestController", new int[] {13,8,13,44},
+						"http.TestController", new int[] {15,8,15,92},
+						new Predicate("sendHTML", new Term[] {
+							new Variable(new ObjectType(com.sun.net.httpserver.HttpExchange.class), "exchange"),
+							Operator.newOperator('+',
+								Primitive.newPrimitive("<html><body><h1>Hello World: "),
+								Operator.newOperator('+',
+									new Variable(Type.LIST, "args"),
+									Primitive.newPrimitive("</h1></body></html>")
+								)
+							)
+						}),
+						new DefaultModuleCallAdaptor() {
+							public boolean invoke(Intention intention, Predicate predicate) {
+								return ((http.WebServer) intention.getModule("http.TestController","ws")).sendHTML(
+									(com.sun.net.httpserver.HttpExchange) intention.evaluate(predicate.getTerm(0)),
+									(java.lang.String) intention.evaluate(predicate.getTerm(1))
+								);
+							}
+						}
+					)
+				}
+			)
+		));
+		addRule(new Rule(
+			new GoalEvent('+',
+				new Goal(
+					new Predicate("test2", new Term[] {
+						Primitive.newPrimitive("GET"),
+						new Variable(new ObjectType(com.sun.net.httpserver.HttpExchange.class), "exchange"),
+						new Variable(Type.LIST, "args")
+					})
+				)
+			),
+			Predicate.TRUE,
+			new Block(
+				"http.TestController", new int[] {18,89,20,5},
+				new Statement[] {
+					new ModuleCall("ws",
+						"http.TestController", new int[] {19,8,19,44},
 						new Predicate("sendView", new Term[] {
 							new Variable(new ObjectType(com.sun.net.httpserver.HttpExchange.class), "exchange"),
 							Primitive.newPrimitive("/Hello.html")
 						}),
-						new ModuleCallAdaptor() {
+						new DefaultModuleCallAdaptor() {
 							public boolean invoke(Intention intention, Predicate predicate) {
 								return ((http.WebServer) intention.getModule("http.TestController","ws")).sendView(
 									(com.sun.net.httpserver.HttpExchange) intention.evaluate(predicate.getTerm(0)),
 									(java.lang.String) intention.evaluate(predicate.getTerm(1))
+								);
+							}
+						}
+					)
+				}
+			)
+		));
+		addRule(new Rule(
+			new GoalEvent('+',
+				new Goal(
+					new Predicate("test3", new Term[] {
+						Primitive.newPrimitive("GET"),
+						new Variable(new ObjectType(com.sun.net.httpserver.HttpExchange.class), "exchange"),
+						new Variable(Type.LIST, "args")
+					})
+				)
+			),
+			Predicate.TRUE,
+			new Block(
+				"http.TestController", new int[] {22,89,24,5},
+				new Statement[] {
+					new ModuleCall("ws",
+						"http.TestController", new int[] {23,8,23,55},
+						new Predicate("sendJSON", new Term[] {
+							new Variable(new ObjectType(com.sun.net.httpserver.HttpExchange.class), "exchange"),
+							new Funct("is", new Term[] {
+								new ListTerm(new Term[] {
+									new Funct("happy", new Term[] {
+										Primitive.newPrimitive("rem")
+									}),
+									Primitive.newPrimitive("bob")
+								})
+							})
+						}),
+						new DefaultModuleCallAdaptor() {
+							public boolean invoke(Intention intention, Predicate predicate) {
+								return ((http.WebServer) intention.getModule("http.TestController","ws")).sendJSON(
+									(com.sun.net.httpserver.HttpExchange) intention.evaluate(predicate.getTerm(0)),
+									(astra.term.Funct) intention.evaluate(predicate.getTerm(1))
 								);
 							}
 						}
@@ -96,6 +173,7 @@ public class TestController extends ASTRAClass {
 	public Fragment createFragment(astra.core.Agent agent) throws ASTRAClassNotFoundException {
 		Fragment fragment = new Fragment(this);
 		fragment.addModule("ws",http.WebServer.class,agent);
+		fragment.addModule("db",astra.util.DB.class,agent);
 		return fragment;
 	}
 

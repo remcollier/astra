@@ -45,11 +45,19 @@ public class ModuleCall extends AbstractStatement {
 							context.addUnboundVariables(visitor.variables());
 							context.resetActionParams();
 							try {
+								// THIS IS THE PROBLEM - THE ADAPTOR IS CALLED
+								// FROM HERE, AND THE CONTEXT IS RESUMED.
+								// NEED A SUSPEND NOTIFY METHOD TO ALLOW AUTO ACTIONS
+								// TO CIRCUMVENT THIS...
+								// DEFAULT SHOULD BE TO NOT SKIP NOTIFICATION...
+								
+								// ALTERNATIVE IS TO SUSPEND THE ACTION (BLOCK) AND 
+								// WAIT TO BE NOTIFIED
 								if (!adaptor.invoke(context, method)) {
 									context.notifyDone("Failed Action: " + module + "." + method);
 								}
 								context.applyActionParams();
-								context.notifyDone(null);
+								if (!adaptor.suppressNotification()) context.notifyDone(null);
 							} catch (Throwable th) {
 								context.notifyDone("Failed Action: " + module + "." + method, th);
 							}

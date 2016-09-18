@@ -12,6 +12,7 @@ public class Module {
 	public @interface EVENT {
 		String[] types();
 		String signature();
+		String[] symbols();
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
@@ -29,6 +30,10 @@ public class Module {
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.METHOD)
 	public @interface FORMULA {}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target(ElementType.METHOD)
+	public @interface SUPPRESS_NOTIFICATIONS {}
 	
 	protected Agent agent;
 	

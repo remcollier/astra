@@ -109,18 +109,14 @@
       </perspectiveExtension>
    </extension>
  <extension
-       point="org.eclipse.debug.core.launchConfigurationTypes">
-    <launchConfigurationType
-          delegate="astra.ide.launch.ASTRAFileLaunchConfigurationDelegate"
-          id="astra.file.launcher"
-          modes="run"
-          name="ASTRA Agent">
-    </launchConfigurationType>
- </extension>
- <extension
        point="org.eclipse.debug.ui.launchConfigurationTypeImages">
     <launchConfigurationTypeImage
           configTypeID="astra.file.launcher"
+          icon="icons/astra.gif"
+          id="astra.file.launcherImage">
+    </launchConfigurationTypeImage>
+    <launchConfigurationTypeImage
+          configTypeID="astra.debugger.launcher"
           icon="icons/astra.gif"
           id="astra.file.launcherImage">
     </launchConfigurationTypeImage>
@@ -149,6 +145,43 @@
           </enablement>
        </contextualLaunch>
     </shortcut>
+    <shortcut
+          class="astra.ide.launch.ASTRAFileDebugShortcut"
+          icon="icons/astra.gif"
+          id="astra.debugger.shortcut"
+          label="ASTRA Agent"
+          modes="debug">
+       <contextualLaunch>
+          <contextLabel
+                label="ASTRA Agent"
+                mode="debug">
+          </contextLabel>
+          <enablement>
+             <with
+                   variable="selection">
+                <iterate>
+                   <test property="astra.file.isFile">
+                   </test>
+                </iterate>
+             </with>
+          </enablement>
+       </contextualLaunch>
+    </shortcut>
+ </extension>
+ <extension
+       point="org.eclipse.debug.core.launchConfigurationTypes">
+    <launchConfigurationType
+          delegate="astra.ide.launch.ASTRAFileLaunchConfigurationDelegate"
+          id="astra.file.launcher"
+          modes="run"
+          name="ASTRA Agent">
+    </launchConfigurationType>
+    <launchConfigurationType
+          delegate="astra.ide.launch.ASTRAFileDebugConfigurationDelegate"
+          id="astra.debugger.launcher"
+          modes="debug"
+          name="ASTRA Agent">
+    </launchConfigurationType>
  </extension>
  <extension
        point="org.eclipse.debug.ui.launchConfigurationTabGroups">
@@ -157,6 +190,12 @@
           description="Main Tab"
           id="astra.file.tabGroup"
           type="astra.file.launcher">
+    </launchConfigurationTabGroup>
+    <launchConfigurationTabGroup
+          class="astra.ide.launch.ASTRAFileTabGroup"
+          description="Main Tab"
+          id="astra.file.tabGroup"
+          type="astra.debugger.launcher">
     </launchConfigurationTabGroup>
  </extension>
  <extension

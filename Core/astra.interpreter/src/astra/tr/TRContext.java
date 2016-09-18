@@ -45,7 +45,7 @@ public class TRContext {
 //			System.out.println("handling: " + trace.get(index));
 			Function function = agent.getFunction(trace.get(index));
 //			System.out.println("function: " + function);
-			Map<Integer, Term> bindings = Unifier.unify(function.identifier, trace.get(index));
+			Map<Integer, Term> bindings = Unifier.unify(function.identifier, trace.get(index), agent);
 			if (bindings == null) {
 				System.err.println("ERROR EXECUTING TR FUNCTION: " + trace.get(index));
 				for (int i=trace.size()-1; i >= 0; i--) {
@@ -89,18 +89,6 @@ public class TRContext {
 		
 	}
 
-	public EISAgent getEISAgent(String id) {
-		if (id == null) {
-			id = agent.defaultEnvironment();
-		}
-		if (agent.eisAgents().isEmpty()) {
-			System.err.println("No connected environment");
-			return null;
-		}
-		
-		return agent.eisAgents().get(id);
-	}
-
 	public String name() {
 		return agent.name();
 	}
@@ -111,9 +99,5 @@ public class TRContext {
 
 	public void stopFunction(Predicate function) {
 		agent.stopFunction(function);
-	}
-
-	public CartagoAPI getCartagoAPI() {
-		return agent.getCartagoAPI();
 	}
 }

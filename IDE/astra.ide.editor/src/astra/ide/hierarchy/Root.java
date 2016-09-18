@@ -22,7 +22,9 @@ public class Root extends PlatformObject {
 		try {
 			return ASTRAProject.getProject(file.getProject()).getASTRAClassElement(file);
 		} catch (CoreException e) {
+			e.printStackTrace();
 		} catch (ParseException e) {
+			e.printStackTrace();
 		}
 		return null;
 	}
