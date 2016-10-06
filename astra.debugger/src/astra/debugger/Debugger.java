@@ -31,16 +31,16 @@ public class Debugger extends ASTRAClass {
 			),
 			Predicate.TRUE,
 			new Block(
-				"astra.debugger.Debugger", new int[] {19,27,28,5},
+				"astra.debugger.Debugger", new int[] {18,27,26,5},
 				new Statement[] {
 					new Wait(
-						"astra.debugger.Debugger", new int[] {20,8,28,5},
+						"astra.debugger.Debugger", new int[] {19,8,26,5},
 						new Predicate("debugger_state", new Term[] {
 							Primitive.newPrimitive("initialized")
 						})
 					),
 					new If(
-						"astra.debugger.Debugger", new int[] {21,8,28,5},
+						"astra.debugger.Debugger", new int[] {20,8,26,5},
 						new Comparison("==",
 							new ModuleTerm("P", Type.INTEGER,
 								new Predicate("size", new Term[] {
@@ -62,11 +62,11 @@ public class Debugger extends ASTRAClass {
 							Primitive.newPrimitive(2)
 						),
 						new Block(
-							"astra.debugger.Debugger", new int[] {21,30,26,9},
+							"astra.debugger.Debugger", new int[] {20,30,25,9},
 							new Statement[] {
 								new Declaration(
 									new Variable(Type.STRING, "name"),
-									"astra.debugger.Debugger", new int[] {22,12,26,9},
+									"astra.debugger.Debugger", new int[] {21,12,25,9},
 									new ModuleTerm("P", Type.STRING,
 										new Predicate("valueAsString", new Term[] {
 											new Variable(Type.LIST, "args"),
@@ -90,7 +90,7 @@ public class Debugger extends ASTRAClass {
 								),
 								new Declaration(
 									new Variable(Type.STRING, "type"),
-									"astra.debugger.Debugger", new int[] {23,12,26,9},
+									"astra.debugger.Debugger", new int[] {22,12,25,9},
 									new ModuleTerm("P", Type.STRING,
 										new Predicate("valueAsString", new Term[] {
 											new Variable(Type.LIST, "args"),
@@ -113,7 +113,7 @@ public class Debugger extends ASTRAClass {
 									)
 								),
 								new ModuleCall("S",
-									"astra.debugger.Debugger", new int[] {24,12,24,37},
+									"astra.debugger.Debugger", new int[] {23,12,23,37},
 									new Predicate("createAgent", new Term[] {
 										new Variable(Type.STRING, "name"),
 										new Variable(Type.STRING, "type")
@@ -128,7 +128,7 @@ public class Debugger extends ASTRAClass {
 									}
 								),
 								new ModuleCall("S",
-									"astra.debugger.Debugger", new int[] {25,12,25,35},
+									"astra.debugger.Debugger", new int[] {24,12,24,35},
 									new Predicate("setMainGoal", new Term[] {
 										new Variable(Type.STRING, "name"),
 										new ListTerm(new Term[] {
@@ -146,14 +146,6 @@ public class Debugger extends ASTRAClass {
 								)
 							}
 						)
-					),
-					new SpawnGoal(
-						"astra.debugger.Debugger", new int[] {27,8,28,5},
-						new Goal(
-							new Predicate("turn", new Term[] {
-								Primitive.newPrimitive("on")
-							})
-						)
 					)
 				}
 			)
@@ -166,23 +158,10 @@ public class Debugger extends ASTRAClass {
 			),
 			Predicate.TRUE,
 			new Block(
-				"astra.debugger.Debugger", new int[] {32,18,36,5},
+				"astra.debugger.Debugger", new int[] {28,18,31,5},
 				new Statement[] {
-					new ModuleCall("C",
-						"astra.debugger.Debugger", new int[] {33,8,33,34},
-						new Predicate("println", new Term[] {
-							Primitive.newPrimitive("launching gui")
-						}),
-						new DefaultModuleCallAdaptor() {
-							public boolean invoke(Intention intention, Predicate predicate) {
-								return ((astra.lang.Console) intention.getModule("astra.debugger.Debugger","C")).println(
-									(java.lang.String) intention.evaluate(predicate.getTerm(0))
-								);
-							}
-						}
-					),
 					new ModuleCall("gui",
-						"astra.debugger.Debugger", new int[] {34,8,34,47},
+						"astra.debugger.Debugger", new int[] {29,8,29,47},
 						new Predicate("launch", new Term[] {
 							Primitive.newPrimitive("astra.debugger.DebuggerUI")
 						}),
@@ -195,7 +174,7 @@ public class Debugger extends ASTRAClass {
 						}
 					),
 					new BeliefUpdate('+',
-						"astra.debugger.Debugger", new int[] {35,8,36,5},
+						"astra.debugger.Debugger", new int[] {30,8,31,5},
 						new Predicate("debugger_state", new Term[] {
 							Primitive.newPrimitive("initialized")
 						})
@@ -238,32 +217,16 @@ public class Debugger extends ASTRAClass {
 				)
 			),
 			new Block(
-				"astra.debugger.Debugger", new int[] {43,65,46,5},
+				"astra.debugger.Debugger", new int[] {33,65,35,5},
 				new Statement[] {
-					new ModuleCall("C",
-						"astra.debugger.Debugger", new int[] {44,8,44,40},
-						new Predicate("println", new Term[] {
-							Operator.newOperator('+',
-								Primitive.newPrimitive("suspending: "),
-								new Variable(Type.STRING, "name")
-							)
-						}),
-						new DefaultModuleCallAdaptor() {
-							public boolean invoke(Intention intention, Predicate predicate) {
-								return ((astra.lang.Console) intention.getModule("astra.debugger.Debugger","C")).println(
-									(java.lang.String) intention.evaluate(predicate.getTerm(0))
-								);
-							}
-						}
-					),
-					new ModuleCall("S",
-						"astra.debugger.Debugger", new int[] {45,8,45,28},
-						new Predicate("suspendAgent", new Term[] {
+					new ModuleCall("Ctrl",
+						"astra.debugger.Debugger", new int[] {34,8,34,26},
+						new Predicate("suspend", new Term[] {
 							new Variable(Type.STRING, "name")
 						}),
 						new DefaultModuleCallAdaptor() {
 							public boolean invoke(Intention intention, Predicate predicate) {
-								return ((astra.lang.System) intention.getModule("astra.debugger.Debugger","S")).suspendAgent(
+								return ((astra.debugger.DebuggerCtrl) intention.getModule("astra.debugger.Debugger","Ctrl")).suspend(
 									(java.lang.String) intention.evaluate(predicate.getTerm(0))
 								);
 							}
@@ -307,32 +270,16 @@ public class Debugger extends ASTRAClass {
 				)
 			),
 			new Block(
-				"astra.debugger.Debugger", new int[] {48,64,51,5},
+				"astra.debugger.Debugger", new int[] {37,64,39,5},
 				new Statement[] {
-					new ModuleCall("C",
-						"astra.debugger.Debugger", new int[] {49,8,49,38},
-						new Predicate("println", new Term[] {
-							Operator.newOperator('+',
-								Primitive.newPrimitive("resuming: "),
-								new Variable(Type.STRING, "name")
-							)
-						}),
-						new DefaultModuleCallAdaptor() {
-							public boolean invoke(Intention intention, Predicate predicate) {
-								return ((astra.lang.Console) intention.getModule("astra.debugger.Debugger","C")).println(
-									(java.lang.String) intention.evaluate(predicate.getTerm(0))
-								);
-							}
-						}
-					),
-					new ModuleCall("S",
-						"astra.debugger.Debugger", new int[] {50,8,50,27},
-						new Predicate("resumeAgent", new Term[] {
+					new ModuleCall("Ctrl",
+						"astra.debugger.Debugger", new int[] {38,8,38,25},
+						new Predicate("resume", new Term[] {
 							new Variable(Type.STRING, "name")
 						}),
 						new DefaultModuleCallAdaptor() {
 							public boolean invoke(Intention intention, Predicate predicate) {
-								return ((astra.lang.System) intention.getModule("astra.debugger.Debugger","S")).resumeAgent(
+								return ((astra.debugger.DebuggerCtrl) intention.getModule("astra.debugger.Debugger","Ctrl")).resume(
 									(java.lang.String) intention.evaluate(predicate.getTerm(0))
 								);
 							}
@@ -342,75 +289,54 @@ public class Debugger extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
-			new GoalEvent('+',
-				new Goal(
-					new Predicate("turn", new Term[] {
-						Primitive.newPrimitive("on")
+			new ModuleEvent("gui",
+				"$gui:",
+				new Predicate("event", new Term[] {
+					Primitive.newPrimitive("step"),
+					new ListTerm(new Term[] {
+						new Variable(Type.STRING, "name")
 					})
-				)
-			),
-			new Predicate("light", new Term[] {
-				Primitive.newPrimitive("off")
-			}),
-			new Block(
-				"astra.debugger.Debugger", new int[] {53,37,57,5},
-				new Statement[] {
-					new BeliefUpdate('-',
-						"astra.debugger.Debugger", new int[] {54,8,57,5},
-						new Predicate("light", new Term[] {
-							Primitive.newPrimitive("off")
-						})
-					),
-					new BeliefUpdate('+',
-						"astra.debugger.Debugger", new int[] {55,8,57,5},
-						new Predicate("light", new Term[] {
-							Primitive.newPrimitive("on")
-						})
-					),
-					new SpawnGoal(
-						"astra.debugger.Debugger", new int[] {56,8,57,5},
-						new Goal(
-							new Predicate("turn", new Term[] {
-								Primitive.newPrimitive("off")
-							})
-						)
-					)
+				}),
+				new ModuleEventAdaptor() {
+					public Event generate(astra.core.Agent agent, Predicate predicate) {
+						return ((astra.gui.GuiModule) agent.getModule("astra.debugger.Debugger","gui")).event(
+							predicate.getTerm(0),
+							predicate.getTerm(1)
+						);
+					}
 				}
-			)
-		));
-		addRule(new Rule(
-			new GoalEvent('+',
-				new Goal(
-					new Predicate("turn", new Term[] {
-						Primitive.newPrimitive("off")
-					})
+			),
+			new Comparison("~=",
+				new Variable(Type.STRING, "name"),
+				new ModuleTerm("S", Type.STRING,
+					new Predicate("name", new Term[] {}),
+					new ModuleTermAdaptor() {
+						public Object invoke(Intention intention, Predicate predicate) {
+							return ((astra.lang.System) intention.getModule("astra.debugger.Debugger","S")).name(
+							);
+						}
+						public Object invoke(BindingsEvaluateVisitor visitor, Predicate predicate) {
+							return ((astra.lang.System) visitor.agent().getModule("astra.debugger.Debugger","S")).name(
+							);
+						}
+					}
 				)
 			),
-			new Predicate("light", new Term[] {
-				Primitive.newPrimitive("on")
-			}),
 			new Block(
-				"astra.debugger.Debugger", new int[] {59,37,63,5},
+				"astra.debugger.Debugger", new int[] {41,62,43,5},
 				new Statement[] {
-					new BeliefUpdate('-',
-						"astra.debugger.Debugger", new int[] {60,8,63,5},
-						new Predicate("light", new Term[] {
-							Primitive.newPrimitive("on")
-						})
-					),
-					new BeliefUpdate('+',
-						"astra.debugger.Debugger", new int[] {61,8,63,5},
-						new Predicate("light", new Term[] {
-							Primitive.newPrimitive("off")
-						})
-					),
-					new SpawnGoal(
-						"astra.debugger.Debugger", new int[] {62,8,63,5},
-						new Goal(
-							new Predicate("turn", new Term[] {
-								Primitive.newPrimitive("on")
-							})
-						)
+					new ModuleCall("Ctrl",
+						"astra.debugger.Debugger", new int[] {42,8,42,23},
+						new Predicate("step", new Term[] {
+							new Variable(Type.STRING, "name")
+						}),
+						new DefaultModuleCallAdaptor() {
+							public boolean invoke(Intention intention, Predicate predicate) {
+								return ((astra.debugger.DebuggerCtrl) intention.getModule("astra.debugger.Debugger","Ctrl")).step(
+									(java.lang.String) intention.evaluate(predicate.getTerm(0))
+								);
+							}
+						}
 					)
 				}
 			)
@@ -418,11 +344,6 @@ public class Debugger extends ASTRAClass {
 	}
 
 	public void initialize(astra.core.Agent agent) {
-		agent.initialize(
-			new Predicate("light", new Term[] {
-				Primitive.newPrimitive("off")
-			})
-		);
 		agent.initialize(
 			new Goal(
 				new Predicate("init", new Term[] {})
@@ -435,6 +356,7 @@ public class Debugger extends ASTRAClass {
 		fragment.addModule("C",astra.lang.Console.class,agent);
 		fragment.addModule("P",astra.lang.Prelude.class,agent);
 		fragment.addModule("S",astra.lang.System.class,agent);
+		fragment.addModule("Ctrl",astra.debugger.DebuggerCtrl.class,agent);
 		fragment.addModule("gui",astra.gui.GuiModule.class,agent);
 		return fragment;
 	}

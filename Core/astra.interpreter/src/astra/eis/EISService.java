@@ -36,6 +36,24 @@ public class EISService {
     // Map to store active EIS instances for the given platform...
     private static Map<String, EISService> services = new HashMap<String, EISService>();
     
+	public static synchronized EISService newService(String id, String jar) {
+		EISService service = services.get(id);
+		if (service == null) {
+			service = new EISService(id);
+			service.setup(jar);
+			services.put(id, service);
+		}
+		return service;
+	}
+
+	public static synchronized EISService getService(String id) {
+		return services.get(id);
+	}
+	
+	public static Collection<EISService> getServices() {
+		return services.values();
+	}
+	
 	private EnvironmentInterfaceStandard ei = null;
 	private Map<String, EISAgent> agents = new HashMap<String, EISAgent>();
 	private String id;
@@ -222,20 +240,6 @@ public class EISService {
     public Map<String, Percept> performAction(String agent, String entity, Action act) throws ActException, NoEnvironmentException {
 		return ei.performAction(agent, act, entity);
     }
-    
-	public static synchronized EISService newService(String id, String jar) {
-		EISService service = services.get(id);
-		if (service == null) {
-			service = new EISService(id);
-			service.setup(jar);
-			services.put(id, service);
-		}
-		return service;
-	}
-
-	public static synchronized EISService getService(String id) {
-		return services.get(id);
-	}
 
 	public String id() {
 		return id;

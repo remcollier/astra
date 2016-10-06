@@ -13,5 +13,4 @@ Export-Package: astra.ast.core,
  astra.ast.tr,
  astra.ast.type,
  astra.ast.visitor,
- astra.compiler,
- astra.dgraph
+ astra.compiler

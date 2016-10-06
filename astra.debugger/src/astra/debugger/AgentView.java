@@ -3,6 +3,7 @@ package astra.debugger;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -15,6 +16,11 @@ import javax.swing.JToolBar;
 
 import astra.core.Agent;
 import astra.core.Intention;
+import astra.core.Module.EVENT;
+import astra.eis.EISAgent;
+import astra.eis.EISAgent.EISBeliefBase;
+import astra.eis.EISService;
+import astra.event.Event;
 import astra.formula.Formula;
 import astra.gui.AstraEventListener;
 import astra.trace.TraceEvent;
@@ -35,7 +41,9 @@ public class AgentView extends JInternalFrame implements TraceEventListener {
 		
 		DefaultComboBoxModel<String> comboModel = new DefaultComboBoxModel<String>();
 		comboModel.addElement("BELIEFS");
+		comboModel.addElement("EIS STATES");
 		comboModel.addElement("INTENTIONS");
+		comboModel.addElement("EVENTS");
 		options = new JComboBox<String>(comboModel);
 		options.addActionListener (new ActionListener () {
 		    public void actionPerformed(ActionEvent e) {
@@ -70,6 +78,7 @@ public class AgentView extends JInternalFrame implements TraceEventListener {
 		body.setLayout(new BorderLayout());
 		body.add(BorderLayout.NORTH, options);
 		body.add(BorderLayout.CENTER, new JScrollPane(display=new JTextArea()));
+		display.setEditable(false);
 		
 		setLayout(new BorderLayout());
 		add(BorderLayout.NORTH, toolBar);
@@ -92,6 +101,24 @@ public class AgentView extends JInternalFrame implements TraceEventListener {
 		if (options.getSelectedItem().equals("BELIEFS")) {
 			for(Formula formula : source.beliefs().beliefs()) {
 				buf.append(formula).append("\n");
+			}
+		} else if (options.getSelectedItem().equals("EIS STATES")) {
+			for(EISService service: EISService.getServices()) {
+				EISAgent agt = service.get(name);
+				if (agt != null) {
+					buf.append("Environment: " + service.id()+"\n\n");
+					for(HashMap.Entry<String, EISBeliefBase> entry : agt.beliefs().entrySet()) {
+						buf.append("Entity: " + entry.getKey()+"\n");
+						for (String formula : entry.getValue().beliefStrings()) {
+							buf.append(formula).append("\n");
+						}
+					}
+					buf.append("\n");
+				}
+			}
+		} else if (options.getSelectedItem().equals("EVENTS")) {
+			for(Event event : source.events()) {
+				buf.append(event.toString()).append("\n");
 			}
 		} else if (options.getSelectedItem().equals("INTENTIONS")) {
 			for(Intention intention : source.intentions()) {

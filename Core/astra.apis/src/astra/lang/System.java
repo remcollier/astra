@@ -17,6 +17,7 @@ import astra.core.AgentCreationException;
 import astra.core.Module;
 import astra.core.ModuleException;
 import astra.core.Scheduler;
+import astra.execution.SchedulerStrategy;
 import astra.formula.Formula;
 import astra.formula.Goal;
 import astra.formula.Predicate;
@@ -171,6 +172,7 @@ public class System extends Module {
 	public boolean resumeAgent(String name) {
 		AgentEntry entry = agents.get(name);
 		entry.agent.state(Agent.ACTIVE);
+		Scheduler.schedule(entry.agent);
 		return true;
 	}
 	
@@ -348,6 +350,29 @@ public class System extends Module {
 	@ACTION
 	public boolean setSchedulePoolSize(int size) {
 		Scheduler.setThreadPoolSize(size);
+		return true;
+	}
+	
+	/**
+	 * Action that allows you to set the scheduling strategy used by the agents...
+	 * @param strategy
+	 * @return
+	 */
+	@ACTION
+	public boolean setSchedulingStrategy(String strategy) {
+		try {
+			Scheduler.setStrategy((SchedulerStrategy) Class.forName(strategy).newInstance());
+			java.lang.System.out.println("Scheduling Strategy set to: "+strategy);
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+			return false;
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+			return false;
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			return false;
+		}
 		return true;
 	}
 	

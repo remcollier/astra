@@ -272,7 +272,7 @@ public class TypeCheckVisitor implements IElementVisitor {
 	@Override
 	public Object visit(DeclarationStatement statement, Object data)
 			throws ParseException {
-		statement.term().accept(this, data);
+		if (statement.term() != null) statement.term().accept(this, data);
 		return null;
 	}
 

@@ -1,5 +1,9 @@
 package astra.ast.reflection;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -45,7 +49,12 @@ public class ReflectionHelper extends AbstractHelper {
 	PackageElement packageElement;
 	ImportElement[] imports;
 	BuildContext context = new BuildContext();
-
+	String target;
+	
+	public ReflectionHelper(String target) {
+		this.target=target;
+	}
+	
 	public BuildContext getBuildContext() {
 		return context;
 	}
@@ -105,11 +114,40 @@ public class ReflectionHelper extends AbstractHelper {
 
 	@Override
 	public ASTRAClassElement loadAST(String clazz) throws ParseException {
-		InputStream in = getClass().getResourceAsStream("/" + clazz.replace(".", "/") + ".astra");
+		boolean local = true;
+		InputStream in = null;
+		try {
+			File file = new File(target+clazz.replace(".", "/") + ".astra");
+			in = new FileInputStream(file);
+		} catch (FileNotFoundException e) {
+			System.out.println("Class: " + clazz + " is not local, searching classpath...");
+			in = getClass().getResourceAsStream("/" + clazz.replace(".", "/") + ".astra");
+		}
+		
 		if (in == null) {
 			throw new NoSuchASTRAClassException("No such ASTRA class: " + clazz);
 		}
-		return new ASTRAClassElement(clazz,in);
+		
+		ASTRAClassElement element = null;
+		try {
+			element = new ASTRAClassElement(clazz,in);
+		} catch (ParseException e) {
+			try {
+				in.close();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			throw e;
+		} finally {
+			try {
+				in.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return element;
 	}
 
 	private Method getMatchingMethod(String moduleClass, MethodSignature signature) {
@@ -239,11 +277,23 @@ public class ReflectionHelper extends AbstractHelper {
 
 	@Override
 	public IJavaHelper spawn() {
-		return new ReflectionHelper();
+		return new ReflectionHelper(target);
 	}
 
-	public long lastModified(String clazz) {
-		URL url = getClass().getResource("/" + clazz.replace(".", "/") + ".astra");
+	@Override
+	public long lastModified(String clazz, String type) {
+		// Try to check if the file is local first
+		File file = new File(target+clazz.replace(".", "/") + type);
+		if (file.exists()) {
+			return file.lastModified();
+		}
+		
+		// Okay, so it isn't local, so search the classpath...
+		URL url = getClass().getResource("/" + clazz.replace(".", "/") + type);
+		// url will be null if there is not resource with the given name...
+		if (url == null) return 0;
+		
+		// okay, get the resources last modified date...
 		try {
 			return url.openConnection().getLastModified();
 		} catch (IOException e) {
@@ -316,5 +366,20 @@ public class ReflectionHelper extends AbstractHelper {
 			if (ann.annotationType().getCanonicalName().equals("astra.core.Module.SUPPRESS_NOTIFICATIONS")) return true;
 		}
 		return false;
+	}
+
+	@Override
+	public void createTarget(ASTRAClassElement element, String code) {
+		try {
+			System.out.println("Generating Target File: " + element.getFilename());
+			File file = new File(target + element.getFilename());
+			file.createNewFile();
+			FileWriter out = new FileWriter(file);
+			out.write(code);
+			out.close();
+			System.out.println("PROGRAM COMPILED SUCCESSFULLY");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

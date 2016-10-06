@@ -33,6 +33,7 @@ public class ASTRAClassElement implements IElement {
 	List<ModuleElement> modules = new LinkedList<ModuleElement>();
 
 	private Token first, last;
+	private boolean local;
 	
 	public ASTRAClassElement(String source, String contents) throws ParseException {
 		this(source, new ByteArrayInputStream(contents.getBytes()));
@@ -51,6 +52,11 @@ public class ASTRAClassElement implements IElement {
 	 * @throws ParseException - generated for any parsing error
 	 */
 	public ASTRAClassElement(String source, InputStream in) throws ParseException {
+			this(source, in, true);
+	}
+	
+	public ASTRAClassElement(String source, InputStream in, boolean local) throws ParseException {
+		this.local = local;
 		ADTTokenizer tokenizer = new ADTTokenizer(in);
 		ASTRAParser parser = new ASTRAParser(tokenizer);
 		
@@ -149,6 +155,7 @@ public class ASTRAClassElement implements IElement {
 			elem.setParent(this);
 		}
 	}
+
 
 	List<ParseException> errorList = new LinkedList<ParseException>();
 	
@@ -393,5 +400,9 @@ public class ASTRAClassElement implements IElement {
 
 	public List<TypesElement> getOntologies() {
 		return this.ontologies;
+	}
+	
+	public boolean local() {
+		return local;
 	}
 }

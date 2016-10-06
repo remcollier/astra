@@ -6,14 +6,13 @@ agent Debugger {
 	module Console C;
 	module Prelude P;
 	module System S;
+	module DebuggerCtrl Ctrl;
 	module GuiModule gui;
 	
 	types test {
-		formula light(string);
 		formula debugger_state(string);
 	}
 	
-	initial light("off");
 	initial !init();
 	
 	rule +!main(list args) {
@@ -24,41 +23,22 @@ agent Debugger {
 			S.createAgent(name, type);
 			S.setMainGoal(name, []);
 		}
-		!!turn("on");
 	}
 	
-
-	
 	rule +!init() {
-		C.println("launching gui");
 		gui.launch("astra.debugger.DebuggerUI");
 		+debugger_state("initialized");
 	}
 	
-//	rule $gui.event("pushed", []) {
-//		C.println("yipee");
-//		gui.updateGui("hello world!", []);
-//	}
-
 	rule $gui.event("suspend", [string name]) : name ~= S.name() {
-		C.println("suspending: " + name);
-		S.suspendAgent(name);
+		Ctrl.suspend(name);
 	}
 	
 	rule $gui.event("resume", [string name]) : name ~= S.name() {
-		C.println("resuming: " + name);
-		S.resumeAgent(name);
+		Ctrl.resume(name);
 	}
 	
-	rule +!turn("on") : light("off") {
-		-light("off");
-		+light("on");
-		!!turn("off");
-	}
-	
-	rule +!turn("off") : light("on") {
-		-light("on");
-		+light("off");
-		!!turn("on");
+	rule $gui.event("step", [string name]) : name ~= S.name() {
+		Ctrl.step(name);
 	}
 }

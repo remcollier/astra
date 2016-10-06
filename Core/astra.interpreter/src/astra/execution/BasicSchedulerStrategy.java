@@ -1,50 +1,76 @@
 package astra.execution;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import astra.core.Agent;
+import astra.core.Scheduler;
 import astra.core.Task;
+import astra.execution.SchedulerStrategy;
 
 public class BasicSchedulerStrategy implements SchedulerStrategy {
-	ExecutorService executor = Executors.newFixedThreadPool(20);
-//	static ExecutorService executor = Executors.newCachedThreadPool();
-
+	private ExecutorService executor = Executors.newFixedThreadPool(2);
+	private Map<String, Integer> agents = new HashMap<String, Integer>();
+	private long sleepTime = 100;
+	
 	@Override
 	public void schedule(final Agent agent) {
-		agent.state(Agent.ACTIVE);
-//		System.out.println("[Scheduler] resuming: " + agent.name());
-		executor.submit(new Runnable() {
-			@Override
-			public void run() {
-				try {
+		Integer state = agents.get(agent.name());
+		if (state == null) {
+			agents.put(agent.name(), state = Scheduler.ACTIVE);
+		}
+		
+		if (state == Scheduler.ACTIVE) {
+			executor.submit(new Runnable() {
+				@Override
+				public void run() {
 					agent.execute();
-				} catch (Throwable th) {
-					th.printStackTrace();
-				}
-				synchronized (agent) {
-					if (agent.state() == Agent.ACTIVE) {
-						if (agent.isActive()) {
-							executor.submit(this);
-						} else {
-							agent.state(Agent.INACTIVE);
-						}
-//					} else if (agent.state() == Agent.TERMINATING) {
-//						agent.state(Agent.TERMINATED);
+					
+					try {
+						Thread.sleep(sleepTime);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
+					
+					Scheduler.schedule(agent);
 				}
-			}
-		});
+			});
+		}
 	}
-	
+
 	@Override
 	public void schedule(Task task) {
 		executor.submit(task);
 	}
-	
+
 	public void setThreadPoolSize(int size) {
 		ExecutorService oldExecutor = executor;
 		executor = Executors.newFixedThreadPool(size);
 		oldExecutor.shutdown();
 	}
+
+	@Override
+	public void stop() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setState(Agent agent, int state) {
+		agents.put(agent.name(), state);
+		
+	}
+
+	@Override
+	public int getState(Agent agent) {
+		return agents.get(agent.name());
+	}
+
+	@Override
+	public void setSleepTime(long sleepTime) {
+		this.sleepTime=sleepTime;
+	}
+
 }

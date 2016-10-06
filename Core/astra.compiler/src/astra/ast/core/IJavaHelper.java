@@ -30,12 +30,13 @@ public interface IJavaHelper {
 
 	public BuildContext getBuildContext();
 
-	public long lastModified(String clazz);
+	public boolean getEventSymbols(String className, MethodSignature signature, String symbol);
 
 	public boolean hasAutoAction(String className);
 	public boolean hasAutoFormula(String className);
-
-	public boolean getEventSymbols(String className, MethodSignature signature, String symbol);
-
 	public boolean suppressAutoActionNotifications(String className);
+
+	long lastModified(String clazz, String type);
+
+	public void createTarget(ASTRAClassElement element, String string);
 }

@@ -39,7 +39,7 @@ public class EISAgent implements Queryable {
 		return service.id() + "->" + agent.name();
 	}
 	
-	private class EISBeliefBase {
+	public class EISBeliefBase {
 		Primitive<String> pid;
 		
 		List<Percept> incoming = new LinkedList<Percept>();
@@ -117,6 +117,16 @@ public class EISAgent implements Queryable {
 					System.err.println(percept.toProlog());
 				}
 			}
+		}
+
+		public List<String> beliefStrings() {
+			LinkedList<String> list = new LinkedList<String>();
+			for(Entry<String, List<Percept>> entry : current.entrySet()) {
+				for(Percept percept : entry.getValue()) {
+					list.add(percept.toProlog());
+				}
+			}
+			return list;
 		}
 	}
 
@@ -260,5 +270,9 @@ public class EISAgent implements Queryable {
 			return true;
 		}
 		return false;
+	}
+
+	public Map<String, EISBeliefBase> beliefs() {
+		return beliefSets;
 	}
 }

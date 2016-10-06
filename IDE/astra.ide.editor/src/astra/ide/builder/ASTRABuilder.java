@@ -17,13 +17,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.xml.sax.helpers.DefaultHandler;
 
-import astra.ast.core.ASTRAClassElement;
 import astra.ast.core.ParseException;
 import astra.ast.jdt.ASTRAProject;
 
 public class ASTRABuilder extends IncrementalProjectBuilder {
 	public static final String BUILDER_ID = "astra.ide.builder";
-	private static final String MARKER_TYPE = "astra.ide.problem";
 
 	class ASTRADeltaVisitor implements IResourceDeltaVisitor {
 		public boolean visit(IResourceDelta delta) throws CoreException {
@@ -62,7 +60,7 @@ public class ASTRABuilder extends IncrementalProjectBuilder {
 
 		public void error(ParseException ex) {
 			try {
-				IMarker marker = resource.createMarker(MARKER_TYPE);
+				IMarker marker = resource.createMarker(ASTRAProject.MARKER_TYPE);
 				marker.setAttribute(IMarker.MESSAGE, ex.getMessage());
 				marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
 				if (ex.line() == -1) {
@@ -89,37 +87,31 @@ public class ASTRABuilder extends IncrementalProjectBuilder {
 		}
 		
 		IFile file = (IFile) resource;
+		if (file.getName().endsWith(".astra")) {
+			try {
+				ASTRAProject.getProject(file.getProject()).deleteFile(file);
+			} catch (CoreException e2) {
+				e2.printStackTrace();
+				return;
+			} catch (ParseException e) {
+				e.printStackTrace();
+				return;
+			}
+	
+			if (!file.getProjectRelativePath().toString().startsWith("src")) {
+				return;
+			}
 		
-		try {
-			ASTRAProject project = ASTRAProject.getProject(file.getProject());
-			project.deleteFile(file);
-		} catch (CoreException e2) {
-			e2.printStackTrace();
-			return;
-		} catch (ParseException e) {
-			e.printStackTrace();
-			return;
+			String filename = file.getName().substring(0, file.getName().lastIndexOf("."));
+			IResource parent = file.getParent();
+			while (!parent.getName().equals("src")) {
+				filename = parent.getName() + "/" + filename;
+				parent = parent.getParent();
+			}
+			IPath outputPath = parent.getParent().getProjectRelativePath().append("gen/" + filename + ".java");
+			IFile file2 = file.getProject().getFile(outputPath);
+			file2.delete(true, new NullProgressMonitor());
 		}
-
-
-		try {
-			file.deleteMarkers(MARKER_TYPE, false, IResource.DEPTH_ZERO);
-		} catch (CoreException e1) {
-		}
-		
-		if (!file.getProjectRelativePath().toString().startsWith("src")) {
-			return;
-		}
-		
-		String filename = file.getName().substring(0, file.getName().lastIndexOf("."));
-		IResource parent = file.getParent();
-		while (!parent.getName().equals("src")) {
-			filename = parent.getName() + "/" + filename;
-			parent = parent.getParent();
-		}
-		IPath outputPath = parent.getParent().getProjectRelativePath().append("gen/" + filename + ".java");
-		IFile file2 = file.getProject().getFile(outputPath);
-		file2.delete(true, new NullProgressMonitor());
 	}
 
 	/*
@@ -150,7 +142,6 @@ public class ASTRABuilder extends IncrementalProjectBuilder {
 				return;
 			}
 
-			System.out.println("file: " + file.getName());
 			ASTRAProject project = null;
 			try {
 				project = ASTRAProject.getProject(file.getProject());
@@ -158,30 +149,8 @@ public class ASTRABuilder extends IncrementalProjectBuilder {
 				e2.printStackTrace();
 				return;
 			}
-			
-			for (IFile f : project.getDependencies(file)) {
-				try {
-					f.deleteMarkers(MARKER_TYPE, false, IResource.DEPTH_ZERO);
-				} catch (CoreException e1) {
-					e1.printStackTrace();
-					System.out.println();
-				}
-				
-				ASTRAErrorHandler reporter = new ASTRAErrorHandler(f);
-				try {
-					project.invalidateFile(f);
-					ASTRAClassElement element = project.getASTRAClassElement(f);
-					if (element != null) {
-						for (ParseException e : element.getErrorList()) {
-							reporter.error(e);
-						}
-					}
-				} catch (ParseException e) {
-					reporter.error(e);
-				} catch (Throwable e) {
-					reporter.error(new ParseException("Unexpected Parser Termination: " + e.getMessage(), e, 0, 0, 0));
-				}
-			}
+
+			project.compile(file);
 		}
 	}
 

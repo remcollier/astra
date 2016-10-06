@@ -1,6 +1,5 @@
 package astra.ast.jdt;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Enumeration;
@@ -8,7 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
+import java.util.Map.Entry;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -19,12 +18,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -32,16 +27,13 @@ import astra.ast.core.ASTRAClassElement;
 import astra.ast.core.IJavaHelper;
 import astra.ast.core.ParseException;
 import astra.ast.element.ModuleElement;
-import astra.ast.visitor.CodeGeneratorVisitor;
 import astra.ast.visitor.ComponentStore;
 import astra.ast.visitor.ComponentVisitor;
-import astra.ast.visitor.GoalCheckVisitor;
-import astra.ast.visitor.TypeCheckVisitor;
-import astra.dgraph.ASTRANode;
-import astra.dgraph.DependencyManager;
+import astra.compiler.ASTRAClass;
+import astra.compiler.ASTRAClassHierarchy;
 
 public class ASTRAProject {
-	private static final String MARKER_TYPE = "astra.ide.problem";
+	public static final String MARKER_TYPE = "astra.ide.problem";
 	private static Map<IProject, ASTRAProject> repository = new HashMap<IProject, ASTRAProject>();
 
 	public static ASTRAProject getProject(IProject project) throws CoreException {
@@ -51,25 +43,19 @@ public class ASTRAProject {
 			asProject = new ASTRAProject(project);
 			repository.put(project, asProject);
 			asProject.loadResources();
-//			try {
-//				project.build(IncrementalProjectBuilder.FULL_BUILD, new NullProgressMonitor());
-//			} catch (CoreException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
 		}
 		return asProject;
 	}
 	
 	private IProject project;
-	private DependencyManager manager;
+	private ASTRAClassHierarchy hierarchy;
 	private IJavaHelper helper;
 	
 	
 	private ASTRAProject(IProject project) {
 		this.project = project;
 		helper = new JDTHelper(project);
-		manager = new DependencyManager(helper);
+		hierarchy = new ASTRAClassHierarchy(helper);
 	}
 
 	public IASTRAResource getResource(String name) throws CoreException {
@@ -126,103 +112,57 @@ public class ASTRAProject {
 	}
 	
 	public void deleteFile(IFile file) throws CoreException, ParseException {
+		Map<String, List<ParseException>> errors = new HashMap<String, List<ParseException>>();
+		
+		// Clear any existing errors for this file
+		deleteMarkers(file);
 		String cls = resolveToASTRAClassName(file);
-		manager.deleteClass(cls);
+		hierarchy.deleteClass(cls, errors);
+		
+		displayErrors(errors);
 	}
 	
-	public void invalidateFile(IFile file) throws CoreException, ParseException {
-		String cls = resolveToASTRAClassName(file);
-		manager.reloadClass(cls);
-		compileClass(file,cls);
+	private void displayErrors(Map<String, List<ParseException>> errors) {
+		for (Entry<String, List<ParseException>> entry : errors.entrySet()) {
+			IFile f = this.resolveToIFile(entry.getKey());
+			
+			// Clear any existing errors for this file
+			deleteMarkers(f);
+			
+			// Add any new errors
+			ASTRAErrorHandler reporter = new ASTRAErrorHandler(f);
+			for(ParseException e : entry.getValue()) {
+				reporter.error(e);
+			}
+		}
 	}
-	
+
 	public ASTRAClassElement getASTRAClassElement(IFile file) throws CoreException, ParseException {
+		Map<String, List<ParseException>> errors = new HashMap<String, List<ParseException>>();
+		
 		String cls = resolveToASTRAClassName(file);
 		
-		if (!manager.isClassLoaded(cls)) {
-			manager.loadClass(cls);
-		} else {
-			ASTRANode node = manager.getClass(cls);
-			if (node.getErrorList().isEmpty()) return node.element();
+		if (!hierarchy.contains(cls)) {
+			hierarchy.compile(cls, errors);
 		}
 		
-		if (manager.getClass(cls) == null) {
+		if (!errors.isEmpty()) {
+			displayErrors(errors);
 			return null;
 		}
-		
-		return compileClass(file, cls);
-	}
-
-	private ASTRAClassElement compileClass(IFile file, String cls) throws CoreException, ParseException {
-		IProgressMonitor monitor = new NullProgressMonitor();
-		ASTRAClassElement element = manager.getClass(cls).element();
-		
-		if (element.getErrorList().isEmpty()) {
-			ComponentStore store = getComponentStore(cls);
-			
-			ASTRANode node = manager.getClass(cls);
-	
-			CodeGeneratorVisitor cgv = new CodeGeneratorVisitor(helper,store);
-			node.element().accept(new TypeCheckVisitor(), store);
-			node.element().accept(new GoalCheckVisitor(), store);
-			node.element().accept(cgv, null);
-
-			// Generate the new code...
-			IPath outputPath = file.getParent().getProjectRelativePath().
-					append(file.getName().substring(0, file.getName().lastIndexOf(".")) + ".java");
-			
-			// Setup output file for Generated Java Code
-			IFolder folder = project.getFolder("gen");
-			if (!folder.exists()) {
-				// Need to dynamically creeate the gen folder and add it as a source folder....
-				folder.create(true, true, monitor);
-				IJavaProject javaProject = JavaCore.create(project);
-				IPackageFragmentRoot root = javaProject.getPackageFragmentRoot(folder);
-				IClasspathEntry[] oldEntries = javaProject.getRawClasspath();
-				IClasspathEntry[] newEntries = new IClasspathEntry[oldEntries.length + 1];
-				System.arraycopy(oldEntries, 0, newEntries, 0, oldEntries.length);
-				newEntries[oldEntries.length] = JavaCore.newSourceEntry(root.getPath());
-				javaProject.setRawClasspath(newEntries, null);
-			}
-	
-			IFile file2 = folder.getFile(outputPath.removeFirstSegments(1));
-			Stack<IFolder> stack = new Stack<IFolder>();
-			IFolder ifolder = (IFolder) file2.getParent();
-	
-			if (!ifolder.exists()) {
-				while (!ifolder.exists()) {
-					stack.push(ifolder);
-					ifolder = (IFolder) ifolder.getParent();
-				}
-				while (!stack.isEmpty()) {
-					stack.pop().create(true, true, monitor);
-				}
-			} else {
-				try {
-					file2.delete(true, new NullProgressMonitor());
-				} catch (CoreException e) {
-					e.printStackTrace();
-				}
-			}
-			
-			file2.create(new ByteArrayInputStream(cgv.toString().getBytes()), true, monitor);
-			file2.getParent().getParent().refreshLocal(IResource.DEPTH_INFINITE, monitor);
-		}
-		return element;
+		return hierarchy.getClass(cls).element();
 	}
 
 	private ComponentStore getComponentStore(String cls) throws ParseException {
-		LinkedList<ASTRANode> linearisation = manager.getLinearisation(cls);
+		LinkedList<ASTRAClass> linearisation = hierarchy.getLinearisation(cls);
 		
 		ComponentStore store = new ComponentStore();
 		ComponentVisitor visitor = new ComponentVisitor(helper, store);
 		for (int i=linearisation.size()-1; i >= 0; i--) {
-			ASTRANode node = linearisation.get(i);
-			System.out.println("processing: " + node);
-			if (!node.loaded()) throw new ParseException("Could not compile: " + cls + " due to error in: " + node.element().getQualifiedName(), node.element());
+			ASTRAClass node = linearisation.get(i);
+			if (!node.isLoaded()) throw new ParseException("Could not compile: " + cls + " due to error in: " + node.element().getQualifiedName(), node.element());
 			
 			node.element().accept(visitor, store);
-			System.out.println("store: " + store.events);
 		}
 		
 		return store;
@@ -233,21 +173,6 @@ public class ASTRAProject {
 		ModuleElement element = store.modules.get(module);
 		if (element == null) return null;
 		return element.className();
-	}
-
-	/**
-	 * Gets subclass dependents...
-	 * 
-	 * @param file
-	 * @return
-	 */
-	public List<IFile> getDependencies(IFile file) {
-		List<IFile> list = new LinkedList<IFile>();
-		String cls = resolveToASTRAClassName(file);
-		for (ASTRANode node : manager.dependencyList(cls)) {
-			list.add(resolveToIFile(node.element().getQualifiedName()));
-		}
-		return list;
 	}
 
 	private IFile resolveToIFile(String name) {
@@ -304,17 +229,31 @@ public class ASTRAProject {
 					case IResource.FILE:
 						IFile file = (IFile) resource;
 						if (file.getName().endsWith(".astra")) {
-							ASTRAErrorHandler reporter = new ASTRAErrorHandler(file);
-							try {
-								manager.loadClass(resolveToASTRAClassName(file));
-							} catch (ParseException e) {
-								reporter.error(e);
-							}
+							compile(file);
 						}
 					}
 					return false;
 				}
 			});
 		}
+	}
+
+	public void compile(IFile file) {
+		deleteMarkers(file);
+		Map<String, List<ParseException>> errors = new HashMap<String, List<ParseException>>();
+		
+		hierarchy.compile(resolveToASTRAClassName(file), errors);
+		
+		displayErrors(errors);
+	}
+
+	private void deleteMarkers(IFile file) {
+		// Clear any existing errors for this file
+		try {
+			file.deleteMarkers(ASTRAProject.MARKER_TYPE, false, IResource.DEPTH_ZERO);
+		} catch (CoreException e1) {
+			e1.printStackTrace();
+		}
+		
 	}
 }

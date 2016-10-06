@@ -1,5 +1,6 @@
 package astra.ast.jdt;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -9,13 +10,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IClasspathEntry;
@@ -23,6 +28,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.ILocalVariable;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaCore;
@@ -190,7 +196,7 @@ public class JDTHelper extends AbstractHelper {
 			if (!file.exists()) {
 				for(IClasspathEntry entry : javaProject.getRawClasspath()) {
 					IPath path = entry.getPath();
-					System.out.println("jar: " + path);
+//					System.out.println("jar: " + path);
 					if ("jar".equalsIgnoreCase(path.getFileExtension())) {
 						JarFile jf = null;
 						try {
@@ -206,7 +212,7 @@ public class JDTHelper extends AbstractHelper {
 								}
 							}
 							JarEntry je = jf.getJarEntry(filename.replace(File.separatorChar, '/'));
-							if (je != null) return new ASTRAClassElement(clazz,jf.getInputStream(je));
+							if (je != null) return new ASTRAClassElement(clazz,jf.getInputStream(je), false);
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
@@ -216,7 +222,7 @@ public class JDTHelper extends AbstractHelper {
 				return null;
 			}
 			
-			return new ASTRAClassElement(clazz,file.getContents());
+			return new ASTRAClassElement(clazz,file.getContents(), true);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
@@ -358,8 +364,45 @@ public class JDTHelper extends AbstractHelper {
 	}
 
 	@Override
-	public long lastModified(String clazz) {
-		return 0;
+	public long lastModified(String clazz, String type) {
+		String filename = clazz.replace('.', File.separatorChar)+type;
+		try {
+			IFile file = project.getFile("/src/" + filename);
+			if (file.exists()) {
+				return file.getLocalTimeStamp();
+			} else {
+				for(IClasspathEntry entry : javaProject.getRawClasspath()) {
+					IPath path = entry.getPath();
+//					System.out.println("jar: " + path);
+					
+					if ("jar".equalsIgnoreCase(path.getFileExtension())) {
+						JarFile jf = null;
+						try {
+							File osFile = path.toFile();
+							if (osFile.exists()) {
+								jf = new JarFile(path.toString());
+							} else {
+								file = project.getWorkspace().getRoot().getFile(path);
+								if (file.exists()) {
+									jf = new JarFile(file.getLocation().toOSString());
+								} else {
+									return -1;
+								}
+							}
+							JarEntry je = jf.getJarEntry(filename.replace(File.separatorChar, '/'));
+							if (je != null) osFile.lastModified();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						
+					}
+				}
+			}
+			
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+		return -1;
 	}
 
 	@Override
@@ -505,5 +548,71 @@ public class JDTHelper extends AbstractHelper {
 			return null;
 		}
 		return null;
+	}
+
+	@Override
+	public void createTarget(ASTRAClassElement element, String source) {
+		IProgressMonitor monitor = new NullProgressMonitor();
+		
+		String filename = element.getQualifiedName().replace('.', File.separatorChar)+".astra";
+		IFile file = project.getFile("/src/" + filename);
+
+		// Generate the new code...
+		IPath outputPath = file.getParent().getProjectRelativePath().
+				append(file.getName().substring(0, file.getName().lastIndexOf(".")) + ".java");
+		
+		// Setup output file for Generated Java Code
+		IFolder folder = project.getFolder("gen");
+		if (!folder.exists()) {
+			// Need to dynamically create the gen folder and add it as a source folder....
+			try {
+				folder.create(true, true, monitor);
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+			
+			try {
+				IJavaProject javaProject = JavaCore.create(project);
+				IPackageFragmentRoot root = javaProject.getPackageFragmentRoot(folder);
+				IClasspathEntry[] oldEntries = javaProject.getRawClasspath();
+				IClasspathEntry[] newEntries = new IClasspathEntry[oldEntries.length + 1];
+				System.arraycopy(oldEntries, 0, newEntries, 0, oldEntries.length);
+				newEntries[oldEntries.length] = JavaCore.newSourceEntry(root.getPath());
+				javaProject.setRawClasspath(newEntries, null);
+			} catch (JavaModelException e) {
+				e.printStackTrace();
+			}
+		}
+
+		IFile file2 = folder.getFile(outputPath.removeFirstSegments(1));
+		Stack<IFolder> stack = new Stack<IFolder>();
+		IFolder ifolder = (IFolder) file2.getParent();
+
+		if (!ifolder.exists()) {
+			while (!ifolder.exists()) {
+				stack.push(ifolder);
+				ifolder = (IFolder) ifolder.getParent();
+			}
+			while (!stack.isEmpty()) {
+				try {
+					stack.pop().create(true, true, monitor);
+				} catch (CoreException e) {
+					e.printStackTrace();
+				}
+			}
+		} else {
+			try {
+				file2.delete(true, new NullProgressMonitor());
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		try {
+			file2.create(new ByteArrayInputStream(source.getBytes()), true, monitor);
+			file2.getParent().getParent().refreshLocal(IResource.DEPTH_INFINITE, monitor);		
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
 	}
 }
