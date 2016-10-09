@@ -1,6 +1,7 @@
 package astra.ast.core;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -141,6 +142,14 @@ public class ASTRAClassElement implements IElement {
 				store(new ParseException("Unexpected Error: " + th.getMessage(), th, 1, 1, 0));
 				th.printStackTrace();
 				logger.log(Level.SEVERE, "Unexpected Error", th);
+			} finally {
+				try {
+					in.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 			}
 		}
 		

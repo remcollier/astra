@@ -5,11 +5,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import astra.cartago.CartagoAPI;
 import astra.core.AbstractTask;
 import astra.core.Agent;
 import astra.core.Module;
-import astra.eis.EISAgent;
 import astra.formula.Formula;
 import astra.formula.Predicate;
 import astra.reasoner.Unifier;

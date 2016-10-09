@@ -66,7 +66,7 @@ public class ASTRAEditor extends TextEditor {
 
 		// this will hold the new annotations along
 		// with their corresponding positions
-		HashMap<Annotation, Object> newAnnotations = new HashMap<Annotation, Object>();
+		HashMap<Annotation, Position> newAnnotations = new HashMap<Annotation, Position>();
 
 		for (int i = 0; i < positions.size(); i++) {
 			ProjectionAnnotation annotation = new ProjectionAnnotation();
@@ -81,7 +81,7 @@ public class ASTRAEditor extends TextEditor {
 		oldAnnotations = annotations;
 	}
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Object getAdapter(Class required) {
 		if (IContentOutlinePage.class.equals(required)) {
 			if (fOutlinePage == null) {

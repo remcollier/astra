@@ -1,9 +1,6 @@
 package astra.lang;
 
-import java.util.Map.Entry;
-
 import astra.core.Module;
-import astra.eis.EISAgent;
 import astra.formula.Formula;
 import astra.formula.Predicate;
 

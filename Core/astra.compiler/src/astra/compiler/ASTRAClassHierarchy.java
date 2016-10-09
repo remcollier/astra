@@ -265,10 +265,18 @@ public class ASTRAClassHierarchy {
 	}
 
 	public synchronized void deleteClass(String cls, Map<String, List<ParseException>> errors) {
+		System.out.println("Deleting:  " + cls);
 		Vertex<ASTRAClass> vertex = classes.remove(cls);
+		if (vertex == null) {
+			System.out.println("VERTEX is null");
+			return;
+		} 
 		List<Vertex<ASTRAClass>> list = new LinkedList<Vertex<ASTRAClass>>();
-		if (vertex.element().isLoaded()) invalidate(vertex, list);
+		if (vertex.element() != null && vertex.element().isLoaded()) invalidate(vertex, list);
 		graph.removeVertex(vertex);
+		
+		//remove vertex from the list
+		list.remove(0);
 		refreshDependencies(list, errors);
 	}
 

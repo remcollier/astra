@@ -11,9 +11,6 @@ import java.util.Set;
 
 import astra.acre.ACREService;
 import astra.acre.AcreAPI;
-import astra.cartago.CartagoAPI;
-import astra.eis.EISAgent;
-import astra.eis.EISService;
 import astra.event.Event;
 import astra.event.GoalEvent;
 import astra.event.ScopedBeliefEvent;

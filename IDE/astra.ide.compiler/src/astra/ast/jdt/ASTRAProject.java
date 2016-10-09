@@ -17,7 +17,10 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -111,11 +114,11 @@ public class ASTRAProject {
 		return null;
 	}
 	
-	public void deleteFile(IFile file) throws CoreException, ParseException {
+	public void removeASTRAClass(IFile file) throws CoreException, ParseException {
 		Map<String, List<ParseException>> errors = new HashMap<String, List<ParseException>>();
 		
 		// Clear any existing errors for this file
-		deleteMarkers(file);
+//		deleteMarkers(file);
 		String cls = resolveToASTRAClassName(file);
 		hierarchy.deleteClass(cls, errors);
 		
@@ -215,35 +218,36 @@ public class ASTRAProject {
 	}
 
 	private void loadResources() throws CoreException {
-		for (IResource resource : project.members()) {
-			resource.accept(new IResourceVisitor() {
-				@Override
-				public boolean visit(IResource resource) throws CoreException {
-					switch (resource.getType()) {
-					case IResource.FOLDER:
-						IFolder folder = (IFolder) resource;
-						for (IResource res : folder.members()) {
-							res.accept(this);
-						}
-						break;
-					case IResource.FILE:
-						IFile file = (IFile) resource;
-						if (file.getName().endsWith(".astra")) {
-							compile(file);
-						}
-					}
-					return false;
-				}
-			});
-		}
+//		for (IResource resource : project.members()) {
+//			resource.accept(new IResourceVisitor() {
+//				@Override
+//				public boolean visit(IResource resource) throws CoreException {
+//					switch (resource.getType()) {
+//					case IResource.FOLDER:
+//						IFolder folder = (IFolder) resource;
+//						for (IResource res : folder.members()) {
+//							res.accept(this);
+//						}
+//						break;
+//					case IResource.FILE:
+//						IFile file = (IFile) resource;
+//						if (file.getName().endsWith(".astra")) {
+//							compile(file);
+//						}
+//					}
+//					return false;
+//				}
+//			});
+//		}
 	}
 
-	public void compile(IFile file) {
+	public void compile(IFile file) throws CoreException {
 		deleteMarkers(file);
 		Map<String, List<ParseException>> errors = new HashMap<String, List<ParseException>>();
 		
 		hierarchy.compile(resolveToASTRAClassName(file), errors);
 		
+		project.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, new NullProgressMonitor());
 		displayErrors(errors);
 	}
 
@@ -254,6 +258,23 @@ public class ASTRAProject {
 		} catch (CoreException e1) {
 			e1.printStackTrace();
 		}
-		
+	}
+
+	public void deleteGeneratedFile(IFile file) {
+		IPath outputPath = file.getParent().getProjectRelativePath().
+				append(file.getName().substring(0, file.getName().lastIndexOf(".")) + ".java");
+		System.out.println("Deleting File: " + outputPath.toString());
+		// Setup output file for Generated Java Code
+		IFolder folder = project.getFolder("gen");
+		IFile file2 = folder.getFile(outputPath.removeFirstSegments(1));
+
+		if (file2.exists()) {
+			try {
+				file2.delete(true, new NullProgressMonitor());
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+		}
+		System.out.println("Deleted File: " + outputPath.toString());
 	}
 }

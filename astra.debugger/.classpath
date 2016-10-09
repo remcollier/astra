@@ -5,5 +5,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/astra.apis"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/astra.interpreter"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/astra.compiler"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/astra.eis"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/astra.cartago"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

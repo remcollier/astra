@@ -10,6 +10,10 @@ import astra.type.Type;
 
 
 public class ModuleTerm implements Term {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 596832607031187737L;
 	String module;
 	Predicate method;
 	ModuleTermAdaptor adaptor;

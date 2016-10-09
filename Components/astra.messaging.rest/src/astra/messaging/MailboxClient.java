@@ -2,12 +2,9 @@ package astra.messaging;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -17,14 +14,10 @@ import org.apache.http.impl.client.HttpClientBuilder;
 
 import com.google.gson.Gson;
 import com.google.gson.InstanceCreator;
-import com.google.gson.reflect.TypeToken;
 
 import astra.formula.Formula;
 import astra.formula.Predicate;
-import astra.messaging.AstraMessage;
-import astra.term.Primitive;
 import astra.term.Term;
-import astra.util.ContentCodec;
 
 public class MailboxClient {
 	static final String SESSION_URL = "http://www.astralanguage.com/messaging/session";

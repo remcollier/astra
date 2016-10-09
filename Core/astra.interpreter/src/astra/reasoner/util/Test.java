@@ -4,22 +4,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import astra.eis.EISAgent;
-import astra.eis.EISFormula;
 import astra.formula.AND;
-import astra.formula.Comparison;
 import astra.formula.Formula;
-import astra.formula.Inference;
-import astra.formula.OR;
 import astra.formula.Predicate;
 import astra.reasoner.Queryable;
 import astra.reasoner.ResolutionBasedReasoner;
 import astra.term.Primitive;
 import astra.term.Term;
-import astra.term.Variable;
-import astra.type.Type;
-import eis.iilang.Identifier;
-import eis.iilang.Percept;
 
 public class Test implements Queryable {
 	List<Formula> formulae;

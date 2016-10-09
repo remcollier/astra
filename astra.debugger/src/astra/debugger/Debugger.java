@@ -3,20 +3,37 @@ package astra.debugger;
  * GENERATED CODE - DO NOT CHANGE
  */
 
-import astra.acre.*;
-import astra.cartago.*;
-import astra.core.*;
-import astra.execution.*;
-import astra.event.*;
-import astra.messaging.*;
-import astra.formula.*;
-import astra.lang.*;
-import astra.eis.*;
-import astra.statement.*;
-import astra.term.*;
-import astra.type.*;
-import astra.tr.*;
-import astra.reasoner.util.*;
+import astra.core.ASTRAClass;
+import astra.core.ASTRAClassNotFoundException;
+import astra.core.AgentCreationException;
+import astra.core.Fragment;
+import astra.core.Intention;
+import astra.core.Rule;
+import astra.core.Scheduler;
+import astra.event.Event;
+import astra.event.GoalEvent;
+import astra.event.ModuleEvent;
+import astra.event.ModuleEventAdaptor;
+import astra.execution.BasicSchedulerStrategy;
+import astra.formula.Comparison;
+import astra.formula.Goal;
+import astra.formula.Predicate;
+import astra.reasoner.util.BindingsEvaluateVisitor;
+import astra.statement.BeliefUpdate;
+import astra.statement.Block;
+import astra.statement.Declaration;
+import astra.statement.DefaultModuleCallAdaptor;
+import astra.statement.If;
+import astra.statement.ModuleCall;
+import astra.statement.Statement;
+import astra.statement.Wait;
+import astra.term.ListTerm;
+import astra.term.ModuleTerm;
+import astra.term.ModuleTermAdaptor;
+import astra.term.Primitive;
+import astra.term.Term;
+import astra.term.Variable;
+import astra.type.Type;
 
 public class Debugger extends ASTRAClass {
 	public Debugger() {

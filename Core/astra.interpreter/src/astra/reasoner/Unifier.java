@@ -7,7 +7,6 @@ import javax.script.Bindings;
 
 import astra.acre.AcreEvent;
 import astra.core.Agent;
-import astra.eis.EISEvent;
 import astra.event.BeliefEvent;
 import astra.event.Event;
 import astra.event.GoalEvent;
@@ -20,7 +19,6 @@ import astra.formula.Predicate;
 import astra.messaging.MessageEvent;
 import astra.reasoner.unifier.AcreEventUnifier;
 import astra.reasoner.unifier.BeliefEventUnifier;
-import astra.reasoner.unifier.EISEventUnifier;
 import astra.reasoner.unifier.GoalEventUnifier;
 import astra.reasoner.unifier.MessageEventUnifier;
 import astra.reasoner.util.BindingsEvaluateVisitor;
@@ -50,7 +48,6 @@ public class Unifier {
 		eventFactory.put(BeliefEvent.class, new BeliefEventUnifier());
 		eventFactory.put(GoalEvent.class, new GoalEventUnifier());
 		eventFactory.put(MessageEvent.class, new MessageEventUnifier());
-		eventFactory.put(EISEvent.class, new EISEventUnifier());
 		eventFactory.put(AcreEvent.class, new AcreEventUnifier());
 	}
 	

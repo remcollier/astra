@@ -7,8 +7,6 @@ import java.util.Set;
 import java.util.Stack;
 
 import astra.acre.AcreAPI;
-import astra.cartago.CartagoAPI;
-import astra.eis.EISAgent;
 import astra.event.Event;
 import astra.event.GoalEvent;
 import astra.event.ScopedGoalEvent;

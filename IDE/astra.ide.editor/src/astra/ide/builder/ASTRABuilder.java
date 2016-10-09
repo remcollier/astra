@@ -1,6 +1,7 @@
 package astra.ide.builder;
 
 import java.util.Map;
+import java.util.Stack;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -80,16 +81,16 @@ public class ASTRABuilder extends IncrementalProjectBuilder {
 
 	protected void deleteGeneratedCode(IResource resource) throws CoreException {
 		if (resource instanceof IFolder) {
-			for (IResource res : ((IFolder) resource).members()) {
-				deleteGeneratedCode(res);
-			}
+//			for (IResource res : ((IFolder) resource).members()) {
+//				deleteGeneratedCode(res);
+//			}
 			return;
 		}
 		
 		IFile file = (IFile) resource;
 		if (file.getName().endsWith(".astra")) {
 			try {
-				ASTRAProject.getProject(file.getProject()).deleteFile(file);
+				ASTRAProject.getProject(file.getProject()).removeASTRAClass(file);
 			} catch (CoreException e2) {
 				e2.printStackTrace();
 				return;
@@ -101,16 +102,18 @@ public class ASTRABuilder extends IncrementalProjectBuilder {
 			if (!file.getProjectRelativePath().toString().startsWith("src")) {
 				return;
 			}
-		
-			String filename = file.getName().substring(0, file.getName().lastIndexOf("."));
-			IResource parent = file.getParent();
-			while (!parent.getName().equals("src")) {
-				filename = parent.getName() + "/" + filename;
-				parent = parent.getParent();
-			}
-			IPath outputPath = parent.getParent().getProjectRelativePath().append("gen/" + filename + ".java");
-			IFile file2 = file.getProject().getFile(outputPath);
-			file2.delete(true, new NullProgressMonitor());
+
+			ASTRAProject.getProject(file.getProject()).deleteGeneratedFile(file);
+
+			//			String filename = file.getName().substring(0, file.getName().lastIndexOf("."));
+//			IResource parent = file.getParent();
+//			while (!parent.getName().equals("src")) {
+//				filename = parent.getName() + "/" + filename;
+//				parent = parent.getParent();
+//			}
+//			IPath outputPath = parent.getParent().getProjectRelativePath().append("gen/" + filename + ".java");
+//			IFile file2 = file.getProject().getFile(outputPath);
+//			file2.delete(true, new NullProgressMonitor());
 		}
 	}
 
@@ -142,15 +145,13 @@ public class ASTRABuilder extends IncrementalProjectBuilder {
 				return;
 			}
 
-			ASTRAProject project = null;
 			try {
-				project = ASTRAProject.getProject(file.getProject());
+				ASTRAProject.getProject(file.getProject()).compile(file);
 			} catch (CoreException e2) {
 				e2.printStackTrace();
 				return;
 			}
 
-			project.compile(file);
 		}
 	}
 

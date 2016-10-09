@@ -556,6 +556,7 @@ public class JDTHelper extends AbstractHelper {
 		
 		String filename = element.getQualifiedName().replace('.', File.separatorChar)+".astra";
 		IFile file = project.getFile("/src/" + filename);
+		System.out.println("Creating Target: " + filename);
 
 		// Generate the new code...
 		IPath outputPath = file.getParent().getProjectRelativePath().
@@ -602,7 +603,7 @@ public class JDTHelper extends AbstractHelper {
 			}
 		} else {
 			try {
-				file2.delete(true, new NullProgressMonitor());
+				file2.delete(true, monitor);
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}
@@ -614,5 +615,6 @@ public class JDTHelper extends AbstractHelper {
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
+		System.out.println("Created Target: " + filename);
 	}
 }
