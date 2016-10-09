@@ -1,5 +1,22 @@
 package astra.acre;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import astra.core.Agent;
+import astra.formula.AcreFormula;
+import astra.formula.Formula;
+import astra.lang.ACRE;
+import astra.reasoner.Queryable;
+import astra.reasoner.util.LogicUtilities;
+import astra.term.Performative;
+import astra.term.Primitive;
+import astra.term.Variable;
 import is.lill.acre.conversation.Conversation;
 import is.lill.acre.conversation.ConversationManager;
 import is.lill.acre.event.ACREEvent;
@@ -19,23 +36,6 @@ import is.lill.acre.message.ACREAgentIdentifier;
 import is.lill.acre.message.IACREAgentIdentifier;
 import is.lill.acre.message.IACREMessage;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import astra.core.Agent;
-import astra.formula.AcreFormula;
-import astra.formula.Formula;
-import astra.reasoner.Queryable;
-import astra.reasoner.util.LogicUtilities;
-import astra.term.Performative;
-import astra.term.Primitive;
-import astra.term.Variable;
-
 public class AcreAPI implements Observer,Queryable {
 	private ConversationManager conversationManager;
 	private IACREAgentIdentifier acreId;
@@ -50,7 +50,7 @@ public class AcreAPI implements Observer,Queryable {
 
 		conversationManager = new ConversationManager();
 		conversationManager.setOwner(acreId);
-		conversationManager.setProtocolManager(Agent.protocolManager);
+		conversationManager.setProtocolManager(ACRE.protocolManager);
 		conversationManager.addObserver(this);
 
 		// NOTE: May need to observe protocol manager too...

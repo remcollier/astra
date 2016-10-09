@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import astra.acre.AcreAPI;
 import astra.event.Event;
 import astra.event.GoalEvent;
 import astra.event.ScopedGoalEvent;
@@ -508,10 +507,6 @@ public class Intention {
 
 	public void stopFunction(Predicate function) {
 		agent.stopFunction(function);
-	}
-
-	public AcreAPI getAcreAPI() {
-		return agent.getAcreAPI();
 	}
 
 	public Term getVariableValue(Integer vid) {

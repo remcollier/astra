@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import astra.acre.ACREService;
-import astra.acre.AcreAPI;
 import astra.event.Event;
 import astra.event.GoalEvent;
 import astra.event.ScopedBeliefEvent;
@@ -34,8 +32,6 @@ import astra.tr.Function;
 import astra.tr.TRContext;
 import astra.trace.TraceEvent;
 import astra.trace.TraceManager;
-import is.lill.acre.message.ACREMessage;
-import is.lill.acre.protocol.ProtocolManager;
 
 public class Agent {
 	// Agent Registry
@@ -87,11 +83,9 @@ public class Agent {
 	
 	private List<SensorAdaptor> sensorArray = new LinkedList<SensorAdaptor>();
 
-	// ACRE Interface
-	private AcreAPI acreAPI;
-	public static final ProtocolManager protocolManager = new ProtocolManager();
-	private boolean useAcre = false; 
-
+	// Message Listeners - listener pattern to notify other classes of
+	// incoming/outgoing messages.
+	private List<AgentMessageListener> messageListeners = new LinkedList<AgentMessageListener>();
 	private boolean debugging = false;
 	
 	/**
@@ -133,8 +127,6 @@ public class Agent {
 		reasoner.addSource(beliefManager);
 		agents.put(name, this);
 		
-		acreAPI = new AcreAPI(this);
-		reasoner.addSource(acreAPI);
 		TraceManager.getInstance().recordEvent(new TraceEvent(TraceEvent.NEW_AGENT, Calendar.getInstance().getTime(), this));
 	}
 	
@@ -215,9 +207,6 @@ public class Agent {
 		
 		this.beliefManager.update();
 
-		// remove finished protocols from the active list
-        if (useAcre) acreAPI.update();
-		
 		synchronized (completed) {
 			while (!completed.isEmpty()) {
 				Notification notif = completed.poll();
@@ -314,11 +303,10 @@ public class Agent {
 
 	public synchronized void receive(AstraMessage message) {
 //		System.out.println("from: "+ message.sender + " to: " + message.receivers + " content: " + message.content);
-        if (useAcre) {
-        	ACREMessage m = ACREService.message( message );
-            acreAPI.getConversationManager().processMessage( m );
-        }
-        
+		for(AgentMessageListener listener : messageListeners) {
+			listener.receive(message);
+		}
+		
         // rebuild params...
         ListTerm list = new ListTerm();
         if (message.protocol != null) {
@@ -493,20 +481,15 @@ public class Agent {
 		return this.clazz;
 	}
 
-	public AcreAPI getAcreAPI() {
-		return acreAPI;
-	}
-
 	public Intention intention() {
 		return intention;
 	}
 
-	public void useAcre(boolean useAcre) {
-		this.useAcre = useAcre;
-	}
-
 	public void setDebugging(boolean debugging) {
 		this.debugging = debugging;
-		
+	}
+	
+	public void addAgentMessageListener(AgentMessageListener listener) {
+		messageListeners.add(listener);
 	}
 }

@@ -5,7 +5,6 @@ import java.util.Map;
 
 import javax.script.Bindings;
 
-import astra.acre.AcreEvent;
 import astra.core.Agent;
 import astra.event.BeliefEvent;
 import astra.event.Event;
@@ -17,7 +16,6 @@ import astra.formula.FormulaVariable;
 import astra.formula.Goal;
 import astra.formula.Predicate;
 import astra.messaging.MessageEvent;
-import astra.reasoner.unifier.AcreEventUnifier;
 import astra.reasoner.unifier.BeliefEventUnifier;
 import astra.reasoner.unifier.GoalEventUnifier;
 import astra.reasoner.unifier.MessageEventUnifier;
@@ -48,7 +46,6 @@ public class Unifier {
 		eventFactory.put(BeliefEvent.class, new BeliefEventUnifier());
 		eventFactory.put(GoalEvent.class, new GoalEventUnifier());
 		eventFactory.put(MessageEvent.class, new MessageEventUnifier());
-		eventFactory.put(AcreEvent.class, new AcreEventUnifier());
 	}
 	
 	public static Map<Integer, Term> unify(Event source, Event target, Agent agent) {
