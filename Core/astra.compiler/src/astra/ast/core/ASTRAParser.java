@@ -16,12 +16,9 @@ import astra.ast.element.PackageElement;
 import astra.ast.element.PlanElement;
 import astra.ast.element.RuleElement;
 import astra.ast.element.TypesElement;
-import astra.ast.event.AdvancedAcreEvent;
-import astra.ast.event.BasicAcreEvent;
 import astra.ast.event.MessageEvent;
 import astra.ast.event.ModuleEvent;
 import astra.ast.event.UpdateEvent;
-import astra.ast.formula.AcreFormula;
 import astra.ast.formula.AndFormula;
 import astra.ast.formula.BindFormula;
 import astra.ast.formula.BracketFormula;
@@ -33,11 +30,6 @@ import astra.ast.formula.NOTFormula;
 import astra.ast.formula.OrFormula;
 import astra.ast.formula.PredicateFormula;
 import astra.ast.formula.ScopedGoalFormula;
-import astra.ast.statement.AcreAdvanceStatement;
-import astra.ast.statement.AcreCancelStatement;
-import astra.ast.statement.AcreConfirmCancelStatement;
-import astra.ast.statement.AcreDenyCancelStatement;
-import astra.ast.statement.AcreStartStatement;
 import astra.ast.statement.AssignmentStatement;
 import astra.ast.statement.BlockStatement;
 import astra.ast.statement.DeclarationStatement;
@@ -607,94 +599,6 @@ public class ASTRAParser {
 				return new SubGoalStatement(createGoal(list),
 						first, last, tokenizer.getSource(first, last));
 			}
-		case Token.ACRE_START:
-			tok2 = tokens.remove(0);
-			if (tok2.type != Token.LEFT_BRACKET) {
-				throw new ParseException("Malformed Statement: acre_start(<protocol>, <receiver>, <performative>, <content>, <cid>)", first, last);
-			}
-			
-			list = splitAt(tokens, new int[] {Token.COMMA});
-			if (list.get(list.size()-1).type != Token.COMMA)
-				throw new ParseException("Malformed Statement: acre_start(<protocol>, <receiver>, <performative>, <content>, <cid>)", first, last);
-			ITerm protocol = createTerm(list.subList(0, list.size()-1));
-
-			list = splitAt(tokens, new int[] {Token.COMMA});
-			if (list.get(list.size()-1).type != Token.COMMA)
-				throw new ParseException("Malformed Statement: acre_start(<protocol>, <receiver>, <performative>, <content>, <cid>)", first, last);
-			ITerm receiver = createTerm(list.subList(0, list.size()-1));
-			
-			list = splitAt(tokens, new int[] {Token.COMMA});
-			if (list.get(list.size()-1).type != Token.COMMA)
-				throw new ParseException("Malformed Statement: acre_start(<protocol>, <receiver>, <performative>, <content>, <cid>)", first, last);
-			ITerm performative = createTerm(list.subList(0, list.size()-1));
-
-			list = splitAt(tokens, new int[] {Token.COMMA});
-			if (list.get(list.size()-1).type != Token.COMMA)
-				throw new ParseException("Malformed Statement: acre_start(<protocol>, <receiver>, <performative>, <content>, <cid>)", first, last);
-			content = createPredicate(list.subList(0, list.size()-1));
-			
-			if (tokens.get(tokens.size()-1).type != Token.RIGHT_BRACKET)
-				throw new ParseException("Malformed Statement: acre_start(<protocol>, <receiver>, <performative>, <content>, <cid>)", first, last);
-			ITerm cid = createTerm(tokens.subList(0, tokens.size()-1));
-			if (!(cid instanceof InlineVariableDeclaration)) {
-				throw new ParseException("Malformed Statement: the last parameter of acre_start should be an inline variable declaration", first, last);
-			}
-			return new AcreStartStatement(protocol, receiver, performative, content, cid, 
-					first, last, tokenizer.getSource(first, last));
-		case Token.ACRE_ADVANCE:
-			tok2 = tokens.get(0);
-			if (tok2.type != Token.LEFT_BRACKET) {
-				throw new ParseException("Malformed Statement: acre_advance(<performative>, <cid>, <content>)", tok2);
-			}
-			tok2 = getLast(tokens);
-			if (tok2.type != Token.RIGHT_BRACKET) {
-				throw new ParseException("Malformed Statement: acre_advance(<performative>, <cid>, <content>)", tok2);
-			}
-			
-			tokens.remove(0);
-			terms = getTermList(tokens.subList(0, tokens.size()-1), true);
-			if (terms.size() != 2) {
-				throw new ParseException("Malformed Statement: acre_advance(<performative>, <cid>, <content>)", tok2);
-			}
-			return new AcreAdvanceStatement(terms.get(0), terms.get(1),
-					createPredicate(tokens.subList(0, tokens.size()-1)), 
-					first, last, tokenizer.getSource(first, last));
-		case Token.ACRE_CANCEL:
-			tok2 = tokens.get(0);
-			if (tok2.type != Token.LEFT_BRACKET) {
-				throw new ParseException("Malformed Statement: acre_cancel(<cid>)", tok2);
-			}
-			tok2 = getLast(tokens);
-			if (tok2.type != Token.RIGHT_BRACKET) {
-				throw new ParseException("Malformed Statement: acre_cancel(<cid>)", tok2);
-			}
-			
-			return new AcreCancelStatement(createTerm(tokens.subList(1, tokens.size()-1)),
-					tok, tok2, tokenizer.getSource(tok, tok2));
-		case Token.ACRE_CONFIRM_CANCEL:
-			tok2 = tokens.get(0);
-			if (tok2.type != Token.LEFT_BRACKET) {
-				throw new ParseException("Malformed Statement: acre_cancel(<cid>)", tok2);
-			}
-			tok2 = getLast(tokens);
-			if (tok2.type != Token.RIGHT_BRACKET) {
-				throw new ParseException("Malformed Statement: acre_cancel(<cid>)", tok2);
-			}
-			
-			return new AcreConfirmCancelStatement(createTerm(tokens.subList(1, tokens.size()-1)),
-					tok, tok2, tokenizer.getSource(tok, tok2));
-		case Token.ACRE_DENY_CANCEL:
-			tok2 = tokens.get(0);
-			if (tok2.type != Token.LEFT_BRACKET) {
-				throw new ParseException("Malformed Statement: acre_cancel(<cid>)", tok2);
-			}
-			tok2 = getLast(tokens);
-			if (tok2.type != Token.RIGHT_BRACKET) {
-				throw new ParseException("Malformed Statement: acre_cancel(<cid>)", tok2);
-			}
-			
-			return new AcreDenyCancelStatement(createTerm(tokens.subList(1, tokens.size()-1)),
-					tok, tok2, tokenizer.getSource(tok, tok2));
 		case Token.PLUS:
 		case Token.MINUS:
 			list = splitAt(tokens, new int[] {Token.SEMI_COLON});
@@ -829,33 +733,6 @@ public class ASTRAParser {
 			if (terms.size() == 4) params = terms.get(3);
 			return new MessageEvent(terms.get(0), terms.get(1), content, params, 
 					first, last, tokenizer.getSource(first, last));		
-		case Token.ACRE_EVT:
-			tok2 = tokens.get(0);
-			if (tok2.type != Token.LEFT_BRACKET) {
-				throw new ParseException("Missing left bracket", first, last);
-			}
-			if (last.type != Token.RIGHT_BRACKET) {
-				throw new ParseException("Missing right bracket", first, last);
-			}
-
-			tokens.remove(0);
-			terms = getTermList(tokens.subList(0, tokens.size()-1), false);
-			if (terms.size() > 4) {
-				throw new ParseException("Malformed ACRE Environment Event: @acre(<type>, [<cid>, <state>[, <length>] ])", first, last);
-			}
-
-			if (terms.get(0).toString().equals("\"advanced\"")) {
-				return new AdvancedAcreEvent(terms.get(0), terms.get(1), terms.get(2), terms.get(3),
-						first, last, tokenizer.getSource(first, last));
-			} else if (terms.size() == 2) {
-				return new BasicAcreEvent(terms.get(0), terms.get(1),
-						first, last, tokenizer.getSource(first, last));
-			} else {
-				System.out.println("type:" + terms.get(0).toString());
-				System.out.println("Advanced ACRE Type: not implemented Yet");
-				System.exit(0);
-			}
-			break;
 		case Token.DOLLAR:
 			tok2 = tokens.remove(0);
 			if (tokens.remove(0).type != Token.PERIOD) {
@@ -973,24 +850,6 @@ public class ASTRAParser {
 					first, last, tokenizer.getSource(first, last));
 		} else if (tok.type == Token.FORMULA) {
 			return new FormulaVariable(tokens.remove(0).token, 
-					first, last, tokenizer.getSource(first, last));
-		} else if (tok.type == Token.ACRE_FORMULA) {
-			Token tok2 = tokens.get(0);
-			if (tok2.type != Token.LEFT_BRACKET) {
-				throw new ParseException("Malformed Formula: acre_message(<cid>, <index>, <type>, <perf>, <content>)", tok2);
-			}
-			tok2 = getLast(tokens);
-			if (tok2.type != Token.RIGHT_BRACKET) {
-				throw new ParseException("Malformed Formula: acre_message(<cid>, <index>, <type>, <perf>, <content>)", tok2);
-			}
-			
-			tokens.remove(0);
-			List<ITerm> terms = getTermList(tokens.subList(0, tokens.size()-1), true);
-			if (terms.size() != 4) {
-				throw new ParseException("Malformed Formula: acre_message(<cid>, <index>, <type>, <perf>, <content>)", tok2);
-			}
-			return new AcreFormula(terms.get(0), terms.get(1), terms.get(2), terms.get(3),
-					createPredicate(tokens.subList(0, tokens.size()-1)), 
 					first, last, tokenizer.getSource(first, last));
 		} else if (tok.type == Token.IDENTIFIER) {
 			Token tok2 = tokens.get(0);

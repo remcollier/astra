@@ -9,12 +9,9 @@ import astra.ast.element.PackageElement;
 import astra.ast.element.PlanElement;
 import astra.ast.element.RuleElement;
 import astra.ast.element.TypesElement;
-import astra.ast.event.AdvancedAcreEvent;
-import astra.ast.event.BasicAcreEvent;
 import astra.ast.event.MessageEvent;
 import astra.ast.event.ModuleEvent;
 import astra.ast.event.UpdateEvent;
-import astra.ast.formula.AcreFormula;
 import astra.ast.formula.AndFormula;
 import astra.ast.formula.BindFormula;
 import astra.ast.formula.BracketFormula;
@@ -26,11 +23,6 @@ import astra.ast.formula.NOTFormula;
 import astra.ast.formula.OrFormula;
 import astra.ast.formula.PredicateFormula;
 import astra.ast.formula.ScopedGoalFormula;
-import astra.ast.statement.AcreAdvanceStatement;
-import astra.ast.statement.AcreCancelStatement;
-import astra.ast.statement.AcreConfirmCancelStatement;
-import astra.ast.statement.AcreDenyCancelStatement;
-import astra.ast.statement.AcreStartStatement;
 import astra.ast.statement.AssignmentStatement;
 import astra.ast.statement.BlockStatement;
 import astra.ast.statement.DeclarationStatement;
@@ -99,8 +91,6 @@ public interface IElementVisitor {
 	// Events
 	public Object visit(UpdateEvent event, Object data) throws ParseException;
 	public Object visit(MessageEvent event, Object data) throws ParseException;
-	public Object visit(BasicAcreEvent event, Object data) throws ParseException;
-	public Object visit(AdvancedAcreEvent event, Object data) throws ParseException;
 	public Object visit(ModuleEvent moduleEvent, Object data) throws ParseException;
 	
 	// Formulae
@@ -113,7 +103,6 @@ public interface IElementVisitor {
 	public Object visit(FormulaVariable formula, Object data) throws ParseException;
 	public Object visit(ModuleFormula formula, Object data) throws ParseException;
 	public Object visit(ScopedGoalFormula formula, Object data) throws ParseException;
-	public Object visit(AcreFormula formula, Object data) throws ParseException;
 	public Object visit(BracketFormula formula, Object data) throws ParseException;
 
 	// Statements
@@ -136,11 +125,6 @@ public interface IElementVisitor {
 	public Object visit(TRStatement statement, Object data) throws ParseException;
 	public Object visit(SynchronizedBlockStatement statement, Object data) throws ParseException;
 	public Object visit(ScopedStatement statement, Object data) throws ParseException;
-	public Object visit(AcreStartStatement statement, Object data) throws ParseException;
-	public Object visit(AcreAdvanceStatement statement, Object data) throws ParseException;
-	public Object visit(AcreCancelStatement statement, Object data) throws ParseException;
-	public Object visit(AcreConfirmCancelStatement statement, Object data) throws ParseException;
-	public Object visit(AcreDenyCancelStatement statement, Object data) throws ParseException;
 	public Object visit(ForAllStatement statement, Object data) throws ParseException;
 	public Object visit(PlusPlusStatement plusPlusStatement, Object data) throws ParseException;
 	public Object visit(MinusMinusStatement minusMinusStatement, Object data) throws ParseException;

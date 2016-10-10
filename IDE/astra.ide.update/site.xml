@@ -12,5 +12,11 @@
    <feature url="features/astra.ide.feature_3.6.0.201609280852.jar" id="astra.ide.feature" version="3.6.0.201609280852">
       <category name="astra.ide"/>
    </feature>
+   <feature url="features/astra.ide.feature_3.6.0.201610101219.jar" id="astra.ide.feature" version="3.6.0.201610101219">
+      <category name="astra.ide"/>
+   </feature>
+   <feature url="features/astra.ide.feature_3.6.0.201610101236.jar" id="astra.ide.feature" version="3.6.0.201610101236">
+      <category name="astra.ide"/>
+   </feature>
    <category-def name="astra.ide" label="ASTRA IDE"/>
 </site>

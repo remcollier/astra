@@ -98,16 +98,6 @@ public class Token {
 	public static final int FORALL = 85;
 	public static final int BIND = 86;
 	
-	// ACRE
-	public static final int ACRE_TYPE = 100;
-	public static final int ACRE_EVT = 101;
-	public static final int ACRE_START = 102;
-	public static final int ACRE_ADVANCE = 103;
-	public static final int ACRE_CANCEL = 104;
-	public static final int ACRE_CONFIRM_CANCEL = 105;
-	public static final int ACRE_DENY_CANCEL = 106;
-	public static final int ACRE_FORMULA = 107;
-
 	public String token;
 	public int beginLine;
 	public int beginColumn;
@@ -194,7 +184,6 @@ public class Token {
 		typeMap.put(">", GREATER_THAN);
 		typeMap.put("<", LESS_THAN);
 		typeMap.put("@message", MESSAGE);
-		typeMap.put("@acre", ACRE_EVT);
 		typeMap.put("[", LEFT_SQ_BRACKET);
 		typeMap.put("]", RIGHT_SQ_BRACKET);
 		typeMap.put("%", MODULO);
@@ -222,25 +211,6 @@ public class Token {
 		typeMap.put("request_whenever", SPEECHACT);
 		typeMap.put("subscribe", SPEECHACT);
 
-		typeMap.put("started", ACRE_TYPE);
-		typeMap.put("ended", ACRE_TYPE);
-		typeMap.put("failed", ACRE_TYPE);
-		typeMap.put("cancel_request", ACRE_TYPE);
-		typeMap.put("cancel_fail", ACRE_TYPE);
-		typeMap.put("cancel_confirm", ACRE_TYPE);
-		typeMap.put("timeout", ACRE_TYPE);
-		typeMap.put("advanced", ACRE_TYPE);
-		typeMap.put("message", ACRE_TYPE);
-		typeMap.put("unmatched", ACRE_TYPE);
-		typeMap.put("ambiguous", ACRE_TYPE);
-		typeMap.put("acre_start", ACRE_START);
-		typeMap.put("acre_advance", ACRE_ADVANCE);
-		typeMap.put("acre_cancel", ACRE_CANCEL);
-		typeMap.put("acre_confirm_cancel", ACRE_CONFIRM_CANCEL);
-		typeMap.put("acre_deny_cancel", ACRE_DENY_CANCEL);
-		typeMap.put("acre_message", ACRE_FORMULA);
-		
-		
 		typePrecedence.add(Token.CHARACTER);
 		typePrecedence.add(Token.INTEGER);
 		typePrecedence.add(Token.LONG);
@@ -360,8 +330,7 @@ public class Token {
 	public static boolean isLiteral(int type) {
 		return (type == Token.INTEGER) || (type == Token.LONG) || (type == Token.FLOAT) || 
 				(type == Token.DOUBLE) || (type == Token.STRING) || (type == Token.CHARACTER) ||
-				(type == Token.BOOLEAN) || (type == Token.SPEECHACT) || (type == ACRE_TYPE) ||
-				(type == Token.FUNCT);
+				(type == Token.BOOLEAN) || (type == Token.SPEECHACT) || (type == Token.FUNCT);
 	}
 
 	public static int resolveType(int type) {

@@ -22,11 +22,7 @@ public class ASTRAPartitionScanner extends RuleBasedPartitionScanner {
 			"plan", "agent", "extends", "abstract", "string", "int", "long",
 			"float", "double", "char", "boolean", "object", "list", "start",
 			"stop", "active", "count_bindings", "function", "query", "send", 
-			"@message", "@acre", "acre_add_repository", "acre_start",
-			"acre_advance", "acre_history", "acre_forget", "acre_cancel",
-			"acre_confirm_cancel", "acre_deny_cancel", "acre_set_timeout", "package",
-			"@acre", "acre_start", "acre_advance", "acre_cancel", "acre_confirm_cancel",
-			"acre_deny_cancel", "synchronized", "true", "false", "speechact",
+			"@message", "package", "synchronized", "true", "false", "speechact",
 			"funct", "formula","inference", "bind", "types"
 	};
 	
@@ -34,10 +30,7 @@ public class ASTRAPartitionScanner extends RuleBasedPartitionScanner {
 			"accept-proposal", "agree", "cancel", "cfp", "confirm", "disconfirm",
 	  		"failure", "inform", "inform-if", "inform-ref", "not-understood", "propogate",
 	  		"propose", "proxy", "query-if", "query-ref", "refuse", "reject-proposal",
-	  		"request", "request-when", "request-whenever", "subscribe", "added",
-	  		"removed", "updated", "started", "ended", "failed", "cancel_request",
-	  		"cancel_fail", "cancel_confirm", "timeout", "advanced", "unmatched",
-	  		"ambiguous", "message"
+	  		"request", "request-when", "request-whenever", "subscribe", "message"
 	};
 	
 	char[] punctuation = new char[] {
