@@ -6,6 +6,9 @@ import astra.ast.core.IType;
 import astra.ast.core.ParseException;
 import astra.ast.term.Brackets;
 import astra.ast.term.Operator;
+import astra.core.Intention;
+import astra.formula.Predicate;
+import astra.term.Term;
 
 public class Utilities {
 	public static boolean validatePackageAndClassName(ASTRAClassElement element, String source) 

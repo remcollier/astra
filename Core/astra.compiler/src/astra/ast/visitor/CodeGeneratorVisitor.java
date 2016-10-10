@@ -18,12 +18,9 @@ import astra.ast.element.InitialElement;
 import astra.ast.element.ModuleElement;
 import astra.ast.element.PlanElement;
 import astra.ast.element.RuleElement;
-import astra.ast.event.AdvancedAcreEvent;
-import astra.ast.event.BasicAcreEvent;
 import astra.ast.event.MessageEvent;
 import astra.ast.event.ModuleEvent;
 import astra.ast.event.UpdateEvent;
-import astra.ast.formula.AcreFormula;
 import astra.ast.formula.AndFormula;
 import astra.ast.formula.BindFormula;
 import astra.ast.formula.BracketFormula;
@@ -36,11 +33,6 @@ import astra.ast.formula.NOTFormula;
 import astra.ast.formula.OrFormula;
 import astra.ast.formula.PredicateFormula;
 import astra.ast.formula.ScopedGoalFormula;
-import astra.ast.statement.AcreAdvanceStatement;
-import astra.ast.statement.AcreCancelStatement;
-import astra.ast.statement.AcreConfirmCancelStatement;
-import astra.ast.statement.AcreDenyCancelStatement;
-import astra.ast.statement.AcreStartStatement;
 import astra.ast.statement.AssignmentStatement;
 import astra.ast.statement.BlockStatement;
 import astra.ast.statement.DeclarationStatement;
@@ -82,6 +74,7 @@ import astra.ast.tr.TRRuleElement;
 import astra.ast.tr.UpdateAction;
 import astra.ast.type.BasicType;
 import astra.ast.type.ObjectType;
+import astra.formula.Predicate;
 
 public class CodeGeneratorVisitor extends AbstractVisitor {
 	private StringBuffer code = new StringBuffer();
@@ -142,8 +135,7 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 		code.append("/**\n").append(" * GENERATED CODE - DO NOT CHANGE\n")
 				.append(" */\n\n");
 
-		code.append("import astra.acre.*;\n")
-				.append("import astra.cartago.*;\n")
+		code.append("import astra.cartago.*;\n")
 				.append("import astra.core.*;\n")
 				.append("import astra.execution.*;\n")
 				.append("import astra.event.*;\n")
@@ -575,7 +567,7 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 				code.append(data + "\t\tpublic boolean invoke(Intention intention, Predicate predicate) {\n");
 				code.append(data + "\t\t\treturn ((" + element.qualifiedName());
 				code.append(") intention.getModule(\"" + fullName + "\",\"");
-				code.append(statement.module() + "\")).auto_action(intention,predicate);\n");
+				code.append(statement.module() + "\")).auto_action(intention,evaluate(intention,predicate));\n");
 				code.append(data + "\t\t}\n");
 				
 				if (helper.suppressAutoActionNotifications(element.className())) {
@@ -801,68 +793,6 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 	}
 
 	@Override
-	public Object visit(AcreStartStatement statement, Object data)
-			throws ParseException {
-		code.append(data + "new AcreStart(\n\t" + data + locationData(statement)
-				+ ",\n");
-		statement.protocol().accept(this, data + "\t");
-		code.append(",\n");
-		statement.receiver().accept(this, data + "\t");
-		code.append(",\n");
-		statement.performative().accept(this, data + "\t");
-		code.append(",\n");
-		statement.content().accept(this, data + "\t");
-		code.append(",\n");
-		statement.cid().accept(this, data + "\t");
-		code.append("\n" + data + ")");
-		return null;
-	}
-
-	@Override
-	public Object visit(AcreAdvanceStatement statement, Object data)
-			throws ParseException {
-		code.append(data + "new AcreAdvance(\n\t" + data + locationData(statement)
-				+ ",\n");
-		statement.performative().accept(this, data + "\t");
-		code.append(",\n");
-		statement.cid().accept(this, data + "\t");
-		code.append(",\n");
-		statement.content().accept(this, data + "\t");
-		code.append("\n" + data + ")");
-		return null;
-	}
-
-	@Override
-	public Object visit(AcreCancelStatement statement, Object data)
-			throws ParseException {
-		code.append(data + "new AcreCancel(\n\t" + data + locationData(statement)
-				+ ",\n");
-		statement.cid().accept(this, data + "\t");
-		code.append("\n" + data + ")");
-		return null;
-	}
-
-	@Override
-	public Object visit(AcreConfirmCancelStatement statement, Object data)
-			throws ParseException {
-		code.append(data + "new AcreConfirmCancel(\n\t" + data + locationData(statement)
-				+ ",\n");
-		statement.cid().accept(this, data + "\t");
-		code.append("\n" + data + ")");
-		return null;
-	}
-
-	@Override
-	public Object visit(AcreDenyCancelStatement statement, Object data)
-			throws ParseException {
-		code.append(data + "new AcreDenyCancel(\n\t" + data + locationData(statement)
-				+ ",\n");
-		statement.cid().accept(this, data + "\t");
-		code.append("\n" + data + ")");
-		return null;
-	}
-
-	@Override
 	public Object visit(ScopedStatement statement, Object data)
 			throws ParseException {
 		if (statement.statement() instanceof SubGoalStatement) {
@@ -990,32 +920,6 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 
 		return null;
 	}
-
-	@Override
-	public Object visit(BasicAcreEvent event, Object data)
-			throws ParseException {
-		code.append(data + "new AcreEvent(\n");
-		event.type().accept(this, data + "\t");
-		code.append(",\n");
-		event.cid().accept(this, data + "\t");
-		code.append("\n" + data + ")");
-		return null;
-	}
-
-	@Override
-	public Object visit(AdvancedAcreEvent event, Object data)
-			throws ParseException {
-		code.append(data + "new AcreEvent(\n");
-		event.type().accept(this, data + "\t");
-		code.append(",\n");
-		event.cid().accept(this, data + "\t");
-		code.append(",\n");
-		event.state().accept(this, data + "\t");
-		code.append(",\n");
-		event.length().accept(this, data + "\t");
-		code.append("\n" + data + ")");
-		return null;
-	}
 	
 	// **********************************************************************************
 	// FORMULAS
@@ -1127,22 +1031,6 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 	}
 
 	@Override
-	public Object visit(AcreFormula formula, Object data) throws ParseException {
-		code.append(data + "new AcreFormula(\n");
-		formula.cid().accept(this, data + "\t");
-		code.append(",\n");
-		formula.index().accept(this, data + "\t");
-		code.append(",\n");
-		formula.type().accept(this, data + "\t");
-		code.append(",\n");
-		formula.performative().accept(this, data + "\t");
-		code.append(",\n");
-		formula.content().accept(this, data + "\t");
-		code.append("\n" + data + ")");
-		return null;
-	}
-
-	@Override
 	public Object visit(FormulaVariable formula, Object data)
 			throws ParseException {
 		code.append(data + "new FormulaVariable(new Variable(Type.FORMULA,\""
@@ -1167,7 +1055,7 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 						.append(data + "\t\tpublic Formula invoke(BindingsEvaluateVisitor visitor, Predicate predicate) {\n")
 						.append(data + "\t\t\treturn ((" + element.qualifiedName())
 						.append(") visitor.agent().getModule(\"" + fullName + "\",\"")
-						.append(formula.module() + "\")).auto_formula(predicate);\n")
+						.append(formula.module() + "\")).auto_formula((Predicate) predicate.accept(visitor)));\n")
 						.append(data + "\t\t}\n" + data + "\t}")
 						.append("\n" + data + ")");
 				return null;

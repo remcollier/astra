@@ -3,7 +3,6 @@ package http;
  * GENERATED CODE - DO NOT CHANGE
  */
 
-import astra.acre.*;
 import astra.cartago.*;
 import astra.core.*;
 import astra.execution.*;

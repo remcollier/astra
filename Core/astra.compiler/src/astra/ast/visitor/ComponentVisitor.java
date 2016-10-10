@@ -15,12 +15,9 @@ import astra.ast.element.ModuleElement;
 import astra.ast.element.PlanElement;
 import astra.ast.element.RuleElement;
 import astra.ast.element.TypesElement;
-import astra.ast.event.AdvancedAcreEvent;
-import astra.ast.event.BasicAcreEvent;
 import astra.ast.event.MessageEvent;
 import astra.ast.event.ModuleEvent;
 import astra.ast.event.UpdateEvent;
-import astra.ast.formula.AcreFormula;
 import astra.ast.formula.AndFormula;
 import astra.ast.formula.BindFormula;
 import astra.ast.formula.BracketFormula;
@@ -33,8 +30,6 @@ import astra.ast.formula.NOTFormula;
 import astra.ast.formula.OrFormula;
 import astra.ast.formula.PredicateFormula;
 import astra.ast.formula.ScopedGoalFormula;
-import astra.ast.statement.AcreAdvanceStatement;
-import astra.ast.statement.AcreStartStatement;
 import astra.ast.statement.AssignmentStatement;
 import astra.ast.statement.BlockStatement;
 import astra.ast.statement.DeclarationStatement;
@@ -251,24 +246,6 @@ public class ComponentVisitor extends AbstractVisitor {
 	}
 
 	@Override
-	public Object visit(BasicAcreEvent event, Object data)
-			throws ParseException {
-		event.type().accept(this, data);
-		event.cid().accept(this, data);
-		return null;
-	}
-
-	@Override
-	public Object visit(AdvancedAcreEvent event, Object data)
-			throws ParseException {
-		event.type().accept(this, data);
-		event.cid().accept(this, data);
-		event.state().accept(this, data);
-		event.length().accept(this, data);
-		return null;
-	}
-
-	@Override
 	public Object visit(GoalFormula formula, Object data) throws ParseException {
 		formula.predicate().accept(this, data);
 		return null;
@@ -284,16 +261,6 @@ public class ComponentVisitor extends AbstractVisitor {
 	@Override
 	public Object visit(ScopedGoalFormula formula, Object data) throws ParseException {
 		formula.goal().accept(this, data);
-		return null;
-	}
-
-	@Override
-	public Object visit(AcreFormula formula, Object data) throws ParseException {
-		formula.cid().accept(this, data);
-		formula.index().accept(this, data);
-		formula.type().accept(this, data);
-		formula.performative().accept(this, data);
-		formula.content().accept(this, data);
 		return null;
 	}
 
@@ -532,26 +499,6 @@ public class ComponentVisitor extends AbstractVisitor {
 			throws ParseException {
 		statement.tryStatement().accept(this, data);
 		statement.recoverStatement().accept(this, data);
-		return null;
-	}
-
-	@Override
-	public Object visit(AcreStartStatement statement, Object data)
-			throws ParseException {
-		statement.protocol().accept(this, data);
-		statement.receiver().accept(this, data);
-		statement.performative().accept(this, data);
-		statement.content().accept(this, data);
-		statement.cid().accept(this, data);
-		return null;
-	}
-	
-	@Override
-	public Object visit(AcreAdvanceStatement statement, Object data)
-			throws ParseException {
-		statement.performative().accept(this, data);
-		statement.content().accept(this, data);
-		statement.cid().accept(this, data);
 		return null;
 	}
 
