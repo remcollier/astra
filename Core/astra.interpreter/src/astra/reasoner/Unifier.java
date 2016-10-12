@@ -171,7 +171,7 @@ public class Unifier {
 					if (unify(((ListTerm) sourceTerm).terms(), ((ListTerm) targetTerm).terms(),bindings,agent) == null) return null;
 				} else if (ListSplitter.class.isInstance(targetTerm)) {
 					ListTerm list = (ListTerm) sourceTerm;
-					if (list.size() < 2) return null;
+					if (list.size() < 1) return null;
 					ListTerm tail = new ListTerm(list.subList(1, list.size()).toArray(new Term[list.size()-1]));
 					if (unify(
 							new Term[] {((ListTerm) sourceTerm).get(0), tail}, 
@@ -181,12 +181,12 @@ public class Unifier {
 			} else if (ListTerm.class.isInstance(targetTerm)) {
 				if (ListSplitter.class.isInstance(sourceTerm)) {
 					ListTerm list = (ListTerm) targetTerm;
-					if (list.size() > 1) {
-						ListTerm tail = new ListTerm(list.subList(1, list.size()).toArray(new Term[list.size()-1]));
-						if (unify(
-								new Term[] {((ListTerm) targetTerm).get(0), tail}, 
-								new Term[] {((ListSplitter) sourceTerm).head(), ((ListSplitter) sourceTerm).tail()}, bindings, agent) == null) return null;
-					}
+					if (list.size() < 1) return null;
+					
+					ListTerm tail = new ListTerm(list.subList(1, list.size()).toArray(new Term[list.size()-1]));
+					if (unify(
+							new Term[] {((ListTerm) targetTerm).get(0), tail}, 
+							new Term[] {((ListSplitter) sourceTerm).head(), ((ListSplitter) sourceTerm).tail()}, bindings, agent) == null) return null;
 				} else 
 					return null;
 			} else if (Funct.class.isInstance(sourceTerm)) {

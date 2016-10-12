@@ -74,7 +74,6 @@ import astra.ast.tr.TRRuleElement;
 import astra.ast.tr.UpdateAction;
 import astra.ast.type.BasicType;
 import astra.ast.type.ObjectType;
-import astra.formula.Predicate;
 
 public class CodeGeneratorVisitor extends AbstractVisitor {
 	private StringBuffer code = new StringBuffer();
@@ -135,14 +134,12 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 		code.append("/**\n").append(" * GENERATED CODE - DO NOT CHANGE\n")
 				.append(" */\n\n");
 
-		code.append("import astra.cartago.*;\n")
-				.append("import astra.core.*;\n")
+		code.append("import astra.core.*;\n")
 				.append("import astra.execution.*;\n")
 				.append("import astra.event.*;\n")
 				.append("import astra.messaging.*;\n")
 				.append("import astra.formula.*;\n")
 				.append("import astra.lang.*;\n")
-				.append("import astra.eis.*;\n")
 				.append("import astra.statement.*;\n")
 				.append("import astra.term.*;\n")
 				.append("import astra.type.*;\n")
@@ -1055,7 +1052,7 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 						.append(data + "\t\tpublic Formula invoke(BindingsEvaluateVisitor visitor, Predicate predicate) {\n")
 						.append(data + "\t\t\treturn ((" + element.qualifiedName())
 						.append(") visitor.agent().getModule(\"" + fullName + "\",\"")
-						.append(formula.module() + "\")).auto_formula((Predicate) predicate.accept(visitor)));\n")
+						.append(formula.module() + "\")).auto_formula((Predicate) predicate.accept(visitor));\n")
 						.append(data + "\t\t}\n" + data + "\t}")
 						.append("\n" + data + ")");
 				return null;
