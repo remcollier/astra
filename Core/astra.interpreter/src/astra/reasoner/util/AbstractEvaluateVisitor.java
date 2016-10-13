@@ -244,8 +244,10 @@ public abstract class AbstractEvaluateVisitor implements LogicVisitor {
 		addTermHandler(new Handler<Operator>() {
 			@Override public Class<Operator> getType() { return Operator.class; }
 			@Override public Object handle(LogicVisitor visitor, Operator operator, boolean passByValue) {
+				((AbstractEvaluateVisitor) visitor).passByValue=true;
 				Term l = (Term) operator.left().accept(visitor);
 				Term r = (Term) operator.right().accept(visitor);
+				((AbstractEvaluateVisitor) visitor).passByValue=passByValue;
 
 //				System.out.println("l: " + l);
 //				System.out.println("r: " + r + " / " + r.getClass().getCanonicalName());
@@ -260,7 +262,9 @@ public abstract class AbstractEvaluateVisitor implements LogicVisitor {
 				if (operator.type().equals(Type.STRING)) {
 					if (operator.op() == Operator.PLUS) return Primitive.newPrimitive(Type.stringValue(l) + Type.stringValue(r)); 
 				} else if (operator.type().equals(Type.LIST)) {
-					if (operator.op() == Operator.PLUS) return ((ListTerm) l).merge((ListTerm) r); 
+					if (operator.op() == Operator.PLUS) {
+						return ((ListTerm) l).merge((ListTerm) r);
+					}
 				} else if (operator.type().equals(Type.INTEGER)) {
 					if (operator.op() == Operator.PLUS) return Primitive.newPrimitive(Type.integerValue(l) + Type.integerValue(r)); 
 					if (operator.op() == Operator.MINUS) return Primitive.newPrimitive(Type.integerValue(l) - Type.integerValue(r)); 

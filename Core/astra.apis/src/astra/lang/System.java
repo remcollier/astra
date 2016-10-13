@@ -481,4 +481,14 @@ public class System extends Module {
 	public String getNameFromState(AgentState state) {
 		return state.name;
 	}
+	/**
+	 * Sets the sleep time for the scheduler.
+	 * @param time
+	 * @return
+	 */
+	@ACTION
+	public boolean setSleepTime(long time) {
+		Scheduler.setSleepTime(time);
+		return true;
+	}
 }
