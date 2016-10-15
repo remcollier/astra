@@ -1,0 +1,34 @@
+package astra.http;
+
+import astra.util.DB;
+import astra.netty.Http;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.FullHttpRequest;
+
+agent TestController {
+	module Http ws;
+	module Console C;
+	module System S;
+	
+	rule +!main(list args) {
+		ws.setup();
+		ws.register();
+		
+//		S.createAgent("user", "astra.http.User");
+	}
+	
+	rule +!test("GET", object<ChannelHandlerContext> ctx, object<FullHttpRequest> req, list args) {
+		C.println("handing get request");
+		ws.sendHTML(ctx, req, "<html><body><h1>Hello World: " + args + "</h1></body></html>");
+	}
+
+/*
+	rule +!test2("GET", object<com.sun.net.httpserver.HttpExchange> exchange, list args) {
+		ws.sendView(exchange, "/Hello.html");
+	}
+
+	rule +!test3("GET", object<com.sun.net.httpserver.HttpExchange> exchange, list args) {
+		ws.sendJSON(exchange,is([happy("rem"), "bob"]));
+	}
+*/
+}

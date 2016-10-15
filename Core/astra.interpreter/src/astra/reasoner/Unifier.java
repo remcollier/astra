@@ -49,8 +49,8 @@ public class Unifier {
 	}
 	
 	public static Map<Integer, Term> unify(Event source, Event target, Agent agent) {
-//		System.out.println("in unify: event: " +event.getClass().getName());
-//		System.out.println("in unify: event2: " +event2.getClass().getName());
+//		System.out.println("in unify: event: " +source.getClass().getName());
+//		System.out.println("in unify: event2: " +target.getClass().getName());
 
 		EventUnifier unifier = eventFactory.get(source.getClass());
 		if (unifier != null) {

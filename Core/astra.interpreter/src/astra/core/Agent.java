@@ -319,7 +319,8 @@ public class Agent {
     }
 	
 	public synchronized void addEvent(Event event) {
-//		System.out.println("[" + this.name + "] event: " + event);
+//		System.out.println("[" + this.name + "] event: " + event.signature());
+//		System.out.println("[" + this.name + "] filter: " + filter);
 		if (filter.contains(event.signature())) {
 			synchronized (this) {
 //				System.out.println("[" + name + "] state: " + state);

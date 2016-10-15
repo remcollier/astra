@@ -112,6 +112,7 @@ public class ReflectionHelper extends AbstractHelper {
 		return resolveClass(className).getCanonicalName();
 	}
 
+	@SuppressWarnings("resource")
 	@Override
 	public ASTRAClassElement loadAST(String clazz) throws ParseException {
 		boolean local = true;
@@ -152,7 +153,9 @@ public class ReflectionHelper extends AbstractHelper {
 
 	private Method getMatchingMethod(String moduleClass, MethodSignature signature) {
 		Class<?> cls = resolveClass(moduleClass);
+//		System.out.println("matched class: " + moduleClass + " to: " + cls);
 
+//		System.out.println("Matching: " + signature);
 		while (cls.getSuperclass() != null) {
 			for (Method mthd : cls.getMethods()) {
 				if (mthd.getName().equals(signature.name())
@@ -199,15 +202,18 @@ public class ReflectionHelper extends AbstractHelper {
 
 	@Override
 	public boolean validate(String moduleClass, MethodSignature signature) {
+//		System.out.println("handling: " + moduleClass);
 		return getMatchingMethod(moduleClass, signature) != null;
 	}
 
 	private boolean validate(MethodSignature signature, Method mthd) {
+//		System.out.println("\tValidating Signature against: " + mthd);
 		Type[] params = mthd.getGenericParameterTypes();
 		int i = 0;
 		boolean match = true;
 		while (match && i < params.length) {
 			match = matchType(params[i], signature.type(i));
+//			System.out.println("\t\tcomparing: " + params[i] + " with: " + signature.type(i) + " result: " + match);
 			i++;
 		}
 
@@ -243,16 +249,12 @@ public class ReflectionHelper extends AbstractHelper {
 		}
 
 		// validate raw types...
-		try {
-			Class<?> cl = Class.forName(methodType.type());
-			if (((Class<?>) cls).isAssignableFrom(cl)) {
-				methodType.primitiveType(cl.getCanonicalName());
-				return true;
-			}
-			return false;
-		} catch (ClassNotFoundException e) {
-			return false;
+		Class<?> cl = resolveClass(methodType.type());
+		if ((cl != null) && ((Class<?>) cls).isAssignableFrom(cl)) {
+			methodType.primitiveType(cl.getCanonicalName());
+			return true;
 		}
+		return false;
 	}
 
 	@Override

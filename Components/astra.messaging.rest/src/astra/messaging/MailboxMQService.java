@@ -23,7 +23,7 @@ public class MailboxMQService extends MessageService {
 	private MailboxClient client;
 	
 	public MailboxMQService() {
-		this("http://astralangage.com/messaging");
+		this("http://astralanguage.com/messaging");
 	}
 	
 	public MailboxMQService(String url) {

@@ -10,6 +10,7 @@ import astra.ast.core.IAction;
 import astra.ast.core.IJavaHelper;
 import astra.ast.core.IStatement;
 import astra.ast.core.ITerm;
+import astra.ast.core.ImportElement;
 import astra.ast.core.ParseException;
 import astra.ast.core.Token;
 import astra.ast.element.FunctionElement;
@@ -146,6 +147,10 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 				.append("import astra.tr.*;\n")
 				.append("import astra.reasoner.util.*;\n\n");
 
+		for (ImportElement e : element.imports()) {
+			code.append("import ").append(e.name()).append(";\n");
+		}
+		code.append("\n");
 		qualifiedName = element.getClassDeclaration().name();
 		fullName += qualifiedName;
 		code.append("public class " + qualifiedName + " extends ASTRAClass {\n")

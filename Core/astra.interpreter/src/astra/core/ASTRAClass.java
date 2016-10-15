@@ -87,21 +87,6 @@ public abstract class ASTRAClass implements Queryable {
 		return linearization;
 	}
 	
-//	private ASTRAClass getParentClass(String name) {
-//		try {
-//			if (name.contains(".") || this.getClass().getPackage() == null)
-//				return ASTRAClass.forName(null, name);
-//			else
-//				return ASTRAClass.forName(this.getClass().getPackage().getName(), name);
-//		} catch (ASTRAClassNotFoundException e) {
-//			System.err.println("Linearisation Error in class: " + getClass().getCanonicalName());
-//			e.printStackTrace();
-//			System.exit(0);
-//		}
-//		
-//		return null;
-//	}
-	
 	public int getDistance() {
 		int maxDist, d;
 		if (distFromRoot==-1) {
