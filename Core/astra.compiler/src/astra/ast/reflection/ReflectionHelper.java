@@ -230,8 +230,8 @@ public class ReflectionHelper extends AbstractHelper {
 	}
 
 	private boolean matchType(Type cls, MethodType methodType) {
-		if (methodType.variable()) {
-			if (cls instanceof ParameterizedType) {
+		if (cls instanceof ParameterizedType) {
+			if (methodType.variable()) {
 				ParameterizedType t = (ParameterizedType) cls;
 				if (t.getRawType().equals(ActionParam.class)) {
 					boolean result = matchType(t.getActualTypeArguments()[0], methodType);
@@ -240,6 +240,16 @@ public class ReflectionHelper extends AbstractHelper {
 					}
 					return result;
 				}
+			} else if (methodType.isFunct()) {
+				ParameterizedType t = (ParameterizedType) cls;
+				if (t.getRawType().equals(ActionParam.class)) {
+					boolean result = matchType(t.getActualTypeArguments()[0], methodType);
+					if (result) {
+						methodType.actionParam(true);
+					}
+					return result;
+				}
+				
 			}
 		}
 

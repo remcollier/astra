@@ -9,6 +9,12 @@ import astra.term.Term;
 public class ActionParam<T> {
 	T value;
 	
+	public ActionParam(T value) {
+		this.value = value;
+	}
+	
+	public ActionParam() {}
+
 	public void set(T value) {
 		this.value = value;
 	}

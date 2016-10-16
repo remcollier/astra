@@ -3,12 +3,17 @@ package astra.lang;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import astra.core.ActionParam;
 import astra.core.Module;
 import astra.core.ModuleException;
 import astra.formula.Formula;
 import astra.formula.Predicate;
+import astra.reasoner.Unifier;
+import astra.reasoner.util.BindingsEvaluateVisitor;
 import astra.term.Funct;
 import astra.term.ListTerm;
 import astra.term.Primitive;
@@ -249,6 +254,150 @@ public class Prelude extends Module {
 		return list.contains(Primitive.newPrimitive(value)) ? Predicate.TRUE : Predicate.FALSE;
 	}
 
+	@TERM
+	public String stringValueFor(ListTerm list, String funct) {
+		return stringValueFor(list, funct, 0);
+	}
+	@SuppressWarnings("unchecked")
+	@TERM
+	public String stringValueFor(ListTerm list, String functor, int index) {
+		for (Term term : list.terms()) {
+			if (term instanceof Funct) {
+				Funct funct = (Funct) term;
+				if (funct.functor().equals(functor)) {
+					return ((Primitive<String>) funct.termAt(index)).value();
+				}
+			}
+		}
+		throw new RuntimeException("No funct with functor: " + functor + " in list: " + list);
+	}
+	
+	@TERM
+	public int intValueFor(ListTerm list, String funct) {
+		return intValueFor(list, funct, 0);
+	}
+	@SuppressWarnings("unchecked")
+	@TERM
+	public int intValueFor(ListTerm list, String functor, int index) {
+		for (Term term : list.terms()) {
+			if (term instanceof Funct) {
+				Funct funct = (Funct) term;
+				if (funct.functor().equals(functor)) {
+					return ((Primitive<Integer>) funct.termAt(index)).value();
+				}
+			}
+		}
+		throw new RuntimeException("No funct with functor: " + functor + " in list: " + list);
+	}
+	
+	@TERM
+	public long longValueFor(ListTerm list, String funct) {
+		return longValueFor(list, funct, 0);
+	}
+	@SuppressWarnings("unchecked")
+	@TERM
+	public long longValueFor(ListTerm list, String functor, int index) {
+		for (Term term : list.terms()) {
+			if (term instanceof Funct) {
+				Funct funct = (Funct) term;
+				if (funct.functor().equals(functor)) {
+					return ((Primitive<Long>) funct.termAt(index)).value();
+				}
+			}
+		}
+		throw new RuntimeException("No funct with functor: " + functor + " in list: " + list);
+	}
+	
+	@TERM
+	public char charValueFor(ListTerm list, String funct) {
+		return charValueFor(list, funct, 0);
+	}
+	@SuppressWarnings("unchecked")
+	@TERM
+	public char charValueFor(ListTerm list, String functor, int index) {
+		for (Term term : list.terms()) {
+			if (term instanceof Funct) {
+				Funct funct = (Funct) term;
+				if (funct.functor().equals(functor)) {
+					return ((Primitive<Character>) funct.termAt(index)).value();
+				}
+			}
+		}
+		throw new RuntimeException("No funct with functor: " + functor + " in list: " + list);
+	}
+	
+	@TERM
+	public boolean booleanValueFor(ListTerm list, String funct) {
+		return booleanValueFor(list, funct, 0);
+	}
+	@SuppressWarnings("unchecked")
+	@TERM
+	public boolean booleanValueFor(ListTerm list, String functor, int index) {
+		for (Term term : list.terms()) {
+			if (term instanceof Funct) {
+				Funct funct = (Funct) term;
+				if (funct.functor().equals(functor)) {
+					return ((Primitive<Boolean>) funct.termAt(index)).value();
+				}
+			}
+		}
+		throw new RuntimeException("No funct with functor: " + functor + " in list: " + list);
+	}
+	
+	@TERM
+	public Object objectValueFor(ListTerm list, String funct) {
+		return objectValueFor(list, funct, 0);
+	}
+	@SuppressWarnings("unchecked")
+	@TERM
+	public Object objectValueFor(ListTerm list, String functor, int index) {
+		for (Term term : list.terms()) {
+			if (term instanceof Funct) {
+				Funct funct = (Funct) term;
+				if (funct.functor().equals(functor)) {
+					return ((Primitive<Object>) funct.termAt(index)).value();
+				}
+			}
+		}
+		throw new RuntimeException("No funct with functor: " + functor + " in list: " + list);
+	}
+	
+	@TERM
+	public float floatValueFor(ListTerm list, String funct) {
+		return floatValueFor(list, funct, 0);
+	}
+	@SuppressWarnings("unchecked")
+	@TERM
+	public float floatValueFor(ListTerm list, String functor, int index) {
+		for (Term term : list.terms()) {
+			if (term instanceof Funct) {
+				Funct funct = (Funct) term;
+				if (funct.functor().equals(functor)) {
+					return ((Primitive<Float>) funct.termAt(index)).value();
+				}
+			}
+		}
+		throw new RuntimeException("No funct with functor: " + functor + " in list: " + list);
+	}
+	
+	@TERM
+	public double doubleValueFor(ListTerm list, String funct) {
+		return doubleValueFor(list, funct, 0);
+	}
+	@SuppressWarnings("unchecked")
+	@TERM
+	public double doubleValueFor(ListTerm list, String functor, int index) {
+		for (Term term : list.terms()) {
+			if (term instanceof Funct) {
+				Funct funct = (Funct) term;
+				if (funct.functor().equals(functor)) {
+					return ((Primitive<Double>) funct.termAt(index)).value();
+				}
+			}
+		}
+		throw new RuntimeException("No funct with functor: " + functor + " in list: " + list);
+	}
+	
 	/**
 	 * Term that returns the value at the given index cast as an int.
 	 * 

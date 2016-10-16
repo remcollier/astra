@@ -6,29 +6,32 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 
 agent TestController {
-	module Http ws;
+	module Http http;
 	module Console C;
 	module System S;
+	module Prelude P;
 	
 	rule +!main(list args) {
-		ws.setup();
-		ws.register();
+		http.setup();
+		http.register();
+		http.exportFolder("/view", "view");
 		
 //		S.createAgent("user", "astra.http.User");
 	}
 	
-	rule +!test("GET", object<ChannelHandlerContext> ctx, object<FullHttpRequest> req, list args) {
-		C.println("handing get request");
-		ws.sendHTML(ctx, req, "<html><body><h1>Hello World: " + args + "</h1></body></html>");
+	synchronized rule +!test2("GET", object<ChannelHandlerContext> ctx, object<FullHttpRequest> req, list args) {
+		C.println("handling test2");
+		http.loadView(ctx, req, "/Hello.html");
+		C.println("finished");
 	}
 
-/*
-	rule +!test2("GET", object<com.sun.net.httpserver.HttpExchange> exchange, list args) {
-		ws.sendView(exchange, "/Hello.html");
+	rule +!test3("GET", object<ChannelHandlerContext> ctx, object<FullHttpRequest> req, list args) {
+		http.sendJSON(ctx, req, is([happy("rem"), "bob"]));
 	}
 
-	rule +!test3("GET", object<com.sun.net.httpserver.HttpExchange> exchange, list args) {
-		ws.sendJSON(exchange,is([happy("rem"), "bob"]));
+	rule +!validate("POST", object<ChannelHandlerContext> ctx, object<FullHttpRequest> req, list args, list fields) {
+		C.println("user: "+ fields);
+		string U = P.stringValueFor(fields, "username");
+		C.println("U="+U);
 	}
-*/
 }

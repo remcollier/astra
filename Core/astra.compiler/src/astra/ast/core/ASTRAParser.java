@@ -220,6 +220,43 @@ public class ASTRAParser {
 				first, last, tokenizer.getSource(first, last));
 	}
 	
+	public RuleElement createSynchronizedRule(List<Token> tokens) throws ParseException {
+		if (tokens.remove(0).type != Token.RULE) {
+			throw new ParseException("Expected rule keyword, but got: " + tokens.get(0).token, tokens.get(0), tokens.get(0));
+		}
+		
+		Token first = tokens.get(0);
+		Token last = tokens.get(tokens.size() - 1);
+		List<Token> list = splitAt(tokens, new int[] {Token.COLON, Token.LEFT_BRACE});
+		Token tok = list.remove(list.size()-1);
+
+		IEvent event = createEvent(list);
+
+		// If we split on a COLON, then we have a context...
+		IFormula context = new PredicateFormula("true", new LinkedList<ITerm>(), tok, tok, tokenizer.getSource(tok, tok));;
+		if (tok.type == Token.COLON) {
+			list = splitAt(tokens, new int[] {Token.LEFT_BRACE});
+			// Now we have to have terminated with a LEFT_BRACE, so get it...
+			tok = list.remove(list.size()-1);
+			if (list.isEmpty()) throw new ParseException("Unexpected token: ':'", tok, tok);
+			context = createFormula(list);
+		}
+		
+		// Re-insert left brace and process the statement...
+		tokens.add(0, tok);
+		
+		// Convert the block into a synchronized block...
+		BlockStatement block = (BlockStatement) createStatement(tokens);
+		List<IStatement> statements = new LinkedList<IStatement>();
+		for(IStatement statement: block.statements()) {
+			statements.add(statement);
+		}
+		SynchronizedBlockStatement sblock = 
+				new SynchronizedBlockStatement("synchronized", statements, block.start, block.end, block.getSource());
+		return new RuleElement(event, context, sblock,
+				first, last, tokenizer.getSource(first, last));
+	}
+
 	public FunctionElement createFunction(List<Token> tokens) throws ParseException {
 		Token first = tokens.get(0);
 		Token last = tokens.get(tokens.size() - 1);

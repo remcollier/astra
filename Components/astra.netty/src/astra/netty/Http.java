@@ -2,10 +2,6 @@ package astra.netty;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.util.Map;
-
-import com.sun.net.httpserver.HttpExchange;
 
 import astra.core.Module;
 import astra.netty.server.WebServer;
@@ -13,15 +9,12 @@ import astra.term.Funct;
 import astra.term.ListTerm;
 import astra.term.Primitive;
 import astra.term.Term;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.DefaultFileRegion;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpUtil;
-import io.netty.handler.codec.http.HttpVersion;
-import io.netty.handler.codec.http.LastHttpContent;
+import io.netty.util.CharsetUtil;
 
 public class Http extends Module {
 	public static WebServer server;
@@ -55,21 +48,17 @@ public class Http extends Module {
 	}
 
 	@ACTION
-	public boolean sendHTML(ChannelHandlerContext ctx, FullHttpRequest request, String text) {
-		try {
-	        sendResponse(ctx, request, WebServer.TYPE_HTML, text);
-			return true;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
+	public boolean exportFolder(String base_url, String path) {
+		System.out.println("Exposing folder: " + path + " under base_url: " + base_url);
+		server.createContext(base_url, new FolderHandler(base_url, path));
+		return true;
 	}
 
 	@ACTION
 	public boolean sendJSON(ChannelHandlerContext ctx, FullHttpRequest request, Funct funct) {
 		String response = encode(funct);
 		try {
-	        sendResponse(ctx, request, WebServer.TYPE_JSON, response);
+			sendResponse(ctx, request, WebServer.TYPE_JSON, response);
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -95,9 +84,22 @@ public class Http extends Module {
 
 	@TERM
 	public String stringParam(ChannelHandlerContext ctx, FullHttpRequest request, String name) {
-//		Map<String, Object> parameters = (Map<String, Object>) exchange.getAttribute("parameters");
-//		System.out.println("parameters: " + parameters);
-//		return parameters.get(name).toString();
+		ByteBuf content = request.content();
+	    System.out.println(content.toString(CharsetUtil.UTF_8));
+//		HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(request);
+//	    System.out.println("We have the decoder for the request");
+//	    List<InterfaceHttpData> datas = decoder.getBodyHttpDatas();
+//	    for (InterfaceHttpData data : datas){
+//	     System.out.println(data.toString());
+//	    }				
+
+//		InterfaceHttpData data = decoder.getBodyHttpData(name);
+//		if (data.getHttpDataType() == HttpDataType.Attribute) {
+//			Attribute<String> attribute = (Attribute<String>) data;
+//			String value = attribute.getAndRemove();
+//			System.out.println(name + ": " + value);
+//			return value;
+//		}
 		return null;
 	}
 
@@ -118,23 +120,18 @@ public class Http extends Module {
 		return out + " ]";
 	}
 
-	private static void sendResponse(ChannelHandlerContext ctx, FullHttpRequest request, String type, String text) throws IOException {
-        WebServer.writeResponse(ctx, request, HttpResponseStatus.OK, type, text);
+	private static void sendResponse(ChannelHandlerContext ctx, FullHttpRequest request, String type, String text)
+			throws IOException {
+		WebServer.writeResponse(ctx, request, HttpResponseStatus.OK, type, text);
 	}
 
 	@ACTION
-	public boolean sendView(ChannelHandlerContext ctx, FullHttpRequest request, String view) {
+	public boolean loadView(ChannelHandlerContext ctx, FullHttpRequest request, String view) {
 		try {
-			File file = new File("view/" + view);
-			RandomAccessFile raf = new RandomAccessFile(file, "r");
-			FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
-			HttpUtil.setContentLength(response, raf.length());
-			ctx.write(response); 
-			ctx.write(new DefaultFileRegion(raf.getChannel(), 0, file.length())); 
-			ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);  
-			raf.close();
+			String file_uri = "view" + view.replace('/', File.separatorChar);
+			WebServer.writeFileResponse(ctx, request, file_uri);
 			return true;
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}

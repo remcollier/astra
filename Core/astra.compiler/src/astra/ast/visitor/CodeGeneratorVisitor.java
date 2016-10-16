@@ -1082,8 +1082,8 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 		for (int i = 0; i < signature.types().length; i++) {
 			if (i > 0) code.append(",");
 			code.append("\n");
-			code.append(data + "\t\t\t\t(" + signature.type(i).toClassString()
-					+ ") visitor.evaluate(predicate.getTerm(" + i + "))");
+			code.append(data + "\t\t\t\t(" + signature.type(i).toClassString() + ") ");
+			code.append("visitor.evaluate(predicate.getTerm(" + i + "))");
 		}
 
 		code.append("\n" + data + "\t\t\t);\n")

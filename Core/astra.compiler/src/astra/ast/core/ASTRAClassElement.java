@@ -116,6 +116,10 @@ public class ASTRAClassElement implements IElement {
 					list = parser.readTo(Token.SEMI_COLON);
 					inferences.add((InferenceElement) parser.createInference(list.subList(0, list.size()-1)).setParent(this));
 					break;
+				case Token.SYNCHRONIZED:
+					list = parser.readTo(Token.RIGHT_BRACE);
+					rules.add((RuleElement) parser.createSynchronizedRule(list).setParent(this));
+					break;
 				case Token.RULE:
 					list = parser.readTo(Token.RIGHT_BRACE);
 					rules.add((RuleElement) parser.createRule(list).setParent(this));

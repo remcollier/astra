@@ -1,0 +1,44 @@
+<html>
+
+<head>
+	<title>Hello World</title>
+	<script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+</head>
+
+<body>
+	<div id="text"></div>
+
+	Login Test
+
+	<table>
+		<tr>
+			<td>Username:</td>
+			<td><input type=text id="user"/></td>
+		</tr>
+		<tr>
+			<td>Password</td>
+			<td><input type=password id="pass"/></td>
+		</tr>
+		<tr>
+			<td colspan=2 style="text-align:right"><input type=button value="Login" onclick="do_login();"/></td>
+		</tr>
+	</table>
+
+	<script type="text/javascript">
+		$("#text").load("/main/test3");
+		
+		function do_login() {
+			data = {
+				username : $("#user").val(),
+				password : $("#pass").val()
+			};
+			
+			console.log(data);
+			$.post("/main/validate", data, function(response) {
+				$("#text").html(response);
+			});
+		}
+	</script>
+</body>
+
+</html>

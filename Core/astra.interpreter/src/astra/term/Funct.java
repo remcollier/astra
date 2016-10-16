@@ -107,4 +107,8 @@ public class Funct implements Term {
 		return this.id+":"+terms.length;
 	}
 
+	public void set(int i, Term term) {
+		terms[i] = term;
+	}
+
 }
