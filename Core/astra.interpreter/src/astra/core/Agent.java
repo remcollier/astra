@@ -313,7 +313,7 @@ public class Agent {
         	list.add(new Funct("protocol", new Term[] {Primitive.newPrimitive(message.protocol) }));
         }
         if (message.conversationId != null) {
-        	list.add(new Funct("conversationId", new Term[] {Primitive.newPrimitive(message.conversationId) }));
+        	list.add(new Funct("conversation_id", new Term[] {Primitive.newPrimitive(message.conversationId) }));
         }
         addEvent( new MessageEvent( new Performative(message.performative), Primitive.newPrimitive( message.sender ), ContentCodec.getInstance().decode(message.content), list ) );
     }

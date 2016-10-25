@@ -1,9 +1,82 @@
 package astra.fipa;
 
-agent FIPARequestProtocol {
-	rule +!start_fipa_request(string receiver, funct action, int timeout, string id) {
-		!get_conversation_id(id);
-		send(request, receiver, content(id, action));
+agent FIPARequestProtocol extends FIPAProtocol {
+	rule +!fipa_request(string receiver, funct action, returns funct result) : fipa_default_timeout(int timeout) {
+		!fipa_request(receiver, action, timeout, result);
+	}
+
+	rule +!fipa_request(string receiver, funct action, int timeout, returns funct answer) {
+		// get a conversation id
+		!fipa_conversation_id(string id);
+		
+		send(request, receiver, fipa_logic.toPredicate(action), [conversation_id(id), protocol("fipa_request_protocol")]);
+		
 		!!fipa_timeout(id, timeout);
+		
+		when(fipa_state(id, string state) & fipa_prelude.contains(["COMPLETED", "FAILED", "REFUSED", "CANCELLED"], state)) {
+			if (fipa_prelude.contains(["REFUSED", "CANCELLED", "FAILED"], state)) {
+				!fipa_failed(id);
+			} else if (fipa_completed(id, answer)) {
+				-fipa_completed(id, answer);
+				!fipa_completed(id);
+			}
+		}
+	}
+	
+	synchronized rule +fipa_timedout(string id) : fipa_state(id, "SENT") {
+		!fipa_set_state(id, "FAILED");
+	}
+	
+	rule @message(refuse, string sender, formula action, list params) :
+				fipa_state(fipa_prelude.stringValueFor(params, "conversation_id"), "NEW") &
+				fipa_prelude.stringValueFor(params, "protocol") == "fipa_request_protocol" {
+		!fipa_set_state(fipa_prelude.stringValueFor(params, "conversation_id"), "REFUSED");
+	}
+	
+	rule @message(agree, string sender, formula action, list params) :
+				fipa_state(fipa_prelude.stringValueFor(params, "conversation_id"), "NEW") &
+				fipa_prelude.stringValueFor(params, "protocol") == "fipa_request_protocol" {
+		!fipa_set_state(fipa_prelude.stringValueFor(params, "conversation_id"), "AGREED");
+	}
+	
+	rule @message(inform, string sender, formula answer, list params) : 
+				fipa_state(fipa_prelude.stringValueFor(params, "conversation_id"), "AGREED") &
+				fipa_prelude.stringValueFor(params, "protocol") == "fipa_request_protocol" {
+		string id = fipa_prelude.stringValueFor(params, "conversation_id");
+		+fipa_completed(id, fipa_logic.toFunctor(answer));
+		!fipa_set_state(id, "COMPLETED");
+	}
+	
+	rule @message(failure, string sender, formula action, list params) :
+				fipa_state(fipa_prelude.stringValueFor(params, "conversation_id"), "AGREED") &
+				fipa_prelude.stringValueFor(params, "protocol") == "fipa_request_protocol" {
+		!fipa_set_state(fipa_prelude.stringValueFor(params, "conversation_id"), "FAILED");
+	}
+	
+	rule @message(request, string sender, formula action, list params) : 
+				fipa_prelude.stringValueFor(params, "protocol") == "fipa_request_protocol" {
+		!fipa_request_validate(sender, fipa_logic.toFunctor(action), boolean outcome);
+	
+		if (fipa_logic.toPredicate(outcome)) {
+			try {
+				send(agree, sender, action, params);
+				
+				send(cancel, sender, fipa_logic.toPredicate(action), params);
+//				!fipa_request_execute(sender, fipa_logic.toFunctor(action), funct answer);
+//				send(inform, sender, fipa_logic.toPredicate(answer), params);
+			} recover {
+				send(failure, sender, action, params);
+			}
+		} else {
+			send(refuse, sender, action, params);
+		}
+	}
+
+	rule +!fipa_request_validate(string sender, funct action, returns boolean result) {
+		result=true;
+	}
+
+	rule +!fipa_request_execute(string sender, funct action, returns funct answer) {
+		answer = done();
 	}
 }

@@ -86,7 +86,7 @@ public class RenameVisitor implements LogicVisitor {
 		addTermHandler(new Handler<Variable>() {
 			@Override public Class<Variable> getType() { return Variable.class; }
 			@Override public Object handle(LogicVisitor visitor, Variable variable, String modifier, Map<Integer, Term> bindings) {
-				Variable v = new Variable(variable.type(), modifier + variable.identifier());
+				Variable v = new Variable(variable.type(), modifier + variable.identifier(), variable.returns());
 				bindings.put(variable.id(), v);
 				return v;
 			}

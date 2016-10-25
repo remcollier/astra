@@ -3,17 +3,12 @@ package astra.lang;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import astra.core.ActionParam;
 import astra.core.Module;
 import astra.core.ModuleException;
 import astra.formula.Formula;
 import astra.formula.Predicate;
-import astra.reasoner.Unifier;
-import astra.reasoner.util.BindingsEvaluateVisitor;
 import astra.term.Funct;
 import astra.term.ListTerm;
 import astra.term.Primitive;

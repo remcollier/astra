@@ -186,40 +186,40 @@ public class ASTRAClassHierarchy {
 			throw new ParseException("Cannot compile: " + vertex.element().name() + " source is not local", vertex.element().element());
 		}
 		
-		if  (!vertex.element().element().local()) {
-			throw new ParseException("Cannot compile: " + vertex.element().name() + " source is not local", vertex.element().element());
-		}
-		
-		// The class is loaded, but only syntactic checks have been carried out. Now do
-		// the semantic checks...
-		LinkedList<ASTRAClass> linearisation = getLinearisation(vertex);
-		
-		// Step 1: Iterate through the linearised list of classes (general-specific order)
-		//         building a representation of the ontologies & triggering events.
-		ComponentStore store = new ComponentStore();
-		ComponentVisitor visitor = new ComponentVisitor(helper, store);
-		for (int i=linearisation.size()-1; i >= 0; i--) {
-			ASTRAClass node = linearisation.get(i);
-			if (!node.isLoaded()) {
-				throw new ParseException("Could not compile: " + vertex.element().name() + " due to error in: " + node.element().getQualifiedName(), node.element());
-			}
+
+		// Only try to generate code if the file is local...
+		if  (vertex.element().element().local()) {
+			// The class is loaded, but only syntactic checks have been carried out. Now do
+			// the semantic checks...
+			LinkedList<ASTRAClass> linearisation = getLinearisation(vertex);
 			
-			// Construct the component store for the class: contains a set of resolved modules,
-			// ontologies and rule trigger events.
-			node.element().accept(visitor, store);
+			// Step 1: Iterate through the linearised list of classes (general-specific order)
+			//         building a representation of the ontologies & triggering events.
+			ComponentStore store = new ComponentStore();
+			ComponentVisitor visitor = new ComponentVisitor(helper, store);
+			for (int i=linearisation.size()-1; i >= 0; i--) {
+				ASTRAClass node = linearisation.get(i);
+				if (!node.isLoaded()) {
+					throw new ParseException("Could not compile: " + vertex.element().name() + " due to error in: " + node.element().getQualifiedName(), node.element());
+				}
+				
+				// Construct the component store for the class: contains a set of resolved modules,
+				// ontologies and rule trigger events.
+				node.element().accept(visitor, store);
+			}
+			// Now get a reference to the class you are actually compiling...
+			ASTRAClass node = linearisation.get(0);
+
+			// Step 2: Check that the formulae and goals have corresponding entries in
+			//         the component store.
+			node.element().accept(new TypeCheckVisitor(), store);
+			node.element().accept(new GoalCheckVisitor(), store);
+
+			// Step 3: Generate the source code and save it to disk
+			CodeGeneratorVisitor cgv = new CodeGeneratorVisitor(helper,store);
+			node.element().accept(cgv, null);
+			helper.createTarget(node.element(), cgv.toString());
 		}
-		// Now get a reference to the class you are actually compiling...
-		ASTRAClass node = linearisation.get(0);
-
-		// Step 2: Check that the formulae and goals have corresponding entries in
-		//         the component store.
-		node.element().accept(new TypeCheckVisitor(), store);
-		node.element().accept(new GoalCheckVisitor(), store);
-
-		// Step 3: Generate the source code and save it to disk
-		CodeGeneratorVisitor cgv = new CodeGeneratorVisitor(helper,store);
-		node.element().accept(cgv, null);
-		helper.createTarget(node.element(), cgv.toString());
 	}
 
 	private void removeParentDependencies(Vertex<ASTRAClass> vertex) {

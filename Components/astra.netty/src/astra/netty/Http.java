@@ -82,27 +82,6 @@ public class Http extends Module {
 		return null;
 	}
 
-	@TERM
-	public String stringParam(ChannelHandlerContext ctx, FullHttpRequest request, String name) {
-		ByteBuf content = request.content();
-	    System.out.println(content.toString(CharsetUtil.UTF_8));
-//		HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(request);
-//	    System.out.println("We have the decoder for the request");
-//	    List<InterfaceHttpData> datas = decoder.getBodyHttpDatas();
-//	    for (InterfaceHttpData data : datas){
-//	     System.out.println(data.toString());
-//	    }				
-
-//		InterfaceHttpData data = decoder.getBodyHttpData(name);
-//		if (data.getHttpDataType() == HttpDataType.Attribute) {
-//			Attribute<String> attribute = (Attribute<String>) data;
-//			String value = attribute.getAndRemove();
-//			System.out.println(name + ": " + value);
-//			return value;
-//		}
-		return null;
-	}
-
 	private static String encode(Funct funct) {
 		return "{ \"" + funct.functor() + "\" : " + encode(funct.termAt(0)) + " }";
 	}

@@ -1,12 +1,16 @@
 package astra.statement;
 
+import java.util.HashMap;
+
 import astra.core.Intention;
 import astra.formula.Formula;
-import astra.formula.Predicate;
+import astra.formula.ModuleFormula;
 import astra.messaging.AstraMessage;
 import astra.messaging.MessageService;
+import astra.reasoner.util.BindingsEvaluateVisitor;
 import astra.reasoner.util.ContentCodec;
 import astra.reasoner.util.ContextEvaluateVisitor;
+import astra.term.FormulaTerm;
 import astra.term.Funct;
 import astra.term.ListTerm;
 import astra.term.Performative;
@@ -50,10 +54,13 @@ public class Send extends AbstractStatement {
 							message.receivers.add(((Primitive<String>) term).value());
 						}
 					}
-					if (ListTerm.class.isInstance(params)) {
-						for (Term t : (ListTerm) params) {
+					
+					Object parameters = params.accept(visitor);
+					if (ListTerm.class.isInstance(parameters)) {
+//						System.out.println("params: " + parameters);
+						for (Term t : (ListTerm) parameters) {
 							if (Funct.class.isInstance(t)) {
-								Funct funct = (Funct) t;
+								Funct funct = (Funct) ((Funct) t).accept(visitor);
 								if (funct.size() > 1) {
 									context.failed("Unexpected Param in send(...): " + funct);
 									return false;
@@ -61,7 +68,7 @@ public class Send extends AbstractStatement {
 								
 								if (funct.functor().equals("protocol")) {
 									message.protocol = ((Primitive<?>) funct.termAt(0)).value().toString();
-								} else if (funct.functor().equals("conversationId")) {
+								} else if (funct.functor().equals("conversation_id")) {
 									message.conversationId = ((Primitive<?>) funct.termAt(0)).value().toString();
 								} else {
 									context.failed("Unexpected Param in send(...): " + funct);
@@ -69,10 +76,27 @@ public class Send extends AbstractStatement {
 								}
 							}
 						}
-						
 					}
 					message.performative = ((Performative) performative.accept(visitor)).value();
-					message.content = ContentCodec.getInstance().encode((Formula) content.accept(visitor));
+					
+					// Process the content...
+					Formula ctnt = null;
+					Object cnt = content.accept(visitor);
+					if (cnt instanceof FormulaTerm) {
+						ctnt = ((FormulaTerm) cnt).value();
+					} else if (cnt instanceof ModuleFormula) {
+						// This is normally executed by the resolution algorithm, but that is
+						// not used here. This replaces content defined as a module formula
+						// with the actual content.
+						ctnt = ((ModuleFormula) cnt).adaptor().invoke(new BindingsEvaluateVisitor(new HashMap<Integer, Term>(), context.agent), ((ModuleFormula) cnt).predicate());
+					} else if (cnt instanceof Formula) {
+						ctnt = (Formula) cnt;
+					} else {
+						context.failed("Invalid Formula type: " + cnt.getClass().getCanonicalName());
+						return false;
+					}
+//					System.out.println("content: " + ctnt);
+					message.content = ContentCodec.getInstance().encode(ctnt);
 					
 	//				ACREAPI api = context.agent().getAPI(ACREAPI.class);
 	//				if ( api != null ) {

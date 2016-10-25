@@ -121,6 +121,7 @@ public class ReflectionHelper extends AbstractHelper {
 			File file = new File(target+clazz.replace(".", "/") + ".astra");
 			in = new FileInputStream(file);
 		} catch (FileNotFoundException e) {
+			local = false;
 			System.out.println("Class: " + clazz + " is not local, searching classpath...");
 			in = getClass().getResourceAsStream("/" + clazz.replace(".", "/") + ".astra");
 		}
@@ -131,7 +132,7 @@ public class ReflectionHelper extends AbstractHelper {
 		
 		ASTRAClassElement element = null;
 		try {
-			element = new ASTRAClassElement(clazz,in);
+			element = new ASTRAClassElement(clazz,in, local);
 		} catch (ParseException e) {
 			try {
 				in.close();
@@ -171,6 +172,8 @@ public class ReflectionHelper extends AbstractHelper {
 										int i = 0;
 										boolean match = true;
 										while (match && i < params.length) {
+//											System.out.println("params["+i+"]="+ params[i]);
+//											System.out.println("signature.type("+i+")="+ signature.type(i));
 											match = params[i].equals(signature.type(i).type());
 											i++;
 										}
@@ -203,6 +206,7 @@ public class ReflectionHelper extends AbstractHelper {
 	@Override
 	public boolean validate(String moduleClass, MethodSignature signature) {
 //		System.out.println("handling: " + moduleClass);
+//		System.out.println("signature: " + signature);
 		return getMatchingMethod(moduleClass, signature) != null;
 	}
 
@@ -255,6 +259,7 @@ public class ReflectionHelper extends AbstractHelper {
 
 		// handle primitives
 		if (methodType.isPrimitive()) {
+//			System.out.println(">>>>>>> PRIMITIVE");
 			return methodType.validatePrimitive(((Class<?>) cls).getCanonicalName());
 		}
 

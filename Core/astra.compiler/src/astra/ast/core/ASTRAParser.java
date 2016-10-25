@@ -479,7 +479,7 @@ public class ASTRAParser {
 				throw new ParseException("Malformed Statement: send(<performative>, <receiver>, <formula> [,<params>])", first, last);
 			}
 			
-			PredicateFormula content = this.convertToPredicate(terms.get(2));
+			IFormula content = this.convertToPredicate(terms.get(2));
 			ITerm params = null;
 			if (terms.size() == 4) params = terms.get(3);
 			list.remove(list.size()-1);
@@ -706,9 +706,21 @@ public class ASTRAParser {
 		}
 	}
 
-	private PredicateFormula convertToPredicate(ITerm term) {
-		Function function = (Function) term;
-		return new PredicateFormula(function.functor(), function.terms(), function.start, function.end, function.getSource());
+	private IFormula convertToPredicate(ITerm term) throws ParseException {
+		if (term instanceof Function) {
+			Function function = (Function) term;
+			return new PredicateFormula(function.functor(), function.terms(), function.start, function.end, function.getSource());
+		} else if (term instanceof ModuleTerm) {
+			ModuleTerm mterm = (ModuleTerm) term;
+			return new ModuleFormula(mterm.module(), mterm.method(), mterm.start, mterm.end, mterm.getSource());  
+		} else if (term instanceof InlineVariableDeclaration) {
+			InlineVariableDeclaration var = (InlineVariableDeclaration) term;
+			return new FormulaVariable(var.identifier(),var.start, var.end, var.getSource());
+		} else if (term instanceof Variable) {
+			Variable var = (Variable) term;
+			return new FormulaVariable(var.identifier(),var.start, var.end, var.getSource());
+		}
+		throw new ParseException("Unable to convert term to predicate: " + term.getClass().getCanonicalName(), term);
 	}
 
 	private void semiColonCheck(List<Token> list) throws ParseException {
@@ -759,12 +771,12 @@ public class ASTRAParser {
 
 			tokens.remove(0);
 			List<ITerm> terms = getTermList(tokens.subList(0, tokens.size()-1), false);
-			
+
 			if (terms.size() < 3 || terms.size() > 4) {
 				throw new ParseException("Malformed Message Event: @message(<performative>, <sender>, <formula>)", first, last);
 			}
 
-			PredicateFormula content = this.convertToPredicate(terms.get(2));
+			IFormula content = this.convertToPredicate(terms.get(2));
 
 			ITerm params = null;
 			if (terms.size() == 4) params = terms.get(3);
@@ -889,6 +901,10 @@ public class ASTRAParser {
 			return new FormulaVariable(tokens.remove(0).token, 
 					first, last, tokenizer.getSource(first, last));
 		} else if (tok.type == Token.IDENTIFIER) {
+			if (tokens.size() == 0) {
+				new RuntimeException("tokens is empty").printStackTrace();
+				System.exit(0);
+			}
 			Token tok2 = tokens.get(0);
 			if (tok2.type == Token.PERIOD) {
 				return new ModuleFormula(tok.token, createPredicate(tokens.subList(1, tokens.size())), 
@@ -1086,6 +1102,14 @@ public class ASTRAParser {
 					return new Literal(tok.token+tok2.token, new BasicType(tok2.type), first, last, tokenizer.getSource(first, last));
 				}
 				throw new ParseException("Malformed literal: " + tok.token+tok2.token, tok, tok2);
+			} else if (tok.type == Token.RETURNS) {
+				ITerm term = createTerm(tokens);
+				if (term instanceof InlineVariableDeclaration) {
+					((InlineVariableDeclaration) term).returns(true);
+				} else {
+					throw new ParseException("Attempt to return a non variable value.", tok, tok);
+				}
+				return term;
 			}
 		}
 		System.out.println("tokens: " + tokens);

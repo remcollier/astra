@@ -11,8 +11,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import astra.formula.Predicate;
+import astra.term.Funct;
 import astra.term.Primitive;
 import astra.term.Term;
+import eis.AgentListener;
 import eis.EILoader;
 import eis.EnvironmentInterfaceStandard;
 import eis.EnvironmentListener;
@@ -62,22 +64,22 @@ public class EISService {
 	private class EISEnvironmentListener implements EnvironmentListener {
 		@Override
 		public void handleNewEntity(String entity) {
-			broadcastEvent(new EISEvent(EISEvent.ENVIRONMENT, new Predicate("newEntity", new Term[] { Primitive.newPrimitive(entity) })));
+			broadcastEvent(new EISEvent(EISEvent.ENVIRONMENT, new Funct("newEntity", new Term[] { Primitive.newPrimitive(entity) })));
 		}
 
 		@Override
 		public void handleDeletedEntity(String entity, Collection<String> EISAgents) {
-			broadcastEvent(new EISEvent(EISEvent.ENVIRONMENT, new Predicate("deletedEntity", new Term[] { Primitive.newPrimitive(entity) })));
+			broadcastEvent(new EISEvent(EISEvent.ENVIRONMENT, new Funct("deletedEntity", new Term[] { Primitive.newPrimitive(entity) })));
 		}
 
 		@Override
 		public void handleFreeEntity(String entity, Collection<String> EISAgents) {
-			broadcastEvent(new EISEvent(EISEvent.ENVIRONMENT, new Predicate("freedEntity", new Term[] { Primitive.newPrimitive(entity) })));
+			broadcastEvent(new EISEvent(EISEvent.ENVIRONMENT, new Funct("freedEntity", new Term[] { Primitive.newPrimitive(entity) })));
 		}
 
 		@Override
 		public void handleStateChange(EnvironmentState newState) {
-			broadcastEvent(new EISEvent(EISEvent.ENVIRONMENT, new Predicate("state", new Term[] { Primitive.newPrimitive(newState.toString()) })));
+			broadcastEvent(new EISEvent(EISEvent.ENVIRONMENT, new Funct("state", new Term[] { Primitive.newPrimitive(newState.toString()) })));
 		}
 	}
 	
@@ -165,7 +167,15 @@ public class EISService {
     	try {
 			ei.registerAgent(agent.name());
 			agents.put(agent.name(), agent);
-//			ei.attachAgentListener(agent.name(), new EISAgentListener());
+			ei.attachAgentListener(agent.name(), new AgentListener() {
+
+				@Override
+				public void handlePercept(String arg0, Percept arg1) {
+					System.out.println("agent: " +arg0 + " / percept: " +arg1.toProlog());
+					
+				}
+				
+			});
 		} catch (AgentException e) {
 			e.printStackTrace();
 		}

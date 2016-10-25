@@ -11,13 +11,13 @@ import java.util.Queue;
 import java.util.Set;
 
 import astra.event.Event;
+import astra.event.GoalEvent;
 import astra.event.ModuleEvent;
 import astra.formula.Formula;
 import astra.formula.Inference;
 import astra.formula.Predicate;
 import astra.reasoner.Queryable;
 import astra.reasoner.Unifier;
-import astra.reasoner.util.BindingsEvaluateVisitor;
 import astra.reasoner.util.VariableVisitor;
 import astra.term.Term;
 import astra.tr.Function;
@@ -163,15 +163,14 @@ public abstract class ASTRAClass implements Queryable {
 		if (list == null) return false;
 		
 		for (Rule rule : list) {
-//			VariableVisitor visitor = new VariableVisitor();
 			Event _event = rule.event;
+			
 			if (_event instanceof ModuleEvent) {
 				_event = ((ModuleEvent) _event).adaptor().generate(agent,((ModuleEvent) _event).event());
 			}
 			
 			if (_event != null) {
 				Map<Integer, Term> bindings = Unifier.unify(_event, event, agent);
-//				System.out.println("Event Bindings: " + bindings);
 				if (bindings != null) {
 					List<Map<Integer, Term>> results = agent.query(rule.context, bindings);
 					if (results != null) {

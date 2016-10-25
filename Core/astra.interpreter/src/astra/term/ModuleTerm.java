@@ -51,6 +51,7 @@ public class ModuleTerm implements Term {
 	}
 
 	public Object evaluate(Intention context) {
+//		System.out.println("invoking...");
 		return adaptor.invoke(context, (Predicate) method.accept(new ContextEvaluateVisitor(context)));
 	}
 

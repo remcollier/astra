@@ -19,6 +19,7 @@ import astra.statement.Block;
 import astra.statement.PlanCall;
 import astra.statement.StatementHandler;
 import astra.statement.Subgoal;
+import astra.term.FormulaTerm;
 import astra.term.ModuleTerm;
 import astra.term.NullTerm;
 import astra.term.Operator;
@@ -127,6 +128,8 @@ public class Intention {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public <T> T evaluate(Term term) {
+//		System.out.println("here: " + term);
+//		System.out.println("cls: "+ term.getClass().getCanonicalName());
 		if (term instanceof Primitive) {
 			T val =  ((Primitive<T>) term).value();
 			return val;
@@ -157,7 +160,8 @@ public class Intention {
 		}
 		
 		if (term instanceof astra.term.FormulaTerm) {
-			return (T) term;
+			
+			return (T) ((FormulaTerm) term).value();
 		}
 		if (term instanceof astra.term.ListTerm) {
 			return (T) term.accept(new ContextEvaluateVisitor(this));

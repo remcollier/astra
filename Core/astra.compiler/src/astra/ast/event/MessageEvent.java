@@ -45,7 +45,7 @@ public class MessageEvent extends AbstractElement implements IEvent {
 	}
 	
 	public String toSignature() {
-		return "message:"+speechact+":" + content.toSignature();
+		return "message:"+speechact;//+":" + content.toSignature();
 	}
 	
 	public ITerm params() {

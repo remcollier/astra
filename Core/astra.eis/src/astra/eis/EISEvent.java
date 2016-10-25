@@ -11,13 +11,13 @@ public class EISEvent implements Event {
 	
 	private char type;
 	private Term entity;
-	private Formula formula;
+	private Term formula;
 
-	public EISEvent(char type, Formula event) {
-		this(type, null, event);
+	public EISEvent(char type, Term term) {
+		this(type, null, term);
 	}
 	
-	public EISEvent(char type, Term entity, Formula event) {
+	public EISEvent(char type, Term entity, Term event) {
 		this.type = type;
 		this.entity = entity;
 		this.formula = event;
@@ -39,7 +39,7 @@ public class EISEvent implements Event {
 		return entity;
 	}
 	
-	public Formula content() {
+	public Term content() {
 		return formula;
 	}
 

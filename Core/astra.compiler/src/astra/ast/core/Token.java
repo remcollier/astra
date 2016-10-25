@@ -80,6 +80,7 @@ public class Token {
 	public static final int BOOLEAN_TYPE = 68;
 	public static final int OBJECT_TYPE = 69;
 	public static final int FUNCT_TYPE = 86;
+	public static final int RETURNS = 0;
 	
 	// STATEMENTS
 	public static final int SEND = 70;
@@ -143,6 +144,7 @@ public class Token {
 		typeMap.put("list", LIST_TYPE);
 		typeMap.put("formula", FORMULA);
 		typeMap.put("funct", FUNCT_TYPE);
+		typeMap.put("returns", RETURNS);
 		
 		// Statements
 		typeMap.put("send", SEND);
@@ -220,6 +222,7 @@ public class Token {
 		typePrecedence.add(Token.SPEECHACT);
 		typePrecedence.add(Token.OBJECT);
 		typePrecedence.add(Token.STRING);
+		typePrecedence.add(Token.FORMULA);
 		
 		typeToString.put(Token.INTEGER, "int");
 		typeToString.put(Token.LONG, "long");
@@ -324,7 +327,7 @@ public class Token {
 		return (type == Token.INTEGER_TYPE) || (type == Token.LONG_TYPE) || (type == Token.FLOAT_TYPE) || 
 				(type == Token.DOUBLE_TYPE) || (type == Token.STRING_TYPE) || (type == Token.CHARACTER_TYPE) ||
 				(type == Token.BOOLEAN_TYPE) || (type == Token.SPEECHACT_TYPE) || (type == Token.OBJECT_TYPE) ||
-				(type == Token.LIST_TYPE) || (type == Token.FUNCT_TYPE);
+				(type == Token.LIST_TYPE) || (type == Token.FUNCT_TYPE) || (type == Token.FORMULA);
 	}
 
 	public static boolean isLiteral(int type) {
@@ -346,6 +349,7 @@ public class Token {
 		if (type == Token.OBJECT_TYPE) return Token.OBJECT;
 		if (type == Token.LIST_TYPE) return Token.LIST;
 		if (type == Token.FUNCT_TYPE) return Token.FUNCT;
+		if (type == Token.FORMULA) return Token.FORMULA;
 //		System.out.println("not handled");
 		return -1;
 	}

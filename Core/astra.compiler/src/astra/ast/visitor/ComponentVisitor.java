@@ -116,8 +116,10 @@ public class ComponentVisitor extends AbstractVisitor {
 		for (RuleElement rule : element.getRules()) {
 			try {
 				String signature = rule.event().toSignature();
+//				System.out.println("signature: " + signature);
 				if (!store.events.contains(signature)) store.events.add(signature);
 			} catch (NullPointerException npe) {
+				npe.printStackTrace();
 				throw new ParseException("Illegal variable use in: " + rule.event(), rule.event());
 			}
 		}
@@ -586,7 +588,8 @@ public class ComponentVisitor extends AbstractVisitor {
 	public Object visit(FormulaVariable formula, Object data)
 			throws ParseException {
 		if (((VariableTypeStack) data).exists(formula.identifier())) {
-			throw new ParseException("Duplicate variable declaration: " + formula.identifier(), formula);
+			return null;
+//			throw new ParseException("Duplicate variable declaration: " + formula.identifier(), formula);
 		}
 //		System.out.println("adding formula variable: " + formula.identifier() + " / type: " + formula.type());
 		((VariableTypeStack) data).addVariable(formula.identifier(), formula.type());

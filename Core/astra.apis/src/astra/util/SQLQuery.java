@@ -3,8 +3,8 @@ package astra.util;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 public class SQLQuery {
 	public static final String SELECT 											= "SELECT";

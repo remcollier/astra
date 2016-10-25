@@ -29,6 +29,7 @@ public class ContentCodec {
 	}
 	public String encode(Formula formula) {
 		if (formula instanceof Predicate) return encode((Predicate) formula);
+		System.out.println("Unexpected format: " + formula.getClass().getCanonicalName());
 		return null;
 	}
 		

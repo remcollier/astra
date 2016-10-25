@@ -1160,7 +1160,7 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 			throws ParseException {
 		code.append(data + "new Variable(");
 		term.type().accept(this, data);
-		code.append(", \"" + term.identifier() + "\")");
+		code.append(", \"" + term.identifier() + "\"," + term.returns() + ")");
 		return null;
 	}
 

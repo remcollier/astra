@@ -4,6 +4,7 @@ import astra.core.Intention;
 import astra.event.GoalEvent;
 import astra.formula.Goal;
 import astra.reasoner.util.ContextEvaluateVisitor;
+import astra.reasoner.util.VariableVisitor;
 
 public class Subgoal extends AbstractStatement {
 	Goal goal;
@@ -27,9 +28,10 @@ public class Subgoal extends AbstractStatement {
 			public boolean execute(Intention intention) {
 				switch (index) {
 				case 0:
+//					System.out.println("goal: " + goal);
 					ContextEvaluateVisitor visitor = new ContextEvaluateVisitor(intention);
 					gl = (Goal) goal.accept(visitor);
-
+//					System.out.println("gl: " + gl);
 					intention.addSubGoal(gl);
 					intention.suspend();
 					index = 1;

@@ -9,10 +9,16 @@ public class Variable implements Term {
 
 	private Type type;
 	private int id;
+	private boolean returns;
 	
 	public Variable(Type type, String name) {
+		this(type, name, false);
+	}
+	
+	public Variable(Type type, String name, boolean returns) {
 		this.id = mapper.toId(name);
 		this.type = type;
+		this.returns = returns;
 	}
 	
 	public Variable(Type type, int key) {
@@ -39,7 +45,7 @@ public class Variable implements Term {
 	}
 	
 	public String toString() {
-		return mapper.fromId(id) + " <" + id + ">"; 
+		return mapper.fromId(id) + " <" + id + "> " + (returns ? "RETURN":"NO RETURN"); 
 	}
 
 	@Override
@@ -47,6 +53,10 @@ public class Variable implements Term {
 		return type.equals(right.type());
 	}
 
+	public boolean returns() {
+		return returns;
+	}
+	
 	@Override
 	public String signature() {
 		// TODO Auto-generated method stub

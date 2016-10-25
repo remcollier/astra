@@ -10,11 +10,13 @@ import astra.ast.core.Token;
 public class InlineVariableDeclaration extends AbstractElement implements ITerm {
 	IType type;
 	String identifier;
+	private boolean returns;
 	
 	public InlineVariableDeclaration(IType type, String identifier, Token start, Token end, String source) {
 		super(start, end, source);
 		this.type = type;
 		this.identifier = identifier;
+		this.returns = false;
 	}
 
 	@Override
@@ -33,5 +35,13 @@ public class InlineVariableDeclaration extends AbstractElement implements ITerm 
 	
 	public String toString() {
 		return type + " " + identifier;
+	}
+
+	public void returns(boolean returns) {
+		this.returns = returns;
+	}
+	
+	public boolean returns() {
+		return returns;
 	}
 }

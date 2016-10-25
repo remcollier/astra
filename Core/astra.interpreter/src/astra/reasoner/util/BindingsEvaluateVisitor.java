@@ -3,7 +3,6 @@ package astra.reasoner.util;
 import java.util.HashMap;
 import java.util.Map;
 
-import astra.core.ActionParam;
 import astra.core.Agent;
 import astra.formula.Formula;
 import astra.formula.FormulaVariable;

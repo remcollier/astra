@@ -1,0 +1,70 @@
+package astra.fipa;
+
+agent FIPAProtocol {
+	types fipa_protocol {
+		formula fipa_conversation_counter(int);
+		formula fipa_default_timeout(int);
+		formula fipa_timedout(string);
+		formula fipa_completed(string, funct);
+		formula fipa_decided(string, boolean);
+		formula fipa_state(string, string);
+	} 
+	
+	module System fipa_system;
+	module Logic fipa_logic;
+	module Prelude fipa_prelude;
+	
+	// initial conversation id for 
+	initial fipa_conversation_counter(0);
+	
+	// Default timeout in milliseconds
+	initial fipa_default_timeout(1000);
+	
+	/**
+	 * Rule to create a new conversation id for a conversation
+	 */
+	synchronized rule +!fipa_conversation_id(string id) : fipa_conversation_counter(int count) {
+		-fipa_conversation_counter(count);
+		+fipa_conversation_counter(count+1);
+		
+		// format of conversation id: <name>_<number>
+		id = fipa_system.name() + "_" + (count+1);
+		+fipa_state(id, "NEW");
+	}
+	
+	rule +!fipa_timeout(string conversation_id, int timeout) {
+		fipa_system.sleep(timeout);
+		
+		// generate a belief event to indicate that the timeout occurred...
+		+fipa_timedout(conversation_id);
+		-fipa_timedout(conversation_id);
+	}
+	
+	rule +fipa_timedout(string conversation_id) {
+		// default behaviour is to silently ignore this...
+	}
+	
+	synchronized rule +!fipa_set_state(string conversation_id, string state) : fipa_state(conversation_id, string old_state) {
+		-fipa_state(conversation_id, old_state);
+		+fipa_state(conversation_id, state);
+	}
+	synchronized rule +!fipa_set_state(string conversation_id, string state) {
+		+fipa_state(conversation_id, state);
+	}
+	
+	synchronized rule +!fipa_failed(string conversation_id) : fipa_state(conversation_id, string state) {
+		-fipa_state(conversation_id, state);
+		fipa_system.fail();
+	}
+	
+	synchronized rule +!fipa_failed(string conversation_id) {
+		fipa_system.fail();
+	}
+	
+	synchronized rule +!fipa_completed(string conversation_id) : fipa_state(conversation_id, string state) {
+		-fipa_state(conversation_id, state);
+	}
+	
+	rule @message(cancel, 
+		
+}

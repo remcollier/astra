@@ -1,6 +1,5 @@
 package astra.ast.formula;
 
-import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,7 +8,6 @@ import astra.ast.core.Token;
 import astra.ast.term.InlineVariableDeclaration;
 import astra.ast.term.Variable;
 import astra.ast.type.ObjectType;
-import astra.type.Type;
 
 public class MethodType {
 	private static Map<String, String> types = new HashMap<String, String>();
@@ -31,6 +29,8 @@ public class MethodType {
 		types.put("ListTerm", "list");
 		types.put("astra.term.Funct", "funct");
 		types.put("Funct", "funct");
+		types.put("astra.formula.Formula", "formula");
+		types.put("Formula", "formula");
 	}
 	
 	public static String resolveType(String type) {

@@ -134,7 +134,7 @@ public class EIS extends Module {
 	 */
 	@ACTION
 	public boolean init() {
-		return init(new ListTerm(), new ListTerm());
+		return init(new ListTerm());
 	}
 
 	/**
@@ -147,18 +147,18 @@ public class EIS extends Module {
 	 * @param values
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	@ACTION
-	public boolean init(ListTerm keys, ListTerm values) {
+	public boolean init(ListTerm parameters) {
 		if (service == null) throw new RuntimeException("No EIS Service available.");
 		
 		Map<String, Parameter> map = new HashMap<String,Parameter>();
-		for (int i=0;i<keys.size(); i++) {
-			Object obj = ((Primitive<?>) values.get(i)).value();
+		for (Term term : parameters) {
+			Funct f = (Funct) term;
+			Object obj = ((Primitive<?>) f.termAt(0)).value();
 			if (obj instanceof Number) {
-				map.put(((Primitive<String>) keys.get(i)).value(), new Numeral((Number) obj));
+				map.put(f.functor(), new Numeral((Number) obj));
 			} else {
-				map.put(((Primitive<String>) keys.get(i)).value(), new Identifier(obj.toString()));
+				map.put(f.functor(), new Identifier(obj.toString()));
 			}
 		}
 		
@@ -427,10 +427,7 @@ public class EIS extends Module {
 		return new EISEvent(
 				symbol.charAt(0),
 				entity,
-				new Predicate(
-					((Funct) term).functor(), 
-					((Funct) term).terms()
-				)
+				term
 		);
 	}
 	
@@ -439,10 +436,7 @@ public class EIS extends Module {
 		return new EISEvent(
 				symbol.charAt(0),
 				Primitive.newPrimitive(service.get(agent.name()).defaultEntity()),
-				new Predicate(
-					((Funct) term).functor(), 
-					((Funct) term).terms()
-				)
+				term
 		);
 	}
 	
@@ -450,10 +444,7 @@ public class EIS extends Module {
 	public Event environment(Term term) {
 		return new EISEvent(
 				EISEvent.ENVIRONMENT,
-				new Predicate(
-					((Funct) term).functor(), 
-					((Funct) term).terms()
-				)
+				term
 		);
 	}
 	

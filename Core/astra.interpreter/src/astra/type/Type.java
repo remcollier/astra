@@ -40,8 +40,8 @@ public class Type implements Serializable {
 		types.add(LONG);
 		types.add(FLOAT);
 		types.add(DOUBLE);
-		types.add(STRING);
 		types.add(FUNCTION);
+		types.add(STRING);
 	}
 
 	private int id;
@@ -130,7 +130,12 @@ public class Type implements Serializable {
 		if (term.type().equals(STRING)) return ((Primitive<String>) term).value();
 		if (term.type() instanceof ObjectType) return ((Primitive<?>) term).value().toString();
 		if (term.type().equals(FORMULA)) return ((FormulaTerm) term).value().toString();
-		if (term.type().equals(FUNCTION)) return ((Funct) term).toString();
+		if (term.type().equals(FUNCTION)) {
+			if (term instanceof Primitive) {
+				return ((Primitive<Funct>) term).value().toString();
+			}
+			return ((Funct) term).toString();
+		}
 		if (term.type().equals(LIST)) return ((astra.term.ListTerm) term).toString();
 		throw new UnsupportedTypeCastException("Attempted to convert: " + term + " of type: " + term.type() + " to a long");
 	}

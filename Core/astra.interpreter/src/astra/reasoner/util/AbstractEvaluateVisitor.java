@@ -137,6 +137,7 @@ public abstract class AbstractEvaluateVisitor implements LogicVisitor {
 		});
 		addFormulaHandler(new Handler<Comparison>() {
 			@Override public Class<Comparison> getType() { return Comparison.class; }
+			@SuppressWarnings("unchecked")
 			@Override public Object handle(LogicVisitor visitor, Comparison comparison,boolean passByValue) {
 				// Need to check if the bindings have been generated yet...
 				Term il = (Term) comparison.left().accept(visitor);
@@ -252,6 +253,7 @@ public abstract class AbstractEvaluateVisitor implements LogicVisitor {
 //				System.out.println("l: " + l);
 //				System.out.println("r: " + r + " / " + r.getClass().getCanonicalName());
 //				System.out.println("term types: " + l.type() + " / " + r.type());
+//				System.out.println("operator type: " + operator.type());
 
 				if (l instanceof Variable || r instanceof Variable) return Operator.newOperator(operator.op(), l, r);
 //				if (r instanceof Variable) {
@@ -260,7 +262,12 @@ public abstract class AbstractEvaluateVisitor implements LogicVisitor {
 //				}
 				
 				if (operator.type().equals(Type.STRING)) {
-					if (operator.op() == Operator.PLUS) return Primitive.newPrimitive(Type.stringValue(l) + Type.stringValue(r)); 
+					try {
+						if (operator.op() == Operator.PLUS) return Primitive.newPrimitive(Type.stringValue(l) + Type.stringValue(r));
+					} catch (Throwable th) {
+						th.printStackTrace();
+						System.exit(0);
+					}
 				} else if (operator.type().equals(Type.LIST)) {
 					if (operator.op() == Operator.PLUS) {
 						return ((ListTerm) l).merge((ListTerm) r);

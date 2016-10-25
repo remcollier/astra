@@ -1,0 +1,17 @@
+package astra.fipa;
+
+agent Request extends astra.fipa.FIPARequestProtocol {
+	module Console C;
+	
+	rule +!main(list args) {
+		try {
+			!fipa_request(fipa_system.name(), say("hello"), funct result);
+			
+//			if (result == done()) {
+//			}
+			C.println("SUCCESS: " + result);
+		} recover {
+			C.println("FAILED");
+		}
+	}
+}

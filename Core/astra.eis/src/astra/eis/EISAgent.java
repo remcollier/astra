@@ -24,6 +24,7 @@ import eis.iilang.Numeral;
 import eis.iilang.Parameter;
 import eis.iilang.ParameterList;
 import eis.iilang.Percept;
+import eis.iilang.TruthValue;
 
 public class EISAgent implements Queryable {
 	private static final List<Formula> EMPTY_PERCEPT_LIST = new LinkedList<Formula>();
@@ -58,7 +59,7 @@ public class EISAgent implements Queryable {
 				List<Percept> percepts = current.get(predicate.predicate());
 				if (percepts != null) {
 					for (Percept percept : percepts) {
-						list.add(convertPercept(percept));
+						list.add(convertToPredicate(percept));
 					}
 				}
 				cache.put(predicate.predicate(), list);
@@ -85,10 +86,10 @@ public class EISAgent implements Queryable {
 				// Step 1b: Check if it was in the old percepts
 				list = current.get(percept.getName());
 				if (list == null) {
-					if (agent != null) agent.addEvent(new EISEvent(EISEvent.ADDED, pid, convertPercept(percept)));
+					if (agent != null) agent.addEvent(new EISEvent(EISEvent.ADDED, pid, convertToFunct(percept)));
 				} else {
 					if (!list.remove(percept)) {
-						if (agent != null) agent.addEvent(new EISEvent(EISEvent.ADDED, pid, convertPercept(percept)));
+						if (agent != null) agent.addEvent(new EISEvent(EISEvent.ADDED, pid, convertToFunct(percept)));
 					}
 				}
 			}
@@ -96,7 +97,7 @@ public class EISAgent implements Queryable {
 			// Step 2: identify what it left and generate removed EIS percepts events
 			for (Entry<String,List<Percept>> entry : current.entrySet()) {
 				while (!entry.getValue().isEmpty()) {
-					agent.addEvent(new EISEvent(EISEvent.REMOVED, pid, convertPercept(entry.getValue().remove(0))));
+					agent.addEvent(new EISEvent(EISEvent.REMOVED, pid, convertToFunct(entry.getValue().remove(0))));
 				}
 			}
 			
@@ -144,18 +145,34 @@ public class EISAgent implements Queryable {
 	 * Get the next set of perceptions from EIS and update the entity belief bases...
 	 */
 	public void sense() {
-		Map<String, Collection<Percept>> percepts = service.collectBeliefs(this);
-		
-		for (Entry<String, Collection<Percept>> entry : percepts.entrySet()) {
-			EISBeliefBase base = beliefSets.get(entry.getKey());
-			if (base == null) {
-				beliefSets.put(entry.getKey(), base = new EISBeliefBase(entry.getKey()));
+		try {
+			Map<String, Collection<Percept>> percepts = service.collectBeliefs(this);
+			
+			for (Entry<String, Collection<Percept>> entry : percepts.entrySet()) {
+				EISBeliefBase base = beliefSets.get(entry.getKey());
+				if (base == null) {
+					beliefSets.put(entry.getKey(), base = new EISBeliefBase(entry.getKey()));
+				}
+				base.update(entry.getValue());
 			}
-			base.update(entry.getValue());
+		} catch (Throwable th) {
+			System.out.println("Error Sensing...");
+			th.printStackTrace();
 		}
 	}
 	
-	private Predicate convertPercept( Percept percept ) {
+	private Funct convertToFunct( Percept percept ) {
+        if ( percept == null ) return null;
+        List<Parameter> parameters = percept.getParameters();
+        Term[] terms = new Term[ parameters.size() ];
+        for ( int i = 0; i < parameters.size(); i++ ) {
+        	terms[ i ] = convertParameter(parameters.get( i ));
+        }
+
+        return new Funct( percept.getName(), terms );
+    }
+
+	private Predicate convertToPredicate( Percept percept ) {
         if ( percept == null ) return null;
         List<Parameter> parameters = percept.getParameters();
         Term[] terms = new Term[ parameters.size() ];
@@ -192,6 +209,9 @@ public class EISAgent implements Queryable {
             }
 
             return new Funct( f.getName(), terms );
+        }
+        else if (TruthValue.class.isInstance( parameter )) {
+            return Primitive.newPrimitive( ( (TruthValue) parameter ).getValue() );
         }
         else {
             return Primitive.newPrimitive( ( (Identifier) parameter ).getValue() );
