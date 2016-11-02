@@ -1,7 +1,6 @@
 package astra.eis;
 
 import astra.event.Event;
-import astra.formula.Formula;
 import astra.term.Term;
 
 public class EISEvent implements Event {

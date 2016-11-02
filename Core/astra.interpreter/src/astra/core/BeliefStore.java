@@ -7,7 +7,15 @@ import java.util.Map;
 import astra.formula.Formula;
 import astra.formula.Predicate;
 
-
+/**
+ * Container for storing beliefs.
+ * 
+ * Beliefs are organised into lists of formulae that have the same predicate through the use of
+ * a Map.
+ *  
+ * @author Rem
+ *
+ */
 public class BeliefStore {
 	private Map<Integer, List<Formula>> store = new HashMap<Integer, List<Formula>>();
 	int size = 0;
@@ -64,7 +72,6 @@ public class BeliefStore {
 
 	public void clear() {
 		store.clear();
-		
 	}
 
 	public List<Formula> getMatchingBeliefs(Predicate formula) {
@@ -75,12 +82,6 @@ public class BeliefStore {
 
 	public int size() {
 		return size;
-	}
-
-	public void beliefs(List<Formula> list) {
-		for (Formula formula : list) {
-			addBelief((Predicate) formula);
-		}
 	}
 }
 

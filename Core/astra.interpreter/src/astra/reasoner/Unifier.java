@@ -193,7 +193,7 @@ public class Unifier {
 				Funct sf = (Funct) sourceTerm;
 				Funct tf = (Funct) targetTerm;
 				if (sf.id() != tf.id() || sf.size() != tf.size()) return null;
-				System.out.println("in funct comparison: " + sourceTerm + " / " + targetTerm);
+//				System.out.println("in funct comparison: " + sourceTerm + " / " + targetTerm);
 //				System.out.println("\tWE HAVE AN ID MATCH");
 				if (unify(((Funct) sourceTerm).terms(), ((Funct) targetTerm).terms(), bindings, agent) == null) return null;
 //				System.out.println("\tWE HAVE A TERM MATCH");

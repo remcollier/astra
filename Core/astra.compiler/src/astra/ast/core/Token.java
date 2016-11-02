@@ -98,6 +98,7 @@ public class Token {
 	public static final int SYNCHRONIZED = 84;
 	public static final int FORALL = 85;
 	public static final int BIND = 86;
+	public static final int MAINTAIN = 87;
 	
 	public String token;
 	public int beginLine;
@@ -162,6 +163,7 @@ public class Token {
 		typeMap.put("stop", TR_STOP);
 		typeMap.put("synchronized", SYNCHRONIZED);
 		typeMap.put("bind", BIND);
+		typeMap.put("maintain", MAINTAIN);
 		
 		// Basic Punctuation
 		typeMap.put(".", PERIOD);

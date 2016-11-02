@@ -34,6 +34,7 @@ import astra.ast.statement.DeclarationStatement;
 import astra.ast.statement.ForAllStatement;
 import astra.ast.statement.ForEachStatement;
 import astra.ast.statement.IfStatement;
+import astra.ast.statement.MaintainBlockStatement;
 import astra.ast.statement.MinusMinusStatement;
 import astra.ast.statement.ModuleCallStatement;
 import astra.ast.statement.PlanCallStatement;
@@ -362,6 +363,12 @@ public class AbstractVisitor implements IElementVisitor {
 
 	@Override
 	public Object visit(SynchronizedBlockStatement statement, Object data) throws ParseException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object visit(MaintainBlockStatement statement, Object data) throws ParseException {
 		// TODO Auto-generated method stub
 		return null;
 	}

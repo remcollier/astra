@@ -23,6 +23,7 @@ public interface IJavaHelper {
 
 	public ASTRAClassElement loadAST(String clazz) throws ParseException;
 	public boolean validate(String moduleClass, MethodSignature signature);
+	public boolean isInline(String qualifiedName, MethodSignature signature);
 
 	public List<String> getSensors(String name);
 
@@ -39,4 +40,5 @@ public interface IJavaHelper {
 	long lastModified(String clazz, String type);
 
 	public void createTarget(ASTRAClassElement element, String string);
+
 }

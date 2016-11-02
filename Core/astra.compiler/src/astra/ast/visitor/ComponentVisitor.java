@@ -36,6 +36,7 @@ import astra.ast.statement.DeclarationStatement;
 import astra.ast.statement.ForAllStatement;
 import astra.ast.statement.ForEachStatement;
 import astra.ast.statement.IfStatement;
+import astra.ast.statement.MaintainBlockStatement;
 import astra.ast.statement.MinusMinusStatement;
 import astra.ast.statement.ModuleCallStatement;
 import astra.ast.statement.PlanCallStatement;
@@ -371,6 +372,16 @@ public class ComponentVisitor extends AbstractVisitor {
 
 	@Override
 	public Object visit(SynchronizedBlockStatement statement, Object data) throws ParseException {
+		((VariableTypeStack) data).addScope();
+		for (IStatement s: statement.statements()) {
+			s.accept(this, data);
+		}
+		((VariableTypeStack) data).removeScope();
+		return null;
+	}
+	
+	@Override
+	public Object visit(MaintainBlockStatement statement, Object data) throws ParseException {
 		((VariableTypeStack) data).addScope();
 		for (IStatement s: statement.statements()) {
 			s.accept(this, data);

@@ -40,6 +40,7 @@ import astra.ast.statement.DeclarationStatement;
 import astra.ast.statement.ForAllStatement;
 import astra.ast.statement.ForEachStatement;
 import astra.ast.statement.IfStatement;
+import astra.ast.statement.MaintainBlockStatement;
 import astra.ast.statement.MinusMinusStatement;
 import astra.ast.statement.ModuleCallStatement;
 import astra.ast.statement.PlanCallStatement;
@@ -345,8 +346,7 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 			throw new ParseException("Could not locate declaration for module: " + action.module(), action);
 		}
 
-		MethodSignature signature = new MethodSignature(action.method(),
-				IJavaHelper.ACTION);
+		MethodSignature signature = new MethodSignature(action.method(), IJavaHelper.ACTION);
 		if (!helper.validate(element.qualifiedName(), signature)) {
 			throw new ParseException(
 					"Could not find matching method for action call: "
@@ -354,13 +354,14 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 							+ action.module(), action);
 		}
 
-		code.append(",\n\t" + data + "new ModuleActionAdaptor() {\n")
-				.append(data
-						+ "\t\tpublic boolean invoke(TRContext context, Predicate predicate) {\n")
-				.append(data + "\t\t\treturn ((" + element.qualifiedName()
-						+ ") context.getModule(\"" + fullName + "\",\""
-						+ action.module() + "\"))."
-						+ action.method().predicate() + "(");
+		code.append(",\n\t" + data + "new ModuleActionAdaptor() {\n");
+		code.append(data 
+				+ "\t\tpublic boolean invoke(TRContext context, Predicate predicate) {\n");
+		code
+			.append(data + "\t\t\treturn ((" + element.qualifiedName()
+				+ ") context.getModule(\"" + fullName + "\",\""
+				+ action.module() + "\"))."
+				+ action.method().predicate() + "(");
 
 		for (int i = 0; i < signature.types().length; i++) {
 			if (i > 0)
@@ -488,6 +489,33 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 	}
 
 	@Override
+	public Object visit(MaintainBlockStatement statement, Object data)
+			throws ParseException {
+		code.append(data + "new MaintainBlock(\n")
+				.append(data + "\t" + locationData(statement) + ",\n");
+		statement.formula().accept(this, data+"\t");
+		code.append(",\n")
+				.append(data + "\tnew Block(\n")
+				.append(data + "\t\t" + locationData(statement) + ",\n")
+				.append(data + "\t\tnew Statement[] {");
+
+		boolean first = true;
+		for (IStatement s : statement.statements()) {
+			if (first)
+				first = false;
+			else
+				code.append(",");
+			code.append("\n");
+			s.accept(this, data + "\t\t\t");
+		}
+
+		code.append("\n" + data + "\t\t}\n" + data + "\t)");
+
+		code.append("\n" + data + ")");
+		return null;
+	}
+
+	@Override
 	public Object visit(DeclarationStatement statement, Object data)
 			throws ParseException {
 		code.append(data + "new Declaration(\n").append(
@@ -566,6 +594,12 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 				statement.method().accept(this, data + "\t");
 
 				code.append(",\n\t" + data + "new DefaultModuleCallAdaptor() {\n");
+				code.append(data 
+						+ "\t\tpublic boolean inline() {\n");
+				code.append(data 
+						+ "\t\t\treturn " + helper.isInline(element.qualifiedName(),signature)+";\n");
+				code.append(data 
+						+ "\t\t}\n\n");
 				code.append(data + "\t\tpublic boolean invoke(Intention intention, Predicate predicate) {\n");
 				code.append(data + "\t\t\treturn ((" + element.qualifiedName());
 				code.append(") intention.getModule(\"" + fullName + "\",\"");
@@ -592,13 +626,16 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 				+ data + locationData(statement) + ",\n");
 		statement.method().accept(this, data + "\t");
 
-		code.append(",\n\t" + data + "new DefaultModuleCallAdaptor() {\n")
-				.append(data
-						+ "\t\tpublic boolean invoke(Intention intention, Predicate predicate) {\n")
-				.append(data + "\t\t\treturn ((" + element.qualifiedName()
-						+ ") intention.getModule(\"" + fullName + "\",\""
-						+ statement.module() + "\"))."
-						+ statement.method().predicate() + "(");
+		code.append(",\n\t" + data + "new DefaultModuleCallAdaptor() {\n");
+		code.append(data + "\t\tpublic boolean inline() {\n"
+				+ data + "\t\t\treturn " + helper.isInline(element.qualifiedName(),signature)+";\n"
+				+ data + "\t\t}\n\n");
+		code.append(data
+				+ "\t\tpublic boolean invoke(Intention intention, Predicate predicate) {\n");
+		code.append(data + "\t\t\treturn ((" + element.qualifiedName()
+				+ ") intention.getModule(\"" + fullName + "\",\""
+				+ statement.module() + "\"))."
+				+ statement.method().predicate() + "(");
 
 		for (int i = 0; i < signature.types().length; i++) {
 			if (i > 0)

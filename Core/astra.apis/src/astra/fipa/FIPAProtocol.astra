@@ -64,7 +64,4 @@ agent FIPAProtocol {
 	synchronized rule +!fipa_completed(string conversation_id) : fipa_state(conversation_id, string state) {
 		-fipa_state(conversation_id, state);
 	}
-	
-	rule @message(cancel, 
-		
 }

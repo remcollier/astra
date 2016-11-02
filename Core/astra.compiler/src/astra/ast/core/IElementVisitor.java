@@ -29,6 +29,7 @@ import astra.ast.statement.DeclarationStatement;
 import astra.ast.statement.ForAllStatement;
 import astra.ast.statement.ForEachStatement;
 import astra.ast.statement.IfStatement;
+import astra.ast.statement.MaintainBlockStatement;
 import astra.ast.statement.MinusMinusStatement;
 import astra.ast.statement.ModuleCallStatement;
 import astra.ast.statement.PlanCallStatement;
@@ -124,6 +125,7 @@ public interface IElementVisitor {
 	public Object visit(TryRecoverStatement statement, Object data) throws ParseException;
 	public Object visit(TRStatement statement, Object data) throws ParseException;
 	public Object visit(SynchronizedBlockStatement statement, Object data) throws ParseException;
+	public Object visit(MaintainBlockStatement statement, Object data) throws ParseException;
 	public Object visit(ScopedStatement statement, Object data) throws ParseException;
 	public Object visit(ForAllStatement statement, Object data) throws ParseException;
 	public Object visit(PlusPlusStatement plusPlusStatement, Object data) throws ParseException;

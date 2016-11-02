@@ -1,0 +1,52 @@
+package astra.http;
+
+import astra.util.DB;
+import astra.netty.Http;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.FullHttpRequest;
+
+agent UserController {
+	module Http http;
+	module Prelude P;
+	
+	types example {
+		formula registration(string, string);
+	}
+	
+	initial registration("rcollier", "passw0rd");
+	initial !init();
+		
+	rule +!init() {
+		http.register();
+	}
+	
+	rule +!validate("POST", ChannelHandlerContext ctx, FullHttpRequest req, list args, list fields) {
+		!validateUser(P.stringValueFor(fields, "username"),P.stringValueFor(fields, "password"), list response);
+		http.sendJSON(ctx, req, response);
+	}
+	
+	rule +!register("POST", ChannelHandlerContext ctx, FullHttpRequest req, list args, list fields) {
+		string U = P.stringValueFor(fields, "username");
+		
+		if (registration(U, string Password)) {
+			http.sendJSON(ctx, req, [result("FAILED"), reason("Duplicate User: " + U)]);
+		} else {
+			string P = P.stringValueFor(fields, "password");
+			+registration(U, P);
+			http.sendJSON(ctx, req, [result("OK")]);
+		}
+	}
+
+	rule +!validateUser(string U, string P, returns list response) {
+		try {
+			query(registration(U, string Password));
+			if (P == Password) {
+				response = [result("OK")];
+			} else {
+				response = [result("FAILED"), reason("Incorrect Password for User: " + U)];
+			}
+		} recover {
+			response = [result("FAILED"), reason("No Such User: " + U)];
+		}
+	}
+}

@@ -59,21 +59,6 @@ public class Debug extends Module {
 	}
 
 	/**
-	 * Action that dumps the variable table of the current intention 
-	 * to the console.
-	 * 
-	 * @return
-	 */
-	@ACTION
-	public boolean dumpVariableTable() {
-		java.lang.System.out.println("----------------------------------------------------------------------------------------------");
-		java.lang.System.out.println("VARIABLE TABLE DUMP FOR: " + agent.name());
-		agent.intention().dumpVariableTables();
-		java.lang.System.out.println("----------------------------------------------------------------------------------------------");
-		return true;
-	}
-
-	/**
 	 * Action that dumps a stack trace for the current intention to 
 	 * the console.
 	 * 

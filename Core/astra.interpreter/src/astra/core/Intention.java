@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import astra.core.Agent.Promise;
 import astra.event.Event;
 import astra.event.GoalEvent;
 import astra.event.ScopedGoalEvent;
@@ -15,7 +16,6 @@ import astra.formula.Predicate;
 import astra.formula.ScopedGoal;
 import astra.reasoner.util.ContextEvaluateVisitor;
 import astra.reasoner.util.VariableVisitor;
-import astra.statement.Block;
 import astra.statement.PlanCall;
 import astra.statement.StatementHandler;
 import astra.statement.Subgoal;
@@ -28,31 +28,11 @@ import astra.term.Term;
 import astra.term.Variable;
 
 public class Intention {
-	class Entry<T> {
-		public Entry(int index, T value, boolean finish) {
-			this.index = index;
-			this.value = value;
-			this.finish = finish;
-		}
-		
-		T value;
-		int index;
-		boolean finish;
-		
-		public String toString() {
-			return index + ": " + value + " {" + finish + "}";
-		}
-	}
-	
 	@SuppressWarnings("rawtypes")
 	Map<Variable, ActionParam> actionParams = new HashMap<Variable, ActionParam>();
 	Stack<StatementHandler> failureTrace;
 	String failureReason;
 
-	Stack<StatementHandler> statements = new Stack<StatementHandler>();
-	Stack<Entry<Map<Integer, Term>>> bindingStack = new Stack<Entry<Map<Integer, Term>>>();
-	Stack<Entry<Goal>> goalStack = new Stack<Entry<Goal>>();
-	Map<Goal, Map<Variable, Integer>> subgoalVariables = new HashMap<Goal, Map<Variable, Integer>>();
 	private Throwable exception;
 	public Agent agent;
 	Event event;
@@ -60,66 +40,23 @@ public class Intention {
 	boolean failed = false;
 	int age = 0;
 	
+	Stack<RuleExecutor> executors = new Stack<RuleExecutor>();
+	
 	public Intention(Agent agent, Event event, Rule rule, Map<Integer, Term> bindings) {
 		this.agent = agent;
 		this.event = event;
-		statements.push(rule.statement.getStatementHandler());
-		bindingStack.push(new Entry<Map<Integer, Term>>(0, bindings, true));
+		
+		executors.push(new RuleExecutor(event, rule, bindings));
 	}
 	
 	public synchronized boolean execute() {
-		age++;
-		StatementHandler handler = null;
-		try {
-			handler = statements.peek();
-		} catch (Throwable th) {
-			th.printStackTrace();
-			System.out.println("event: " + event + " / age: " + age);
-		}
-
-		
-//		System.out.println("Executing: " + handler);
-		if (!handler.execute(this)) {
-			statements.pop();
-
-			if (!goalStack.isEmpty() && goalStack.peek().index == statements.size()) {
-				Entry<Goal> entry = goalStack.pop();
-				
-				VariableVisitor visitor = new VariableVisitor();
-				entry.value.accept(visitor);
-				
-//				dumpVariableTables();
-				Map<Variable, Term> update = new HashMap<Variable, Term>();
-				for (Variable variable : visitor.variables()) {
-//					System.out.println("variable: " + variable + " / id=" + variable.id());
-//					System.out.println("subgoal: " + subgoalVariables.get(entry.value).get(variable));
-//					System.out.println("value: " + getVariableValue(subgoalVariables.get(entry.value).get(variable)));
-					update.put(variable, getVariableValue(subgoalVariables.get(entry.value).get(variable)));
-				}
-				
-				if (!bindingStack.isEmpty() && bindingStack.peek().index == statements.size()) {
-					bindingStack.pop();
-				}
-
-				for(Map.Entry<Variable, Term> e : update.entrySet()) {
-					updateVariable(e.getKey(), e.getValue());
-				}
-//				dumpVariableTables();
-			} else {
-				if (!bindingStack.isEmpty() && bindingStack.peek().index == statements.size()) {
-					bindingStack.pop();
-				}
+		if (!executors.peek().execute(this)) {
+			RuleExecutor executor = executors.pop();
+			if (!executors.isEmpty()) {
+				executors.peek().updateRuleBindings(executor.getUnboundBindings());
 			}
-			
 		}
-//		System.out.println("Executed: " + handler);
-//		dumpVariableTables();
-		
-		if (statements.isEmpty() && event instanceof GoalEvent) {
-			GoalEvent g1 = (GoalEvent) event;
-			if (g1.type() == GoalEvent.ADDITION) agent.addEvent(new GoalEvent(GoalEvent.REMOVAL, g1.goal()));
-		}
-		return !statements.isEmpty();
+		return !executors.isEmpty();
 	}
 
 	public Module getModule(String classname, String key) {
@@ -128,14 +65,13 @@ public class Intention {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public <T> T evaluate(Term term) {
-//		System.out.println("here: " + term);
-//		System.out.println("cls: "+ term.getClass().getCanonicalName());
 		if (term instanceof Primitive) {
 			T val =  ((Primitive<T>) term).value();
 			return val;
 		}
 		
 		if (term instanceof Variable) {
+//			System.out.println(executors.peek().variableTrace());
 			Term val = getValue((Variable) term);
 //			System.out.println("variable: " + term + " / value: " + val);
 			if (val instanceof NullTerm) {
@@ -143,6 +79,7 @@ public class Intention {
 			}
 			
 			if (val == null) {
+				System.out.println("adding action param: " + term);
 				ActionParam param = new ActionParam();
 				actionParams.put((Variable) term, param);
 				return (T) param;
@@ -160,9 +97,9 @@ public class Intention {
 		}
 		
 		if (term instanceof astra.term.FormulaTerm) {
-			
 			return (T) ((FormulaTerm) term).value();
 		}
+		
 		if (term instanceof astra.term.ListTerm) {
 			return (T) term.accept(new ContextEvaluateVisitor(this));
 		}
@@ -178,64 +115,30 @@ public class Intention {
 	}
 
 	public Term getValue(Variable term) {
-		int i=bindingStack.size()-1;
-		boolean finish = false;
-		while (i >= 0 && !finish) {
-			Entry<Map<Integer, Term>> entry = bindingStack.get(i--);
-			if (entry.value.containsKey(term.id())) {
-				return entry.value.get(term.id());
-			}
-			finish = entry.finish;
-		}
-//		System.out.println(">>>>>>>>>>>>>>>>>>> i=" + i);
-		
-		return null;
+		return executors.peek().getValue(term);
 	}
 
 	public void addStatement(StatementHandler handler) {
-		if (handler.statement() instanceof Block) {
-			bindingStack.push(new Entry<Map<Integer, Term>>(statements.size(), new HashMap<Integer, Term>(), false));
-		}
-
-		statements.push(handler);
+		executors.peek().addStatement(handler);
 	}
 
-	public void addSubGoal(StatementHandler handler, Map<Integer, Term> bindings) {
-		Map<Variable, Integer> unboundVariables = new HashMap<Variable, Integer>();
-		Map<Integer,Term> b = new HashMap<Integer, Term>();
-		for (java.util.Map.Entry<Integer, Term> entry : bindings.entrySet()) {
-			if (entry.getValue() instanceof Variable) {
-				unboundVariables.put((Variable) entry.getValue(), entry.getKey());
-				b.put(entry.getKey(), null);
-			} else {
-				b.put(entry.getKey(), entry.getValue());
-			}
-		}
-		
-		subgoalVariables.put(goalStack.peek().value, unboundVariables);
-		bindingStack.push(new Entry<Map<Integer, Term>>(statements.size(), b, true));
-//		bindingStack.push(new Entry<Map<Integer, Term>>(statements.size(), bindings, true));
-		statements.push(handler);
+	public void addSubGoal(Event event, Rule rule, Map<Integer, Term> bindings) {
+		executors.push(new RuleExecutor(event, rule, bindings));
 	}
 	
 	public void addSubGoal(Goal gl) {
-		goalStack.push(new Entry<Goal>(statements.size(), gl, false));
 		VariableVisitor visitor = new VariableVisitor();
 		gl.accept(visitor);
-//		System.out.println("pushing[" + statements.size() + "]: " + visitor.variables());
 		for (Variable variable : visitor.variables()) {
 			// NOTE: ADDED THE UPDATE VARIABLE LINE TO CHECK IF THE VARIABLE ALREADY EXISTS
 			if (!this.updateVariable(variable, null)) {
 				addVariable(variable);
-//			} else {
-//				System.out.println(variable + " exists");
 			}
 		}
 		agent.addEvent(new GoalEvent(Event.ADDITION, gl, this));		
 	}
 	
 	public void addScopedSubGoal(String scope, Goal gl) {
-		goalStack.push(new Entry<Goal>(statements.size(), gl, false));
 		agent.addEvent(new ScopedGoalEvent(Event.ADDITION, new ScopedGoal(scope, gl), this));		
 	}
 
@@ -246,57 +149,19 @@ public class Intention {
 	 * 
 	 */
 	public void addStatement(StatementHandler handler, Map<Integer, Term> bindings) {
-		// Step 1: Create a new binding layer
-		bindingStack.push(new Entry<Map<Integer, Term>>(statements.size(), new HashMap<Integer, Term>(), false));
-		
-		// Step 2: Check to see if any of the bindings provided apply to existing variables
-		for (Integer term : bindings.keySet()) {
-			Term logic = bindings.get(term);
-			
-			// Step 2a: Check if the variable already exists in the intention...
-			boolean newVariable = true;
-			boolean finished = false;
-			int i=bindingStack.size()-1;
-			while (i >= 0 && !finished) {
-				Entry<Map<Integer, Term>> entry = bindingStack.get(i--);
-				if (entry.value.containsKey(term)) {
-					entry.value.put(term, logic);
-					newVariable = false;
-					break;
-				}
-				finished = entry.finish;
-			}
-			
-			// Step 2b: If the variable does not exist in the bindings, add it as a new variable
-			if (newVariable) {
-				bindingStack.peek().value.put(term, logic);
-			}
-			
-		}
-		
-		// Step 3: Push the handler on to the program stack.
-		statements.push(handler);
+		executors.peek().addStatement(handler, bindings);
 	}
 	
 	public void addVariable(Variable variable) {
-		bindingStack.peek().value.put(variable.id(), null);
+		executors.peek().addVariable(variable);
 	}
 
 	public void removeVariable(Variable variable) {
-		bindingStack.peek().value.remove(variable.id());
+		executors.peek().removeVariable(variable);
 	}
 	
 	public boolean updateVariable(Variable term, Term logic) {
-		int i=bindingStack.size()-1;
-		while (i >= 0) {
-			Entry<Map<Integer, Term>> entry = bindingStack.get(i--);
-			if (entry.value.containsKey(term.id())) {
-				entry.value.put(term.id(), logic);
-				return true;
-			}
-			if (entry.finish) return false;
-		}
-		return false;
+		return executors.peek().updateVariable(term, logic);
 	}
 
 	public void addUnboundVariables(Set<Variable> variables) {
@@ -308,17 +173,14 @@ public class Intention {
 	}
 	
 	public void addBindings(Map<Integer, Term> bindings) {
-		bindingStack.push(new Entry<Map<Integer, Term>>(statements.size()-1, bindings, true));
+		throw new UnsupportedOperationException("Intention.addBindings does not work");
 	}
 
 	public String toString() {
 		String out = "";
-		for (int i=statements.size()-1 ; i >= 0; i--) {
-			if (statements.get(i).statement() instanceof Subgoal || i == statements.size()-1) {
-				out += statements.get(i) + "\n";
-			}
+		for (int i=executors.size()-1 ; i >= 0; i--) {
+			out += executors.get(i).event() +"\n";
 		}
-		out += event.toString() + "\n";	
 		return out;
 	}
 
@@ -329,8 +191,8 @@ public class Intention {
 	public void failed(String reason, Throwable exception) {
 		failed = true;
 		failureTrace = new Stack<StatementHandler>();
-		for(int i=0; i < statements.size(); i++) {
-			failureTrace.push(statements.get(i));
+		for (RuleExecutor executor : executors) {
+			executor.buildFailureTrace(failureTrace);
 		}
 		failureReason = reason;
 		this.exception = exception;
@@ -360,14 +222,15 @@ public class Intention {
 	}
 
 	public boolean rollback() {
-		while (!statements.isEmpty()) {
-			StatementHandler handler = statements.peek();
-			if (handler.onFail(this)) {
+		// DEAL WITH ROLLBACK...
+		while (!executors.isEmpty()) {
+			RuleExecutor executor = executors.peek();
+			if (executor.rollback(this)) {
 				failed = false;
 				resume();
 				return true;
 			}
-			statements.pop();
+			executors.pop();
 		}
 		return false;
 	}
@@ -398,43 +261,30 @@ public class Intention {
 	
 	@SuppressWarnings("rawtypes")
 	public void applyActionParams() {
+//		if (!actionParams.isEmpty()) {
+//			System.out.println("-----------------------------------------------------------------------");
+//			System.out.println(executors.peek().variableTrace());
+//		}
 		for (java.util.Map.Entry<Variable, ActionParam> entry : actionParams.entrySet()) {
+//			System.out.println("Updating: " + entry.getKey() + " / " + entry.getValue().toLogic());
 			this.updateVariable(entry.getKey(), entry.getValue().toLogic());
 		}
+//		if (!actionParams.isEmpty()) {
+//			System.out.println(executors.peek().variableTrace());
+//			System.out.println("-----------------------------------------------------------------------");
+//		}
 	}
 
 	public void addVariable(Variable variable, Term term) {
-		bindingStack.peek().value.put(variable.id(), term);
-	}
-
-	public void dumpState() {
-		for (Entry<Map<Integer, Term>> entry : bindingStack) {
-			dumpEntry(entry);
-		}
+		executors.peek().addVariable(variable, term);
 	}
 
 	public void dumpStack() {
-		for (int i=statements.size()-1 ; i >= 0; i--) {
-			System.out.println(i +". " + statements.get(i));
-		}
-		System.out.println(event.toString());
-	}
-
-	protected void dumpEntry(Entry<Map<Integer, Term>> entry) {
-		System.out.print("Level " + entry.index + ": [");
-		boolean first = true;
-		for (java.util.Map.Entry<Integer, Term> e : entry.value.entrySet()) {
-			if (first) first = false; else System.out.print(",");
-			System.out.print(Variable.mapper.fromId(e.getKey()) +"(" + e.getKey() + ")" + "=" + e.getValue());
-		}
-		System.out.println("]=" + entry.finish);
-	}
-
-	public synchronized void dumpVariableTables() {
-		System.out.println("Variable Tables for: " + this.event);
-		for (int i=this.bindingStack.size()-1; i >= 0; i--) {
-			System.out.println(bindingStack.get(i).toString());
-		}
+		throw new UnsupportedOperationException("Intention.dumpStack does not work");
+//		for (int i=statements.size()-1 ; i >= 0; i--) {
+//			System.out.println(i +". " + statements.get(i));
+//		}
+//		System.out.println(event.toString());
 	}
 
 	public void addGoal(Goal goal) {
@@ -477,12 +327,11 @@ public class Intention {
 	}
 
 	public StatementHandler getNextStatement() {
-		return statements.peek();
+		return executors.peek().getNextStatment();
 	}
 
 	public void addEvent(Event event) {
 		agent.addEvent(event);
-		
 	}
 
 	public boolean hasLock(String token, Intention context) {
@@ -514,16 +363,16 @@ public class Intention {
 	}
 
 	public Term getVariableValue(Integer vid) {
-		int i=bindingStack.size()-1;
-		boolean finish = false;
-		while (i >= 0 && !finish) {
-			Entry<Map<Integer, Term>> entry = bindingStack.get(i--);
-			if (entry.value.containsKey(vid)) {
-				return entry.value.get(vid);
-			}
-			finish = entry.finish;
-		}
-		
+//		int i=bindingStack.size()-1;
+//		boolean finish = false;
+//		while (i >= 0 && !finish) {
+//			Entry<Map<Integer, Term>> entry = bindingStack.get(i--);
+//			if (entry.value.containsKey(vid)) {
+//				return entry.value.get(vid);
+//			}
+//			finish = entry.finish;
+//		}
+//		
 		return null;
 	}
 
@@ -536,21 +385,33 @@ public class Intention {
 	}
 
 	public void removeBindings() {
-		bindingStack.pop();
+//		bindingStack.pop();
 	}
 
 	public boolean hasVariable(Variable variable) {
-		int i=bindingStack.size()-1;
-		boolean finish = false;
-		while (i >= 0 && !finish) {
-			Entry<Map<Integer, Term>> entry = bindingStack.get(i--);
-			if (entry.value.containsKey(variable.id())) {
-				return true;
-			}
-			finish = entry.finish;
-		}
-		
+//		int i=bindingStack.size()-1;
+//		boolean finish = false;
+//		while (i >= 0 && !finish) {
+//			Entry<Map<Integer, Term>> entry = bindingStack.get(i--);
+//			if (entry.value.containsKey(variable.id())) {
+//				return true;
+//			}
+//			finish = entry.finish;
+//		}
+//		
 		return false;
+	}
+
+	public String failureReason() {
+		return failureReason;
+	}
+
+	public void makePromise(Promise promise) {
+		agent.addPromise(promise);
+	}
+
+	public void dropPromise(Promise promise) {
+		agent.dropPromise(promise);
 	}
 
 }

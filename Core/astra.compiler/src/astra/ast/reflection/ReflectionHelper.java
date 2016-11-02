@@ -33,6 +33,7 @@ import astra.ast.formula.PredicateFormula;
 import astra.ast.term.Variable;
 import astra.ast.type.ObjectType;
 import astra.core.ActionParam;
+import astra.core.Module.ACTION;
 import astra.core.Module.EVENT;
 
 public class ReflectionHelper extends AbstractHelper {
@@ -208,6 +209,19 @@ public class ReflectionHelper extends AbstractHelper {
 //		System.out.println("handling: " + moduleClass);
 //		System.out.println("signature: " + signature);
 		return getMatchingMethod(moduleClass, signature) != null;
+	}
+	
+	public boolean isInline(String moduleClass, MethodSignature signature) {
+		Method method = getMatchingMethod(moduleClass, signature);
+		if (method == null) return true;
+		for (Annotation ann : method.getAnnotations()) {
+			if (ann.annotationType().getCanonicalName().equals(annotations.get(signature.type()))) {
+				if (signature.type() == IJavaHelper.ACTION) {
+					return ((ACTION) ann).inline();
+				}
+			}
+		}
+		return false;
 	}
 
 	private boolean validate(MethodSignature signature, Method mthd) {

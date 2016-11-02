@@ -3,20 +3,19 @@ package astra.debugger;
  * GENERATED CODE - DO NOT CHANGE
  */
 
-import astra.acre.*;
-import astra.cartago.*;
 import astra.core.*;
 import astra.execution.*;
 import astra.event.*;
 import astra.messaging.*;
 import astra.formula.*;
 import astra.lang.*;
-import astra.eis.*;
 import astra.statement.*;
 import astra.term.*;
 import astra.type.*;
 import astra.tr.*;
 import astra.reasoner.util.*;
+
+import astra.gui.GuiModule;
 
 public class Test extends ASTRAClass {
 	public Test() {

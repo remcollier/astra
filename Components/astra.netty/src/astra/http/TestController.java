@@ -27,18 +27,22 @@ public class TestController extends ASTRAClass {
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("main", new Term[] {
-						new Variable(Type.LIST, "args")
+						new Variable(Type.LIST, "args",false)
 					})
 				)
 			),
 			Predicate.TRUE,
 			new Block(
-				"astra.http.TestController", new int[] {14,27,20,5},
+				"astra.http.TestController", new int[] {20,27,24,5},
 				new Statement[] {
 					new ModuleCall("http",
-						"astra.http.TestController", new int[] {15,8,15,20},
+						"astra.http.TestController", new int[] {21,8,21,20},
 						new Predicate("setup", new Term[] {}),
 						new DefaultModuleCallAdaptor() {
+							public boolean inline() {
+								return true;
+							}
+
 							public boolean invoke(Intention intention, Predicate predicate) {
 								return ((astra.netty.Http) intention.getModule("astra.http.TestController","http")).setup(
 								);
@@ -46,9 +50,13 @@ public class TestController extends ASTRAClass {
 						}
 					),
 					new ModuleCall("http",
-						"astra.http.TestController", new int[] {16,8,16,23},
+						"astra.http.TestController", new int[] {22,8,22,23},
 						new Predicate("register", new Term[] {}),
 						new DefaultModuleCallAdaptor() {
+							public boolean inline() {
+								return true;
+							}
+
 							public boolean invoke(Intention intention, Predicate predicate) {
 								return ((astra.netty.Http) intention.getModule("astra.http.TestController","http")).register(
 								);
@@ -56,12 +64,16 @@ public class TestController extends ASTRAClass {
 						}
 					),
 					new ModuleCall("http",
-						"astra.http.TestController", new int[] {17,8,17,42},
+						"astra.http.TestController", new int[] {23,8,23,42},
 						new Predicate("exportFolder", new Term[] {
 							Primitive.newPrimitive("/view"),
 							Primitive.newPrimitive("view")
 						}),
 						new DefaultModuleCallAdaptor() {
+							public boolean inline() {
+								return true;
+							}
+
 							public boolean invoke(Intention intention, Predicate predicate) {
 								return ((astra.netty.Http) intention.getModule("astra.http.TestController","http")).exportFolder(
 									(java.lang.String) intention.evaluate(predicate.getTerm(0)),
@@ -78,64 +90,38 @@ public class TestController extends ASTRAClass {
 				new Goal(
 					new Predicate("test2", new Term[] {
 						Primitive.newPrimitive("GET"),
-						new Variable(new ObjectType(ChannelHandlerContext.class), "ctx"),
-						new Variable(new ObjectType(FullHttpRequest.class), "req"),
-						new Variable(Type.LIST, "args")
+						new Variable(new ObjectType(ChannelHandlerContext.class), "ctx",false),
+						new Variable(new ObjectType(FullHttpRequest.class), "req",false),
+						new Variable(Type.LIST, "args",false)
 					})
 				)
 			),
 			Predicate.TRUE,
-			new SynchronizedBlock(
-				"astra.http.TestController", new int[] {22,112,26,5},
-				"synchronized",
-				new Block(
-					"astra.http.TestController", new int[] {22,112,26,5},
-					new Statement[] {
-						new ModuleCall("C",
-							"astra.http.TestController", new int[] {23,8,23,35},
-							new Predicate("println", new Term[] {
-								Primitive.newPrimitive("handling test2")
-							}),
-							new DefaultModuleCallAdaptor() {
-								public boolean invoke(Intention intention, Predicate predicate) {
-									return ((astra.lang.Console) intention.getModule("astra.http.TestController","C")).println(
-										(java.lang.String) intention.evaluate(predicate.getTerm(0))
-									);
-								}
+			new Block(
+				"astra.http.TestController", new int[] {26,99,28,5},
+				new Statement[] {
+					new ModuleCall("http",
+						"astra.http.TestController", new int[] {27,8,27,46},
+						new Predicate("loadView", new Term[] {
+							new Variable(new ObjectType(ChannelHandlerContext.class), "ctx"),
+							new Variable(new ObjectType(FullHttpRequest.class), "req"),
+							Primitive.newPrimitive("/Hello.html")
+						}),
+						new DefaultModuleCallAdaptor() {
+							public boolean inline() {
+								return true;
 							}
-						),
-						new ModuleCall("http",
-							"astra.http.TestController", new int[] {24,8,24,46},
-							new Predicate("loadView", new Term[] {
-								new Variable(new ObjectType(ChannelHandlerContext.class), "ctx"),
-								new Variable(new ObjectType(FullHttpRequest.class), "req"),
-								Primitive.newPrimitive("/Hello.html")
-							}),
-							new DefaultModuleCallAdaptor() {
-								public boolean invoke(Intention intention, Predicate predicate) {
-									return ((astra.netty.Http) intention.getModule("astra.http.TestController","http")).loadView(
-										(io.netty.channel.ChannelHandlerContext) intention.evaluate(predicate.getTerm(0)),
-										(io.netty.handler.codec.http.FullHttpRequest) intention.evaluate(predicate.getTerm(1)),
-										(java.lang.String) intention.evaluate(predicate.getTerm(2))
-									);
-								}
+
+							public boolean invoke(Intention intention, Predicate predicate) {
+								return ((astra.netty.Http) intention.getModule("astra.http.TestController","http")).loadView(
+									(io.netty.channel.ChannelHandlerContext) intention.evaluate(predicate.getTerm(0)),
+									(io.netty.handler.codec.http.FullHttpRequest) intention.evaluate(predicate.getTerm(1)),
+									(java.lang.String) intention.evaluate(predicate.getTerm(2))
+								);
 							}
-						),
-						new ModuleCall("C",
-							"astra.http.TestController", new int[] {25,8,25,29},
-							new Predicate("println", new Term[] {
-								Primitive.newPrimitive("finished")
-							}),
-							new DefaultModuleCallAdaptor() {
-								public boolean invoke(Intention intention, Predicate predicate) {
-									return ((astra.lang.Console) intention.getModule("astra.http.TestController","C")).println(
-										(java.lang.String) intention.evaluate(predicate.getTerm(0))
-									);
-								}
-							}
-						)
-					}
-				)
+						}
+					)
+				}
 			)
 		));
 		addRule(new Rule(
@@ -143,18 +129,18 @@ public class TestController extends ASTRAClass {
 				new Goal(
 					new Predicate("test3", new Term[] {
 						Primitive.newPrimitive("GET"),
-						new Variable(new ObjectType(ChannelHandlerContext.class), "ctx"),
-						new Variable(new ObjectType(FullHttpRequest.class), "req"),
-						new Variable(Type.LIST, "args")
+						new Variable(new ObjectType(ChannelHandlerContext.class), "ctx",false),
+						new Variable(new ObjectType(FullHttpRequest.class), "req",false),
+						new Variable(Type.LIST, "args",false)
 					})
 				)
 			),
 			Predicate.TRUE,
 			new Block(
-				"astra.http.TestController", new int[] {28,99,30,5},
+				"astra.http.TestController", new int[] {30,91,32,5},
 				new Statement[] {
 					new ModuleCall("http",
-						"astra.http.TestController", new int[] {29,8,29,58},
+						"astra.http.TestController", new int[] {31,8,31,58},
 						new Predicate("sendJSON", new Term[] {
 							new Variable(new ObjectType(ChannelHandlerContext.class), "ctx"),
 							new Variable(new ObjectType(FullHttpRequest.class), "req"),
@@ -168,6 +154,10 @@ public class TestController extends ASTRAClass {
 							})
 						}),
 						new DefaultModuleCallAdaptor() {
+							public boolean inline() {
+								return true;
+							}
+
 							public boolean invoke(Intention intention, Predicate predicate) {
 								return ((astra.netty.Http) intention.getModule("astra.http.TestController","http")).sendJSON(
 									(io.netty.channel.ChannelHandlerContext) intention.evaluate(predicate.getTerm(0)),
@@ -185,36 +175,201 @@ public class TestController extends ASTRAClass {
 				new Goal(
 					new Predicate("validate", new Term[] {
 						Primitive.newPrimitive("POST"),
-						new Variable(new ObjectType(ChannelHandlerContext.class), "ctx"),
-						new Variable(new ObjectType(FullHttpRequest.class), "req"),
-						new Variable(Type.LIST, "args"),
-						new Variable(Type.LIST, "fields")
+						new Variable(new ObjectType(ChannelHandlerContext.class), "ctx",false),
+						new Variable(new ObjectType(FullHttpRequest.class), "req",false),
+						new Variable(Type.LIST, "args",false),
+						new Variable(Type.LIST, "fields",false)
 					})
 				)
 			),
 			Predicate.TRUE,
 			new Block(
-				"astra.http.TestController", new int[] {32,116,36,5},
+				"astra.http.TestController", new int[] {34,116,37,5},
 				new Statement[] {
-					new ModuleCall("C",
-						"astra.http.TestController", new int[] {33,8,33,35},
-						new Predicate("println", new Term[] {
-							Operator.newOperator('+',
-								Primitive.newPrimitive("user: "),
-								new Variable(Type.LIST, "fields")
-							)
+					new Subgoal(
+						"astra.http.TestController", new int[] {35,8,37,5},
+						new Goal(
+							new Predicate("validateUser", new Term[] {
+								new ModuleTerm("P", Type.STRING,
+									new Predicate("stringValueFor", new Term[] {
+										new Variable(Type.LIST, "fields"),
+										Primitive.newPrimitive("username")
+									}),
+									new ModuleTermAdaptor() {
+										public Object invoke(Intention intention, Predicate predicate) {
+											return ((astra.lang.Prelude) intention.getModule("astra.http.TestController","P")).stringValueFor(
+												(astra.term.ListTerm) intention.evaluate(predicate.getTerm(0)),
+												(java.lang.String) intention.evaluate(predicate.getTerm(1))
+											);
+										}
+										public Object invoke(BindingsEvaluateVisitor visitor, Predicate predicate) {
+											return ((astra.lang.Prelude) visitor.agent().getModule("astra.http.TestController","P")).stringValueFor(
+												(astra.term.ListTerm) visitor.evaluate(predicate.getTerm(0)),
+												(java.lang.String) visitor.evaluate(predicate.getTerm(1))
+											);
+										}
+									}
+								),
+								new ModuleTerm("P", Type.STRING,
+									new Predicate("stringValueFor", new Term[] {
+										new Variable(Type.LIST, "fields"),
+										Primitive.newPrimitive("password")
+									}),
+									new ModuleTermAdaptor() {
+										public Object invoke(Intention intention, Predicate predicate) {
+											return ((astra.lang.Prelude) intention.getModule("astra.http.TestController","P")).stringValueFor(
+												(astra.term.ListTerm) intention.evaluate(predicate.getTerm(0)),
+												(java.lang.String) intention.evaluate(predicate.getTerm(1))
+											);
+										}
+										public Object invoke(BindingsEvaluateVisitor visitor, Predicate predicate) {
+											return ((astra.lang.Prelude) visitor.agent().getModule("astra.http.TestController","P")).stringValueFor(
+												(astra.term.ListTerm) visitor.evaluate(predicate.getTerm(0)),
+												(java.lang.String) visitor.evaluate(predicate.getTerm(1))
+											);
+										}
+									}
+								),
+								new Variable(Type.FUNCTION, "response",false)
+							})
+						)
+					),
+					new ModuleCall("http",
+						"astra.http.TestController", new int[] {36,8,36,41},
+						new Predicate("sendJSON", new Term[] {
+							new Variable(new ObjectType(ChannelHandlerContext.class), "ctx"),
+							new Variable(new ObjectType(FullHttpRequest.class), "req"),
+							new Variable(Type.FUNCTION, "response")
 						}),
 						new DefaultModuleCallAdaptor() {
+							public boolean inline() {
+								return true;
+							}
+
 							public boolean invoke(Intention intention, Predicate predicate) {
-								return ((astra.lang.Console) intention.getModule("astra.http.TestController","C")).println(
-									(java.lang.String) intention.evaluate(predicate.getTerm(0))
+								return ((astra.netty.Http) intention.getModule("astra.http.TestController","http")).sendJSON(
+									(io.netty.channel.ChannelHandlerContext) intention.evaluate(predicate.getTerm(0)),
+									(io.netty.handler.codec.http.FullHttpRequest) intention.evaluate(predicate.getTerm(1)),
+									(astra.term.Funct) intention.evaluate(predicate.getTerm(2))
 								);
 							}
 						}
-					),
+					)
+				}
+			)
+		));
+		addRule(new Rule(
+			new GoalEvent('+',
+				new Goal(
+					new Predicate("validateUser", new Term[] {
+						new Variable(Type.STRING, "U",false),
+						new Variable(Type.STRING, "P",false),
+						new Variable(Type.FUNCTION, "response",true)
+					})
+				)
+			),
+			Predicate.TRUE,
+			new Block(
+				"astra.http.TestController", new int[] {39,68,50,5},
+				new Statement[] {
+					new TryRecover(
+						"astra.http.TestController", new int[] {40,8,50,5},
+						new Block(
+							"astra.http.TestController", new int[] {40,12,47,9},
+							new Statement[] {
+								new Query(
+									"astra.http.TestController", new int[] {41,12,41,51},
+									new Predicate("registration", new Term[] {
+										new Variable(Type.STRING, "U"),
+										new Variable(Type.STRING, "Password",false)
+									})
+								),
+								new If(
+									"astra.http.TestController", new int[] {42,12,47,9},
+									new Comparison("==",
+										new Variable(Type.STRING, "P"),
+										new Variable(Type.STRING, "Password")
+									),
+									new Block(
+										"astra.http.TestController", new int[] {42,31,44,13},
+										new Statement[] {
+											new Assignment(
+												new Variable(Type.FUNCTION, "response"),
+												"astra.http.TestController", new int[] {43,16,44,13},
+												new Funct("response", new Term[] {
+													new Funct("result", new Term[] {
+														Primitive.newPrimitive("OK")
+													})
+												})
+											)
+										}
+									),
+									new Block(
+										"astra.http.TestController", new int[] {44,19,47,9},
+										new Statement[] {
+											new Assignment(
+												new Variable(Type.FUNCTION, "response"),
+												"astra.http.TestController", new int[] {45,16,46,13},
+												new Funct("response", new Term[] {
+													new Funct("result", new Term[] {
+														Primitive.newPrimitive("FAILED")
+													}),
+													new Funct("reason", new Term[] {
+														Operator.newOperator('+',
+															Primitive.newPrimitive("Incorrect Password for User: "),
+															new Variable(Type.STRING, "U")
+														)
+													})
+												})
+											)
+										}
+									)
+								)
+							}
+						),
+						new Block(
+							"astra.http.TestController", new int[] {47,18,50,5},
+							new Statement[] {
+								new Assignment(
+									new Variable(Type.FUNCTION, "response"),
+									"astra.http.TestController", new int[] {48,12,49,9},
+									new Funct("response", new Term[] {
+										new Funct("result", new Term[] {
+											Primitive.newPrimitive("FAILED")
+										}),
+										new Funct("reason", new Term[] {
+											Operator.newOperator('+',
+												Primitive.newPrimitive("No Such User: "),
+												new Variable(Type.STRING, "U")
+											)
+										})
+									})
+								)
+							}
+						)
+					)
+				}
+			)
+		));
+		addRule(new Rule(
+			new GoalEvent('+',
+				new Goal(
+					new Predicate("register", new Term[] {
+						Primitive.newPrimitive("POST"),
+						new Variable(new ObjectType(ChannelHandlerContext.class), "ctx",false),
+						new Variable(new ObjectType(FullHttpRequest.class), "req",false),
+						new Variable(Type.LIST, "args",false),
+						new Variable(Type.LIST, "fields",false)
+					})
+				)
+			),
+			Predicate.TRUE,
+			new Block(
+				"astra.http.TestController", new int[] {52,116,62,5},
+				new Statement[] {
 					new Declaration(
 						new Variable(Type.STRING, "U"),
-						"astra.http.TestController", new int[] {34,8,36,5},
+						"astra.http.TestController", new int[] {53,8,62,5},
 						new ModuleTerm("P", Type.STRING,
 							new Predicate("stringValueFor", new Term[] {
 								new Variable(Type.LIST, "fields"),
@@ -236,21 +391,109 @@ public class TestController extends ASTRAClass {
 							}
 						)
 					),
-					new ModuleCall("C",
-						"astra.http.TestController", new int[] {35,8,35,25},
-						new Predicate("println", new Term[] {
-							Operator.newOperator('+',
-								Primitive.newPrimitive("U="),
-								new Variable(Type.STRING, "U")
-							)
+					new If(
+						"astra.http.TestController", new int[] {55,8,62,5},
+						new Predicate("registration", new Term[] {
+							new Variable(Type.STRING, "U"),
+							new Variable(Type.STRING, "Password",false)
 						}),
-						new DefaultModuleCallAdaptor() {
-							public boolean invoke(Intention intention, Predicate predicate) {
-								return ((astra.lang.Console) intention.getModule("astra.http.TestController","C")).println(
-									(java.lang.String) intention.evaluate(predicate.getTerm(0))
-								);
+						new Block(
+							"astra.http.TestController", new int[] {55,46,57,9},
+							new Statement[] {
+								new ModuleCall("http",
+									"astra.http.TestController", new int[] {56,12,56,87},
+									new Predicate("sendJSON", new Term[] {
+										new Variable(new ObjectType(ChannelHandlerContext.class), "ctx"),
+										new Variable(new ObjectType(FullHttpRequest.class), "req"),
+										new ListTerm(new Term[] {
+											new Funct("result", new Term[] {
+												Primitive.newPrimitive("FAILED")
+											}),
+											new Funct("reason", new Term[] {
+												Operator.newOperator('+',
+													Primitive.newPrimitive("Duplicate User: "),
+													new Variable(Type.STRING, "U")
+												)
+											})
+										})
+									}),
+									new DefaultModuleCallAdaptor() {
+										public boolean inline() {
+											return true;
+										}
+
+										public boolean invoke(Intention intention, Predicate predicate) {
+											return ((astra.netty.Http) intention.getModule("astra.http.TestController","http")).sendJSON(
+												(io.netty.channel.ChannelHandlerContext) intention.evaluate(predicate.getTerm(0)),
+												(io.netty.handler.codec.http.FullHttpRequest) intention.evaluate(predicate.getTerm(1)),
+												(astra.term.ListTerm) intention.evaluate(predicate.getTerm(2))
+											);
+										}
+									}
+								)
 							}
-						}
+						),
+						new Block(
+							"astra.http.TestController", new int[] {57,15,62,5},
+							new Statement[] {
+								new Declaration(
+									new Variable(Type.STRING, "P"),
+									"astra.http.TestController", new int[] {58,12,61,9},
+									new ModuleTerm("P", Type.STRING,
+										new Predicate("stringValueFor", new Term[] {
+											new Variable(Type.LIST, "fields"),
+											Primitive.newPrimitive("password")
+										}),
+										new ModuleTermAdaptor() {
+											public Object invoke(Intention intention, Predicate predicate) {
+												return ((astra.lang.Prelude) intention.getModule("astra.http.TestController","P")).stringValueFor(
+													(astra.term.ListTerm) intention.evaluate(predicate.getTerm(0)),
+													(java.lang.String) intention.evaluate(predicate.getTerm(1))
+												);
+											}
+											public Object invoke(BindingsEvaluateVisitor visitor, Predicate predicate) {
+												return ((astra.lang.Prelude) visitor.agent().getModule("astra.http.TestController","P")).stringValueFor(
+													(astra.term.ListTerm) visitor.evaluate(predicate.getTerm(0)),
+													(java.lang.String) visitor.evaluate(predicate.getTerm(1))
+												);
+											}
+										}
+									)
+								),
+								new BeliefUpdate('+',
+									"astra.http.TestController", new int[] {59,12,61,9},
+									new Predicate("registration", new Term[] {
+										new Variable(Type.STRING, "U"),
+										new Variable(Type.STRING, "P")
+									})
+								),
+								new ModuleCall("http",
+									"astra.http.TestController", new int[] {60,12,60,51},
+									new Predicate("sendJSON", new Term[] {
+										new Variable(new ObjectType(ChannelHandlerContext.class), "ctx"),
+										new Variable(new ObjectType(FullHttpRequest.class), "req"),
+										new ListTerm(new Term[] {
+											new Funct("result", new Term[] {
+												Primitive.newPrimitive("OK")
+											})
+										})
+									}),
+									new DefaultModuleCallAdaptor() {
+										public boolean inline() {
+											return true;
+										}
+
+										public boolean invoke(Intention intention, Predicate predicate) {
+											return ((astra.netty.Http) intention.getModule("astra.http.TestController","http")).sendJSON(
+												(io.netty.channel.ChannelHandlerContext) intention.evaluate(predicate.getTerm(0)),
+												(io.netty.handler.codec.http.FullHttpRequest) intention.evaluate(predicate.getTerm(1)),
+												(astra.term.ListTerm) intention.evaluate(predicate.getTerm(2))
+											);
+										}
+									}
+								)
+							}
+						)
 					)
 				}
 			)
@@ -258,6 +501,12 @@ public class TestController extends ASTRAClass {
 	}
 
 	public void initialize(astra.core.Agent agent) {
+		agent.initialize(
+			new Predicate("registration", new Term[] {
+				Primitive.newPrimitive("rcollier"),
+				Primitive.newPrimitive("passw0rd")
+			})
+		);
 	}
 
 	public Fragment createFragment(astra.core.Agent agent) throws ASTRAClassNotFoundException {

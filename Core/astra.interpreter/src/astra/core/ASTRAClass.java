@@ -180,7 +180,7 @@ public abstract class ASTRAClass implements Queryable {
 	
 						if (event.getSource() != null) {
 							Intention intention = (Intention) event.getSource();
-							intention.addSubGoal(rule.statement.getStatementHandler(), bindings);
+							intention.addSubGoal(event, rule, bindings);
 							intention.resume();
 						} else {
 							agent.addIntention(new Intention(agent, event, rule, bindings));

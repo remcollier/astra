@@ -68,8 +68,10 @@ public class ModuleCall extends AbstractStatement {
 							return null;
 						}
 					};
+					
 					context.suspend();
-					if (context.getModule(null, module).inline()) {
+					if (adaptor.inline()) {
+//						if (context.getModule(null, module).inline() || adaptor.inline()) {
 						task.doTask();
 					} else {
 						context.schedule(task);

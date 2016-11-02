@@ -61,7 +61,7 @@ agent FIPARequestProtocol extends FIPAProtocol {
 			try {
 				send(agree, sender, action, params);
 				
-				send(cancel, sender, fipa_logic.toPredicate(action), params);
+				send(cancel, sender, action, params);
 //				!fipa_request_execute(sender, fipa_logic.toFunctor(action), funct answer);
 //				send(inform, sender, fipa_logic.toPredicate(answer), params);
 			} recover {

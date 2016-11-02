@@ -42,8 +42,14 @@ public class Http extends Module {
 
 	@ACTION
 	public boolean register() {
-		System.out.println("Exposing agent: /" + agent.name());
-		server.createContext("/" + agent.name(), new AgentHandler(agent));
+		return register("");
+	}
+
+	@ACTION
+	public boolean register(String ctxt) {
+		String context = (ctxt.startsWith("/") ? "":"/") + ctxt + (ctxt.isEmpty() || ctxt.endsWith("/") ? "":"/") + agent.name();
+		System.out.println("Exposing agent: " + context);
+		server.createContext(context, new AgentHandler(agent));
 		return true;
 	}
 
@@ -57,6 +63,18 @@ public class Http extends Module {
 	@ACTION
 	public boolean sendJSON(ChannelHandlerContext ctx, FullHttpRequest request, Funct funct) {
 		String response = encode(funct);
+		try {
+			sendResponse(ctx, request, WebServer.TYPE_JSON, response);
+			return true;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	@ACTION
+	public boolean sendJSON(ChannelHandlerContext ctx, FullHttpRequest request, ListTerm list) {
+		String response = encode(list);
 		try {
 			sendResponse(ctx, request, WebServer.TYPE_JSON, response);
 			return true;

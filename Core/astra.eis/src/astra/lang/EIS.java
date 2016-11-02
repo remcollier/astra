@@ -26,6 +26,7 @@ import astra.term.ListTerm;
 import astra.term.Primitive;
 import astra.term.Term;
 import astra.term.Variable;
+import astra.type.Type;
 import eis.exceptions.ActException;
 import eis.exceptions.NoEnvironmentException;
 import eis.iilang.Identifier;
@@ -107,6 +108,8 @@ public class EIS extends Module {
 	}
 
 	private EISService service;
+	private String defaultEntity;
+	
 	/**
 	 * Action that launches a new EIS environment from the specified url 
 	 * with the given id and registers the agent with that environment.
@@ -274,6 +277,7 @@ public class EIS extends Module {
 		EISAgent agt = service.get(agent.name());
 		
 		if (agt == null) throw new RuntimeException("No EIS Agent available.");;
+		defaultEntity = entity;
 		return agt.associcateEntity(entity);
 	}
 
@@ -435,7 +439,7 @@ public class EIS extends Module {
 	public Event event(String symbol, Term term) {
 		return new EISEvent(
 				symbol.charAt(0),
-				Primitive.newPrimitive(service.get(agent.name()).defaultEntity()),
+				new Variable(Type.STRING, "_"),
 				term
 		);
 	}

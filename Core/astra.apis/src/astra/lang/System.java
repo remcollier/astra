@@ -327,7 +327,7 @@ public class System extends Module {
 	 * @param time the sleep time in milliseconds
 	 * @return
 	 */
-	@ACTION
+	@ACTION(inline=false)
 	public boolean sleep(int time) {
 		try {
 			Thread.sleep(time);

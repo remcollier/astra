@@ -3,6 +3,7 @@ package astra.statement;
 import java.util.Map;
 
 import astra.core.Intention;
+import astra.core.Agent.Promise;
 import astra.formula.Formula;
 import astra.reasoner.util.ContextEvaluateVisitor;
 import astra.term.Term;
@@ -25,18 +26,24 @@ public class When extends AbstractStatement {
 			public boolean execute(Intention intention) {
 				switch(state) {
 				case 0:
-					try {
-						Map<Integer, Term> bindings = intention.query((Formula) guard.accept(new ContextEvaluateVisitor(intention)));
-						if (bindings != null) {
-							intention.addStatement(body.getStatementHandler(), bindings);
-							intention.execute();
-							state = 1;
+					intention.makePromise(new Promise((Formula) guard.accept(new ContextEvaluateVisitor(intention))) {
+						@Override
+						public void act() {
+							intention.resume();
 						}
-					} catch (Throwable th) {
-						intention.failed("Failed matching guard", th);
-					}
+					});
+					intention.suspend();
+					state = 1;
 					return true;
 				case 1:
+					Map<Integer, Term> bindings = intention.query((Formula) guard.accept(new ContextEvaluateVisitor(intention)));
+					if (bindings != null) {
+						intention.addStatement(body.getStatementHandler(), bindings);
+						intention.execute();
+						state = 2;
+					}
+					return true;
+				case 2:
 				}
 				return false;
 			}

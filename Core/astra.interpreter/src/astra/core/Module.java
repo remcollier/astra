@@ -17,7 +17,9 @@ public class Module {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.METHOD)
-	public @interface ACTION {}
+	public @interface ACTION {
+		boolean inline() default true;
+	}
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.METHOD)

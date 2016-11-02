@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import astra.core.Agent.Promise;
 import astra.event.Event;
 import astra.event.GoalEvent;
 import astra.event.ScopedBeliefEvent;
@@ -34,6 +35,16 @@ import astra.trace.TraceEvent;
 import astra.trace.TraceManager;
 
 public class Agent {
+	public static abstract class Promise {
+		Formula formula;
+		
+		public Promise(Formula formula) {
+			this.formula = formula;
+		}
+		
+		public abstract void act();
+	}
+	
 	// Agent Registry
 	private static Map<String, Agent> agents = new HashMap<String,Agent>();
 
@@ -80,6 +91,7 @@ public class Agent {
 	// Reasoning Engine
 	private Reasoner reasoner;
 	private EventBeliefManager beliefManager;
+	private List<Promise> promises = new LinkedList<Promise>();
 	
 	private List<SensorAdaptor> sensorArray = new LinkedList<SensorAdaptor>();
 
@@ -168,7 +180,7 @@ public class Agent {
 		return null;
 	}
 
-	public void handleEvent(Event event) {
+	public boolean handleEvent(Event event) {
 		try {
 			List<ASTRAClass> classList = clazz.getLinearization();
 			
@@ -183,7 +195,7 @@ public class Agent {
 			
 			for (ASTRAClass cls : classList) {
 				Fragment fragment = linearization.get(cls.getClass().getCanonicalName());
-				if (fragment.getASTRAClass().handleEvent(event, this)) return;
+				if (fragment.getASTRAClass().handleEvent(event, this)) return true;
 			}
 	
 		} catch (Throwable e) {
@@ -198,6 +210,7 @@ public class Agent {
 		} else {
 			if (debugging ) System.err.println("Event: " + event +" was not handled");
 		}
+		return false;
 	}
 
 	public void execute() {
@@ -207,6 +220,12 @@ public class Agent {
 		
 		this.beliefManager.update();
 
+		for (int i=0; i<promises.size(); i++) {
+			if (query(promises.get(i).formula, new HashMap<Integer, Term>()) != null) {
+				System.out.println("promise met: " + promises.get(i).formula);
+				promises.remove(i).act();
+			}
+		}
 		synchronized (completed) {
 			while (!completed.isEmpty()) {
 				Notification notif = completed.poll();
@@ -215,9 +234,7 @@ public class Agent {
 		}
 		
         synchronized (this) {
-	        if (!eventQueue.isEmpty()) {
-				handleEvent(eventQueue.poll());
-			}
+	        while (!eventQueue.isEmpty() && !handleEvent(eventQueue.poll()));
         }
         
 		if (!intentions.isEmpty()) {
@@ -492,5 +509,13 @@ public class Agent {
 	
 	public void addAgentMessageListener(AgentMessageListener listener) {
 		messageListeners.add(listener);
+	}
+
+	public void addPromise(Promise promise) {
+		promises.add(promise);
+	}
+
+	public void dropPromise(Promise promise) {
+		promises.remove(promise);
 	}
 }

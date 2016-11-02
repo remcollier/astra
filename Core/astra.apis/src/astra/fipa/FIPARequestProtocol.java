@@ -646,10 +646,10 @@ public class FIPARequestProtocol extends ASTRAClass {
 				Primitive.newPrimitive("fipa_request_protocol")
 			),
 			new Block(
-				"astra.fipa.FIPARequestProtocol", new int[] {57,91,72,5},
+				"astra.fipa.FIPARequestProtocol", new int[] {57,91,73,5},
 				new Statement[] {
 					new Subgoal(
-						"astra.fipa.FIPARequestProtocol", new int[] {58,8,72,5},
+						"astra.fipa.FIPARequestProtocol", new int[] {58,8,73,5},
 						new Goal(
 							new Predicate("fipa_request_validate", new Term[] {
 								new Variable(Type.STRING, "sender"),
@@ -675,7 +675,7 @@ public class FIPARequestProtocol extends ASTRAClass {
 						)
 					),
 					new If(
-						"astra.fipa.FIPARequestProtocol", new int[] {60,8,72,5},
+						"astra.fipa.FIPARequestProtocol", new int[] {60,8,73,5},
 						new ModuleFormula("fipa_logic",
 							new Predicate("toPredicate", new Term[] {
 								new Variable(Type.BOOLEAN, "outcome")
@@ -689,12 +689,12 @@ public class FIPARequestProtocol extends ASTRAClass {
 						}
 							),
 						new Block(
-							"astra.fipa.FIPARequestProtocol", new int[] {60,45,69,9},
+							"astra.fipa.FIPARequestProtocol", new int[] {60,45,70,9},
 							new Statement[] {
 								new TryRecover(
-									"astra.fipa.FIPARequestProtocol", new int[] {61,12,69,9},
+									"astra.fipa.FIPARequestProtocol", new int[] {61,12,70,9},
 									new Block(
-										"astra.fipa.FIPARequestProtocol", new int[] {61,16,66,13},
+										"astra.fipa.FIPARequestProtocol", new int[] {61,16,67,13},
 										new Statement[] {
 											new Send("astra.fipa.FIPARequestProtocol", new int[] {62,16,62,51},
 												new Performative("agree"),
@@ -702,55 +702,18 @@ public class FIPARequestProtocol extends ASTRAClass {
 												new FormulaVariable(new Variable(Type.FORMULA,"action")),
 												new Variable(Type.LIST, "params")
 											),
-											new Subgoal(
-												"astra.fipa.FIPARequestProtocol", new int[] {64,16,66,13},
-												new Goal(
-													new Predicate("fipa_request_execute", new Term[] {
-														new Variable(Type.STRING, "sender"),
-														new ModuleTerm("fipa_logic", Type.FUNCTION,
-															new Predicate("toFunctor", new Term[] {
-																new Variable(Type.FORMULA, "action")
-															}),
-															new ModuleTermAdaptor() {
-																public Object invoke(Intention intention, Predicate predicate) {
-																	return ((astra.lang.Logic) intention.getModule("astra.fipa.FIPARequestProtocol","fipa_logic")).toFunctor(
-																		(astra.formula.Formula) intention.evaluate(predicate.getTerm(0))
-																	);
-																}
-																public Object invoke(BindingsEvaluateVisitor visitor, Predicate predicate) {
-																	return ((astra.lang.Logic) visitor.agent().getModule("astra.fipa.FIPARequestProtocol","fipa_logic")).toFunctor(
-																		(astra.formula.Formula) visitor.evaluate(predicate.getTerm(0))
-																	);
-																}
-															}
-														),
-														new Variable(Type.FUNCTION, "answer",false)
-													})
-												)
-											),
-											new Send("astra.fipa.FIPARequestProtocol", new int[] {65,16,65,76},
-												new Performative("inform"),
+											new Send("astra.fipa.FIPARequestProtocol", new int[] {64,16,64,52},
+												new Performative("cancel"),
 												new Variable(Type.STRING, "sender"),
-												new ModuleFormula("fipa_logic",
-													new Predicate("toPredicate", new Term[] {
-														new Variable(Type.FUNCTION, "answer")
-													}),
-												new ModuleFormulaAdaptor() {
-														public Formula invoke(BindingsEvaluateVisitor visitor, Predicate predicate) {
-															return ((astra.lang.Logic) visitor.agent().getModule("astra.fipa.FIPARequestProtocol","fipa_logic")).toPredicate(
-																(astra.term.Funct) visitor.evaluate(predicate.getTerm(0))
-															);
-													}
-												}
-													),
+												new FormulaVariable(new Variable(Type.FORMULA,"action")),
 												new Variable(Type.LIST, "params")
 											)
 										}
 									),
 									new Block(
-										"astra.fipa.FIPARequestProtocol", new int[] {66,22,69,9},
+										"astra.fipa.FIPARequestProtocol", new int[] {67,22,70,9},
 										new Statement[] {
-											new Send("astra.fipa.FIPARequestProtocol", new int[] {67,16,67,53},
+											new Send("astra.fipa.FIPARequestProtocol", new int[] {68,16,68,53},
 												new Performative("failure"),
 												new Variable(Type.STRING, "sender"),
 												new FormulaVariable(new Variable(Type.FORMULA,"action")),
@@ -762,9 +725,9 @@ public class FIPARequestProtocol extends ASTRAClass {
 							}
 						),
 						new Block(
-							"astra.fipa.FIPARequestProtocol", new int[] {69,15,72,5},
+							"astra.fipa.FIPARequestProtocol", new int[] {70,15,73,5},
 							new Statement[] {
-								new Send("astra.fipa.FIPARequestProtocol", new int[] {70,12,70,48},
+								new Send("astra.fipa.FIPARequestProtocol", new int[] {71,12,71,48},
 									new Performative("refuse"),
 									new Variable(Type.STRING, "sender"),
 									new FormulaVariable(new Variable(Type.FORMULA,"action")),
@@ -788,11 +751,11 @@ public class FIPARequestProtocol extends ASTRAClass {
 			),
 			Predicate.TRUE,
 			new Block(
-				"astra.fipa.FIPARequestProtocol", new int[] {74,86,76,5},
+				"astra.fipa.FIPARequestProtocol", new int[] {75,86,77,5},
 				new Statement[] {
 					new Assignment(
 						new Variable(Type.BOOLEAN, "result"),
-						"astra.fipa.FIPARequestProtocol", new int[] {75,8,76,5},
+						"astra.fipa.FIPARequestProtocol", new int[] {76,8,77,5},
 						Primitive.newPrimitive(true)
 					)
 				}
@@ -810,11 +773,11 @@ public class FIPARequestProtocol extends ASTRAClass {
 			),
 			Predicate.TRUE,
 			new Block(
-				"astra.fipa.FIPARequestProtocol", new int[] {78,83,80,5},
+				"astra.fipa.FIPARequestProtocol", new int[] {79,83,81,5},
 				new Statement[] {
 					new Assignment(
 						new Variable(Type.FUNCTION, "answer"),
-						"astra.fipa.FIPARequestProtocol", new int[] {79,8,80,5},
+						"astra.fipa.FIPARequestProtocol", new int[] {80,8,81,5},
 						new Funct("done", new Term[] {})
 					)
 				}

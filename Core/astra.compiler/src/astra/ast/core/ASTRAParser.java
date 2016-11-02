@@ -36,6 +36,7 @@ import astra.ast.statement.DeclarationStatement;
 import astra.ast.statement.ForAllStatement;
 import astra.ast.statement.ForEachStatement;
 import astra.ast.statement.IfStatement;
+import astra.ast.statement.MaintainBlockStatement;
 import astra.ast.statement.MinusMinusStatement;
 import astra.ast.statement.ModuleCallStatement;
 import astra.ast.statement.PlanCallStatement;
@@ -426,14 +427,19 @@ public class ASTRAParser {
 		}
 		
 		String token = null;
-		
+		IFormula formula = null;
 		switch ( tok.type ) {
 		case Token.SYNCHRONIZED:
+		case Token.MAINTAIN:
 			Token tok2 = tokens.remove(0);
 			if (tok2.type != Token.LEFT_BRACKET) {
 				throw new ParseException("Illegal token: expected ( but got: " + tok2.token, tok2);
 			}
-			token = tokens.remove(0).token;
+			if (tok.type == Token.SYNCHRONIZED) {
+				token = tokens.remove(0).token;
+			} else {
+				formula = createFormula(splitAt(tokens, new int[] {Token.RIGHT_BRACKET}));
+			}
 			tok2 = tokens.remove(0);
 			if (tok2.type != Token.RIGHT_BRACKET) {
 				throw new ParseException("Illegal token: expected ) but got: " + tok2.token, tok2);
@@ -459,6 +465,8 @@ public class ASTRAParser {
 			
 			if (token != null) {
 				return new SynchronizedBlockStatement(token, statements, first, last, tokenizer.getSource(first, last));
+			} else if (formula != null) {
+				return new MaintainBlockStatement(formula, statements, first, last, tokenizer.getSource(first, last));
 			}
 			return new BlockStatement(statements, first, last, tokenizer.getSource(first, last));
 		case Token.SEND:
@@ -1075,9 +1083,22 @@ public class ASTRAParser {
 			} else if (tok.type == Token.IDENTIFIER) {
 				Token tok2 = tokens.get(0);
 				if (tok2.type == Token.PERIOD) {
-					tokens.remove(0);
-					PredicateFormula formula = createPredicate(tokens);
-					return new ModuleTerm(tok.token, formula, tok, tokenizer.getLastToken(), tokenizer.getSource(tok, tok));
+					if ((tokens.size() > 2) && (tokens.get(2).type == Token.LEFT_BRACKET)) {
+						tokens.remove(0);
+						PredicateFormula formula = createPredicate(tokens);
+						return new ModuleTerm(tok.token, formula, tok, tokenizer.getLastToken(), tokenizer.getSource(tok, tok));
+					} else {
+						tokens.add(0, tok);
+						IType type = new ObjectType(Token.OBJECT_TYPE, getQualifiedName(tokens));
+						if (tokens.isEmpty()) throw new ParseException("Expected variable identifier", tok, tok);
+						tok2 = tokens.remove(0);
+						if (tok2.type != Token.IDENTIFIER) {
+							throw new ParseException("Expected variable identifier", tok, tok2);
+						}
+						if (!tokens.isEmpty()) throw new ParseException("Unexpected Tokens after inline variable declaration" , getLast(tokens));
+						return new InlineVariableDeclaration(type, tok2.token, tok, tok2, tokenizer.getSource(tok, tok2));
+						
+					}
 				} else if (tok2.type == Token.LEFT_BRACKET) {
 					if (getLast(tokens).type != Token.RIGHT_BRACKET) {
 						throw new ParseException("Invalid syntax: missing right bracket for functional term", tok, getLast(tokens));
@@ -1086,6 +1107,15 @@ public class ASTRAParser {
 					tokens.remove(0);
 					tokens.remove(tokens.size()-1);
 					return new Function(tok.token, getTermList(tokens, false), tok, last, tokenizer.getSource(tok, last));
+				} else {
+					IType type = new ObjectType(Token.OBJECT_TYPE, tok.token);
+					if (tokens.isEmpty()) throw new ParseException("Expected variable identifier", tok, tok);
+					tok2 = tokens.remove(0);
+					if (tok2.type != Token.IDENTIFIER) {
+						throw new ParseException("Expected variable identifier", tok, tok2);
+					}
+					if (!tokens.isEmpty()) throw new ParseException("Unexpected Tokens after inline variable declaration" , getLast(tokens));
+					return new InlineVariableDeclaration(type, tok2.token, tok, tok2, tokenizer.getSource(tok, tok2));
 				}
 			} else if (tok.type == Token.LEFT_SQ_BRACKET) {
 				if (getLast(tokens).type != Token.RIGHT_SQ_BRACKET) {
@@ -1112,6 +1142,7 @@ public class ASTRAParser {
 				return term;
 			}
 		}
+		System.out.println("tok: " + tok.token);
 		System.out.println("tokens: " + tokens);
 		throw new ParseException("Unknown Term", first, last);
 	}

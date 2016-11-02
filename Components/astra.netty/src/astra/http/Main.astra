@@ -1,0 +1,28 @@
+package astra.http;
+
+import astra.netty.Http;
+
+agent Main {
+	module Http http;
+	module System S;
+	module Console C;
+	
+	types test {
+		formula is(string,string);
+	}
+	
+	initial is("rem", "happy");
+	
+	rule +!main(list args) {
+		//http.setup();
+		//http.exportFolder("/view", "view");
+		//S.createAgent("user", "astra.http.UserController");
+	}
+	
+	rule +!test() {
+//		maintain (is("rem", "happy")) {
+			-is("rem", "happy");
+			C.println("rem is not happy");
+//		}
+	}
+}

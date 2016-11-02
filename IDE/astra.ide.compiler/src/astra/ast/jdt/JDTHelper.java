@@ -233,6 +233,30 @@ public class JDTHelper extends AbstractHelper {
 	public boolean validate(String moduleClass, MethodSignature signature) {
 		return getMatchingMethod(moduleClass, signature) != null;
 	}
+	
+	public boolean isInline(String moduleClass, MethodSignature signature) {
+		IMethod method = getMatchingMethod(moduleClass, signature);
+		if (method == null) return true;
+		try {
+			for (IAnnotation ann : method.getAnnotations()) {
+				String annot = ANNOTATIONS.get(signature.type());
+				if (ann.getElementName().equals(annot) || ann.getElementName().equals(ALTERNATE.get(signature.type()))) {
+					if (signature.type() == IJavaHelper.ACTION) {
+						String sig = null;
+						for (IMemberValuePair mvp : ann.getMemberValuePairs()) {
+							if (mvp.getMemberName().equals("inline")) {
+								return mvp.getValue().equals("true");
+							}
+						}
+					}
+				}
+			}
+		} catch (JavaModelException e) {
+		}
+		return false;
+	}
+
+	
 
 	private boolean validate(MethodSignature signature, IMethod mthd) throws JavaModelException {
 		ILocalVariable[] params = mthd.getParameters();

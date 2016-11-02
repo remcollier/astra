@@ -6,8 +6,6 @@
 </head>
 
 <body>
-	<div id="text"></div>
-
 	Login Test
 
 	<table>
@@ -20,23 +18,41 @@
 			<td><input type=password id="pass"/></td>
 		</tr>
 		<tr>
-			<td colspan=2 style="text-align:right"><input type=button value="Login" onclick="do_login();"/></td>
+			<td colspan=2 style="text-align:right">
+				<input type=button value="Register" onclick="do_register();"/>
+				<input type=button value="Login" onclick="do_login();"/>
+			</td>
 		</tr>
 	</table>
 
+	<div id="text">Response Here</div>
+
 	<script type="text/javascript">
-		$("#text").load("/main/test3");
-		
 		function do_login() {
 			data = {
 				username : $("#user").val(),
 				password : $("#pass").val()
 			};
 			
-			console.log(data);
-			$.post("/main/validate", data, function(response) {
-				$("#text").html(response);
-			});
+			$.post("/user/validate", data, function(response) {
+				console.log(response);
+				$("#text").html(show_response(response));
+			},"json");
+		}
+		function do_register() {
+			data = {
+				username : $("#user").val(),
+				password : $("#pass").val()
+			};
+			
+			$.post("/user/register", data, function(response) {
+				console.log(response);
+				$("#text").html(show_response(response));
+			},"json");
+		}
+		function show_response(response) {
+			if (response[0].result == "OK") return "SUCCESS";
+			return "FAILURE: " + response[1].reason;
 		}
 	</script>
 </body>

@@ -69,6 +69,10 @@ public class Request extends ASTRAClass {
 										)
 									}),
 									new DefaultModuleCallAdaptor() {
+										public boolean inline() {
+											return true;
+										}
+
 										public boolean invoke(Intention intention, Predicate predicate) {
 											return ((astra.lang.Console) intention.getModule("astra.fipa.Request","C")).println(
 												(java.lang.String) intention.evaluate(predicate.getTerm(0))
@@ -87,6 +91,10 @@ public class Request extends ASTRAClass {
 										Primitive.newPrimitive("FAILED")
 									}),
 									new DefaultModuleCallAdaptor() {
+										public boolean inline() {
+											return true;
+										}
+
 										public boolean invoke(Intention intention, Predicate predicate) {
 											return ((astra.lang.Console) intention.getModule("astra.fipa.Request","C")).println(
 												(java.lang.String) intention.evaluate(predicate.getTerm(0))

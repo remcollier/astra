@@ -109,6 +109,10 @@ public class FIPAProtocol extends ASTRAClass {
 							new Variable(Type.INTEGER, "timeout")
 						}),
 						new DefaultModuleCallAdaptor() {
+							public boolean inline() {
+								return true;
+							}
+
 							public boolean invoke(Intention intention, Predicate predicate) {
 								return ((astra.lang.System) intention.getModule("astra.fipa.FIPAProtocol","fipa_system")).sleep(
 									(java.lang.Integer) intention.evaluate(predicate.getTerm(0))
@@ -237,6 +241,10 @@ public class FIPAProtocol extends ASTRAClass {
 							"astra.fipa.FIPAProtocol", new int[] {55,8,55,26},
 							new Predicate("fail", new Term[] {}),
 							new DefaultModuleCallAdaptor() {
+								public boolean inline() {
+									return true;
+								}
+
 								public boolean invoke(Intention intention, Predicate predicate) {
 									return ((astra.lang.System) intention.getModule("astra.fipa.FIPAProtocol","fipa_system")).fail(
 									);
@@ -266,6 +274,10 @@ public class FIPAProtocol extends ASTRAClass {
 							"astra.fipa.FIPAProtocol", new int[] {59,8,59,26},
 							new Predicate("fail", new Term[] {}),
 							new DefaultModuleCallAdaptor() {
+								public boolean inline() {
+									return true;
+								}
+
 								public boolean invoke(Intention intention, Predicate predicate) {
 									return ((astra.lang.System) intention.getModule("astra.fipa.FIPAProtocol","fipa_system")).fail(
 									);

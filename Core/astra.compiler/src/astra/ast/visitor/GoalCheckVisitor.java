@@ -13,6 +13,7 @@ import astra.ast.statement.BlockStatement;
 import astra.ast.statement.ForAllStatement;
 import astra.ast.statement.ForEachStatement;
 import astra.ast.statement.IfStatement;
+import astra.ast.statement.MaintainBlockStatement;
 import astra.ast.statement.ScopedStatement;
 import astra.ast.statement.SpawnGoalStatement;
 import astra.ast.statement.SubGoalStatement;
@@ -79,6 +80,14 @@ public class GoalCheckVisitor extends AbstractVisitor {
 
 	@Override
 	public Object visit(SynchronizedBlockStatement statement, Object data) throws ParseException {
+		for (IStatement s: statement.statements()) {
+			s.accept(this, data);
+		}
+		return null;
+	}
+	
+	@Override
+	public Object visit(MaintainBlockStatement statement, Object data) throws ParseException {
 		for (IStatement s: statement.statements()) {
 			s.accept(this, data);
 		}
