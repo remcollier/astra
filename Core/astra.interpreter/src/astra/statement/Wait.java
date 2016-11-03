@@ -17,6 +17,8 @@ public class Wait extends AbstractStatement {
 	public StatementHandler getStatementHandler() {
 		return new StatementHandler() {
 			int state = 0;
+			Promise promise;
+			
 			@Override
 			public boolean execute(Intention intention) {
 				switch (state) {
@@ -24,7 +26,7 @@ public class Wait extends AbstractStatement {
 					state = 0;
 					return true;
 				case 0:
-					intention.makePromise(new Promise((Formula) guard.accept(new ContextEvaluateVisitor(intention))) {
+					intention.makePromise(promise=new Promise((Formula) guard.accept(new ContextEvaluateVisitor(intention))) {
 						@Override
 						public void act() {
 							intention.resume();
@@ -47,6 +49,7 @@ public class Wait extends AbstractStatement {
 
 			@Override
 			public boolean onFail(Intention context) {
+				context.dropPromise(promise);
 				return false;
 			}
 

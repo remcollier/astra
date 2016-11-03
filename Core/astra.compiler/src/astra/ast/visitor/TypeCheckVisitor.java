@@ -274,6 +274,7 @@ public class TypeCheckVisitor implements IElementVisitor {
 	
 	@Override
 	public Object visit(MaintainBlockStatement statement, Object data) throws ParseException {
+		statement.formula().accept(this, data);
 		for (IStatement s: statement.statements()) {
 			s.accept(this, data);
 		}

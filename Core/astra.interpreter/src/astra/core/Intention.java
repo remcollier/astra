@@ -407,10 +407,12 @@ public class Intention {
 	}
 
 	public void makePromise(Promise promise) {
+//		System.out.println("made promise: " + promise.formula);
 		agent.addPromise(promise);
 	}
 
 	public void dropPromise(Promise promise) {
+//		System.out.println("dropped promise: " + promise.formula);
 		agent.dropPromise(promise);
 	}
 

@@ -22,27 +22,28 @@ public class MaintainBlock extends AbstractStatement {
 			int state = 0;
 			Promise promise;
 			
-			public boolean execute(Intention context) {
+			public boolean execute(Intention intention) {
 				switch (state) {
 				case 0:
-					context.makePromise(promise = new Promise(new NOT((Formula) formula.accept(new ContextEvaluateVisitor(context)))) {
+					intention.makePromise(promise = new Promise((Formula) formula.accept(new ContextEvaluateVisitor(intention)), true) {
 						@Override
 						public void act() {
-							context.failed("Maintenance Condition False: "+ formula);
+							intention.failed("Maintenance Condition False: "+ formula);
+							intention.resume();
 						}
 					});
-					context.addStatement(statement.getStatementHandler());
+					intention.addStatement(statement.getStatementHandler());
 					state=1;
 					break;
 				case 1:
-					context.dropPromise(promise);
+					intention.dropPromise(promise);
 					return false;
 				}
 				return true;
 			}
 
 			@Override
-			public boolean onFail(Intention context) {
+			public boolean onFail(Intention intention) {
 				return false;
 			}
 
@@ -50,7 +51,6 @@ public class MaintainBlock extends AbstractStatement {
 			public Statement statement() {
 				return MaintainBlock.this;
 			}
-			
 		};
 	}
 

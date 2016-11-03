@@ -382,6 +382,7 @@ public class ComponentVisitor extends AbstractVisitor {
 	
 	@Override
 	public Object visit(MaintainBlockStatement statement, Object data) throws ParseException {
+		statement.formula().accept(this, data);
 		((VariableTypeStack) data).addScope();
 		for (IStatement s: statement.statements()) {
 			s.accept(this, data);

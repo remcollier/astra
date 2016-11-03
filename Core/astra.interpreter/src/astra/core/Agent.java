@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import astra.core.Agent.Promise;
 import astra.event.Event;
 import astra.event.GoalEvent;
 import astra.event.ScopedBeliefEvent;
@@ -36,12 +35,18 @@ import astra.trace.TraceManager;
 
 public class Agent {
 	public static abstract class Promise {
-		Formula formula;
+		public Formula formula;
+		public boolean isTrue;
 		
 		public Promise(Formula formula) {
-			this.formula = formula;
+			this(formula, false);
 		}
 		
+		public Promise(Formula formula, boolean isTrue) {
+			this.formula = formula;
+			this.isTrue = isTrue;
+		}
+
 		public abstract void act();
 	}
 	
@@ -221,8 +226,10 @@ public class Agent {
 		this.beliefManager.update();
 
 		for (int i=0; i<promises.size(); i++) {
-			if (query(promises.get(i).formula, new HashMap<Integer, Term>()) != null) {
-				System.out.println("promise met: " + promises.get(i).formula);
+			Promise promise = promises.get(i);
+			List<Map<Integer, Term>> bindings = query(promise.formula, new HashMap<Integer, Term>());
+			if ((promise.isTrue && (bindings == null)) || (!promise.isTrue && (bindings != null))) {
+//				System.out.println("promise met: " + promise.formula);
 				promises.remove(i).act();
 			}
 		}
