@@ -173,7 +173,7 @@ public class Intention {
 	}
 	
 	public void addBindings(Map<Integer, Term> bindings) {
-		throw new UnsupportedOperationException("Intention.addBindings does not work");
+		executors.peek().addBindings(bindings);
 	}
 
 	public String toString() {

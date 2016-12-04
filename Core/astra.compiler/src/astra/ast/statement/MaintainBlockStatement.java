@@ -11,12 +11,14 @@ import astra.ast.core.Token;
 
 public class MaintainBlockStatement extends AbstractElement implements IStatement {
 	List<IStatement> statements;
+	List<IStatement> recover;
 	IFormula formula;
 	
-	public MaintainBlockStatement(IFormula formula, List<IStatement> statements, Token start, Token end, String source) {
+	public MaintainBlockStatement(IFormula formula, List<IStatement> statements, List<IStatement> recover, Token start, Token end, String source) {
 		super(start, end, source);
 		this.formula = formula;
 		this.statements = statements;
+		this.recover = recover;
 	}
 
 	public IStatement[] statements() {
@@ -32,6 +34,12 @@ public class MaintainBlockStatement extends AbstractElement implements IStatemen
 		String out = "maintain (" + formula + ") { ";
 		for (IStatement statement : statements) {
 			out += statement + "; ";
+		}
+		if (!recover.isEmpty()) {
+			out += "}  recover { ";
+			for (IStatement statement : recover) {
+				out += statement + "; ";
+			}
 		}
 		return out + "}";
 	}

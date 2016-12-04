@@ -47,7 +47,7 @@ public class Agent {
 			this.isTrue = isTrue;
 		}
 
-		public abstract void act();
+		public abstract void act(List<Map<Integer, Term>> bindings);
 	}
 	
 	// Agent Registry
@@ -230,7 +230,7 @@ public class Agent {
 			List<Map<Integer, Term>> bindings = query(promise.formula, new HashMap<Integer, Term>());
 			if ((promise.isTrue && (bindings == null)) || (!promise.isTrue && (bindings != null))) {
 //				System.out.println("promise met: " + promise.formula);
-				promises.remove(i).act();
+				promises.remove(i).act(bindings);
 			}
 		}
 		synchronized (completed) {

@@ -45,7 +45,7 @@ public class Variable implements Term {
 	}
 	
 	public String toString() {
-		return mapper.fromId(id) + " <" + id + "> " + (returns ? "RETURN":"NO RETURN"); 
+		return mapper.fromId(id); 
 	}
 
 	@Override

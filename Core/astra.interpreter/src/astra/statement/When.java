@@ -1,5 +1,6 @@
 package astra.statement;
 
+import java.util.List;
 import java.util.Map;
 
 import astra.core.Intention;
@@ -28,7 +29,8 @@ public class When extends AbstractStatement {
 				case 0:
 					intention.makePromise(new Promise((Formula) guard.accept(new ContextEvaluateVisitor(intention))) {
 						@Override
-						public void act() {
+						public void act(List<Map<Integer, Term>> bindings) {
+							intention.addStatement(body.getStatementHandler(), bindings.get(0));
 							intention.resume();
 						}
 					});
@@ -36,14 +38,6 @@ public class When extends AbstractStatement {
 					state = 1;
 					return true;
 				case 1:
-					Map<Integer, Term> bindings = intention.query((Formula) guard.accept(new ContextEvaluateVisitor(intention)));
-					if (bindings != null) {
-						intention.addStatement(body.getStatementHandler(), bindings);
-						intention.execute();
-						state = 2;
-					}
-					return true;
-				case 2:
 				}
 				return false;
 			}

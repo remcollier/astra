@@ -261,6 +261,7 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 	@Override
 	public Object visit(RuleElement element, Object data) throws ParseException {
 		code.append(data.toString() + "addRule(new Rule(\n");
+		code.append(data+"\t"+locationData(element)+",\n");
 		element.event().accept(this, data + "\t");
 		code.append(",\n");
 		element.context().accept(this, data + "\t");

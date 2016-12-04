@@ -1,10 +1,8 @@
 package astra.core;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.Stack;
 
 import astra.event.Event;
@@ -186,6 +184,16 @@ public class RuleExecutor implements Executor {
 	public void buildFailureTrace(Stack<StatementHandler> failureTrace) {
 		for (StatementExecutor executor : executors) {
 			executor.buildFailureTrace(failureTrace);
+		}
+	}
+
+	public void addBindings(Map<Integer, Term> bindings) {
+		Map<Integer, Term> b = getTopBindings();
+		if (b==null) b=this.bindings;
+		for (Entry<Integer, Term> entry : bindings.entrySet()) {
+			if (!b.containsKey(entry.getKey())) {
+				b.put(entry.getKey(), entry.getValue());
+			}
 		}
 	}
 }

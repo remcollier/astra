@@ -1,9 +1,13 @@
 package astra.statement;
 
+import java.util.List;
+import java.util.Map;
+
 import astra.core.Agent.Promise;
 import astra.core.Intention;
 import astra.formula.Formula;
 import astra.reasoner.util.ContextEvaluateVisitor;
+import astra.term.Term;
 
 public class Wait extends AbstractStatement {
 	Formula guard;
@@ -28,7 +32,8 @@ public class Wait extends AbstractStatement {
 				case 0:
 					intention.makePromise(promise=new Promise((Formula) guard.accept(new ContextEvaluateVisitor(intention))) {
 						@Override
-						public void act() {
+						public void act(List<Map<Integer, Term>> bindings) {
+							intention.addBindings(bindings.get(0));
 							intention.resume();
 						}
 					});
@@ -37,14 +42,6 @@ public class Wait extends AbstractStatement {
 					state = 1;
 				}
 				return false;
-//				try {
-//					Formula query = (Formula) guard.accept(new ContextEvaluateVisitor(intention));
-//					Map<Integer, Term> bindings = intention.query(query);
-//					if (bindings == null) return true;
-//				} catch (Throwable th) {
-//					intention.failed("query cannot be resolved " + guard, th);
-//				}
-//				return false;
 			}
 
 			@Override

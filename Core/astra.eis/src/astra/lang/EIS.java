@@ -238,12 +238,10 @@ public class EIS extends Module {
 	 */
 	@ACTION
 	public boolean join(String id) {
-		if (!service.id().equals(id)) {
-			if (service != null) throw new RuntimeException("EIS Service connected.");
-			
-			service = EISService.getService(id);
-			if (service == null) return false;
-		}
+		if (service != null) throw new RuntimeException("EIS Service connected.");
+		
+		service = EISService.getService(id);
+		if (service == null) return false;
 		
 		agent.addSource(new EISAgent(agent, service));
 		return true;

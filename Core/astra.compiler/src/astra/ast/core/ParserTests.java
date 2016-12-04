@@ -165,9 +165,12 @@ public class ParserTests {
 //		ASTRAParser parser = new ASTRAParser(new ADTTokenizer(new ByteArrayInputStream(
 //				"int X = math.intValue(system.name()) + 1".getBytes())));
 //		System.out.println("module: " + parser.createTerm(parser.readTo(Token.SEMI_COLON)));
+//		ASTRAParser parser = new ASTRAParser(new ADTTokenizer(new ByteArrayInputStream(
+//				"maintain ( likes(\"rem\") ) {} recover {C.println(\"hello\");}".getBytes())));
+//		System.out.println("module: " + parser.createStatement(parser.readTo(Token.EOF)));
 		ASTRAParser parser = new ASTRAParser(new ADTTokenizer(new ByteArrayInputStream(
-				"maintain ( likes(\"rem\") ) {};".getBytes())));
-		System.out.println("module: " + parser.createStatement(parser.readTo(Token.RIGHT_BRACE)));
+				"maintain ( likes(\"rem\") ) {C.println(\"hello\");}".getBytes())));
+		System.out.println("module: " + parser.createStatement(parser.readTo(Token.EOF)));
 	}
 
 }

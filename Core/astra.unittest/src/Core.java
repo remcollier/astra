@@ -21,6 +21,7 @@ public class Core extends ASTRAClass {
 	public Core() {
 		setParents(new Class[] {astra.unit.ASTRAUnitTest.class});
 		addRule(new Rule(
+			"Core", new int[] {15,9,15,43},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("test_maintain", new Term[] {
@@ -30,14 +31,14 @@ public class Core extends ASTRAClass {
 			),
 			Predicate.TRUE,
 			new Block(
-				"Core", new int[] {14,42,22,5},
+				"Core", new int[] {15,42,22,5},
 				new Statement[] {
 					new BeliefUpdate('+',
-						"Core", new int[] {15,8,22,5},
+						"Core", new int[] {16,8,22,5},
 						new Predicate("timed_out", new Term[] {})
 					),
 					new ModuleCall("C",
-						"Core", new int[] {16,8,16,27},
+						"Core", new int[] {17,8,17,27},
 						new Predicate("println", new Term[] {
 							Primitive.newPrimitive("before")
 						}),
@@ -54,13 +55,13 @@ public class Core extends ASTRAClass {
 						}
 					),
 					new MaintainBlock(
-						"Core", new int[] {17,8,22,5},
+						"Core", new int[] {18,8,22,5},
 						new Predicate("timed_out", new Term[] {}),
 						new Block(
-							"Core", new int[] {17,8,22,5},
+							"Core", new int[] {18,8,22,5},
 							new Statement[] {
 								new ModuleCall("C",
-									"Core", new int[] {18,12,18,27},
+									"Core", new int[] {19,12,19,27},
 									new Predicate("println", new Term[] {
 										Primitive.newPrimitive("in")
 									}),
@@ -80,7 +81,7 @@ public class Core extends ASTRAClass {
 						)
 					),
 					new ModuleCall("C",
-						"Core", new int[] {20,8,20,26},
+						"Core", new int[] {21,8,21,26},
 						new Predicate("println", new Term[] {
 							Primitive.newPrimitive("after")
 						}),
@@ -100,6 +101,7 @@ public class Core extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"Core", new int[] {24,9,24,50},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("test_maintain_failed", new Term[] {
@@ -109,17 +111,17 @@ public class Core extends ASTRAClass {
 			),
 			Predicate.TRUE,
 			new Block(
-				"Core", new int[] {24,49,32,5},
+				"Core", new int[] {24,49,31,5},
 				new Statement[] {
 					new BeliefUpdate('+',
-						"Core", new int[] {25,8,32,5},
+						"Core", new int[] {25,8,31,5},
 						new Predicate("timed_out", new Term[] {})
 					),
 					new MaintainBlock(
-						"Core", new int[] {26,8,32,5},
+						"Core", new int[] {26,8,31,5},
 						new Predicate("timed_out", new Term[] {}),
 						new Block(
-							"Core", new int[] {26,8,32,5},
+							"Core", new int[] {26,8,31,5},
 							new Statement[] {
 								new ModuleCall("C",
 									"Core", new int[] {27,12,27,31},
@@ -166,6 +168,7 @@ public class Core extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"Core", new int[] {33,9,33,40},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("test_hello", new Term[] {
@@ -175,10 +178,10 @@ public class Core extends ASTRAClass {
 			),
 			Predicate.TRUE,
 			new Block(
-				"Core", new int[] {34,39,36,5},
+				"Core", new int[] {33,39,35,5},
 				new Statement[] {
 					new ModuleCall("C",
-						"Core", new int[] {35,8,35,26},
+						"Core", new int[] {34,8,34,26},
 						new Predicate("println", new Term[] {
 							Primitive.newPrimitive("hello")
 						}),
@@ -198,6 +201,7 @@ public class Core extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"Core", new int[] {37,9,37,46},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("test_beliefevent", new Term[] {
@@ -207,10 +211,10 @@ public class Core extends ASTRAClass {
 			),
 			Predicate.TRUE,
 			new Block(
-				"Core", new int[] {38,45,40,5},
+				"Core", new int[] {37,45,39,5},
 				new Statement[] {
 					new BeliefUpdate('+',
-						"Core", new int[] {39,8,40,5},
+						"Core", new int[] {38,8,39,5},
 						new Predicate("test", new Term[] {
 							new Variable(new ObjectType(TestSuite.class), "suite")
 						})
@@ -219,6 +223,7 @@ public class Core extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"Core", new int[] {41,9,41,33},
 			new BeliefEvent('+',
 				new Predicate("test", new Term[] {
 					new Variable(new ObjectType(TestSuite.class), "suite",false)
@@ -226,10 +231,10 @@ public class Core extends ASTRAClass {
 			),
 			Predicate.TRUE,
 			new Block(
-				"Core", new int[] {43,32,45,5},
+				"Core", new int[] {41,32,43,5},
 				new Statement[] {
 					new ModuleCall("UT",
-						"Core", new int[] {44,8,44,25},
+						"Core", new int[] {42,8,42,25},
 						new Predicate("success", new Term[] {
 							new Variable(new ObjectType(TestSuite.class), "suite")
 						}),
@@ -249,6 +254,7 @@ public class Core extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"Core", new int[] {45,9,45,39},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("test_fail", new Term[] {
@@ -258,10 +264,10 @@ public class Core extends ASTRAClass {
 			),
 			Predicate.TRUE,
 			new Block(
-				"Core", new int[] {47,38,49,5},
+				"Core", new int[] {45,38,47,5},
 				new Statement[] {
 					new ModuleCall("S",
-						"Core", new int[] {48,8,48,16},
+						"Core", new int[] {46,8,46,16},
 						new Predicate("fail", new Term[] {}),
 						new DefaultModuleCallAdaptor() {
 							public boolean inline() {
@@ -278,6 +284,7 @@ public class Core extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"Core", new int[] {49,9,49,52},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("test_recovered_failure", new Term[] {
@@ -287,15 +294,15 @@ public class Core extends ASTRAClass {
 			),
 			Predicate.TRUE,
 			new Block(
-				"Core", new int[] {51,51,57,5},
+				"Core", new int[] {49,51,55,5},
 				new Statement[] {
 					new TryRecover(
-						"Core", new int[] {52,8,57,5},
+						"Core", new int[] {50,8,55,5},
 						new Block(
-							"Core", new int[] {52,12,54,9},
+							"Core", new int[] {50,12,52,9},
 							new Statement[] {
 								new ModuleCall("S",
-									"Core", new int[] {53,12,53,20},
+									"Core", new int[] {51,12,51,20},
 									new Predicate("fail", new Term[] {}),
 									new DefaultModuleCallAdaptor() {
 										public boolean inline() {
@@ -311,10 +318,10 @@ public class Core extends ASTRAClass {
 							}
 						),
 						new Block(
-							"Core", new int[] {54,18,57,5},
+							"Core", new int[] {52,18,55,5},
 							new Statement[] {
 								new ModuleCall("UT",
-									"Core", new int[] {55,12,55,29},
+									"Core", new int[] {53,12,53,29},
 									new Predicate("success", new Term[] {
 										new Variable(new ObjectType(TestSuite.class), "suite")
 									}),
@@ -337,6 +344,7 @@ public class Core extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"Core", new int[] {57,9,57,45},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("test_assignment", new Term[] {
@@ -346,15 +354,15 @@ public class Core extends ASTRAClass {
 			),
 			Predicate.TRUE,
 			new Block(
-				"Core", new int[] {59,44,62,5},
+				"Core", new int[] {57,44,60,5},
 				new Statement[] {
 					new Declaration(
 						new Variable(Type.INTEGER, "Y"),
-						"Core", new int[] {60,8,62,5},
+						"Core", new int[] {58,8,60,5},
 						Primitive.newPrimitive(5)
 					),
 					new ModuleCall("UT",
-						"Core", new int[] {61,8,61,35},
+						"Core", new int[] {59,8,59,35},
 						new Predicate("assertEquals", new Term[] {
 							new Variable(new ObjectType(TestSuite.class), "suite"),
 							new Variable(Type.INTEGER, "Y"),
@@ -378,6 +386,7 @@ public class Core extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"Core", new int[] {62,9,62,53},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("test_subgoal_assignment", new Term[] {
@@ -387,10 +396,10 @@ public class Core extends ASTRAClass {
 			),
 			Predicate.TRUE,
 			new Block(
-				"Core", new int[] {64,52,67,5},
+				"Core", new int[] {62,52,65,5},
 				new Statement[] {
 					new Subgoal(
-						"Core", new int[] {65,8,67,5},
+						"Core", new int[] {63,8,65,5},
 						new Goal(
 							new Predicate("subgoal", new Term[] {
 								new Variable(Type.INTEGER, "X",false)
@@ -398,7 +407,7 @@ public class Core extends ASTRAClass {
 						)
 					),
 					new ModuleCall("UT",
-						"Core", new int[] {66,8,66,35},
+						"Core", new int[] {64,8,64,35},
 						new Predicate("assertEquals", new Term[] {
 							new Variable(new ObjectType(TestSuite.class), "suite"),
 							new Variable(Type.INTEGER, "X"),
@@ -422,6 +431,7 @@ public class Core extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"Core", new int[] {67,9,67,35},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("subgoal", new Term[] {
@@ -431,17 +441,18 @@ public class Core extends ASTRAClass {
 			),
 			Predicate.TRUE,
 			new Block(
-				"Core", new int[] {69,34,71,5},
+				"Core", new int[] {67,34,69,5},
 				new Statement[] {
 					new Assignment(
 						new Variable(Type.INTEGER, "Y"),
-						"Core", new int[] {70,8,71,5},
+						"Core", new int[] {68,8,69,5},
 						Primitive.newPrimitive(5)
 					)
 				}
 			)
 		));
 		addRule(new Rule(
+			"Core", new int[] {71,9,71,46},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("test_actionparam", new Term[] {
@@ -451,10 +462,10 @@ public class Core extends ASTRAClass {
 			),
 			Predicate.TRUE,
 			new Block(
-				"Core", new int[] {73,45,76,5},
+				"Core", new int[] {71,45,74,5},
 				new Statement[] {
 					new ModuleCall("M",
-						"Core", new int[] {74,8,74,21},
+						"Core", new int[] {72,8,72,21},
 						new Predicate("get", new Term[] {
 							new Variable(Type.LONG, "Y",false)
 						}),
@@ -471,7 +482,7 @@ public class Core extends ASTRAClass {
 						}
 					),
 					new ModuleCall("UT",
-						"Core", new int[] {75,8,75,36},
+						"Core", new int[] {73,8,73,36},
 						new Predicate("assertEquals", new Term[] {
 							new Variable(new ObjectType(TestSuite.class), "suite"),
 							new Variable(Type.LONG, "Y"),
@@ -495,6 +506,7 @@ public class Core extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"Core", new int[] {76,9,76,42},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("test_modterm", new Term[] {
@@ -504,10 +516,10 @@ public class Core extends ASTRAClass {
 			),
 			Predicate.TRUE,
 			new Block(
-				"Core", new int[] {78,41,80,5},
+				"Core", new int[] {76,41,78,5},
 				new Statement[] {
 					new ModuleCall("UT",
-						"Core", new int[] {79,8,79,51},
+						"Core", new int[] {77,8,77,51},
 						new Predicate("assertEquals", new Term[] {
 							new Variable(new ObjectType(TestSuite.class), "suite"),
 							new ModuleTerm("M", Type.STRING,
@@ -543,6 +555,7 @@ public class Core extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"Core", new int[] {80,9,80,39},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("test_wait", new Term[] {
@@ -552,10 +565,10 @@ public class Core extends ASTRAClass {
 			),
 			Predicate.TRUE,
 			new Block(
-				"Core", new int[] {82,38,87,5},
+				"Core", new int[] {80,38,85,5},
 				new Statement[] {
 					new SpawnGoal(
-						"Core", new int[] {83,8,87,5},
+						"Core", new int[] {81,8,85,5},
 						new Goal(
 							new Predicate("timeout", new Term[] {
 								Primitive.newPrimitive(1000)
@@ -563,7 +576,7 @@ public class Core extends ASTRAClass {
 						)
 					),
 					new ModuleCall("C",
-						"Core", new int[] {84,8,84,31},
+						"Core", new int[] {82,8,82,31},
 						new Predicate("println", new Term[] {
 							Primitive.newPrimitive("waiting...")
 						}),
@@ -580,11 +593,11 @@ public class Core extends ASTRAClass {
 						}
 					),
 					new Wait(
-						"Core", new int[] {85,8,87,5},
+						"Core", new int[] {83,8,85,5},
 						new Predicate("timed_out", new Term[] {})
 					),
 					new ModuleCall("C",
-						"Core", new int[] {86,8,86,25},
+						"Core", new int[] {84,8,84,25},
 						new Predicate("println", new Term[] {
 							Primitive.newPrimitive("done")
 						}),
@@ -604,6 +617,7 @@ public class Core extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"Core", new int[] {87,9,87,30},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("timeout", new Term[] {
@@ -613,10 +627,10 @@ public class Core extends ASTRAClass {
 			),
 			Predicate.TRUE,
 			new Block(
-				"Core", new int[] {89,29,93,5},
+				"Core", new int[] {87,29,91,5},
 				new Statement[] {
 					new ModuleCall("S",
-						"Core", new int[] {90,8,90,21},
+						"Core", new int[] {88,8,88,21},
 						new Predicate("sleep", new Term[] {
 							new Variable(Type.INTEGER, "time")
 						}),
@@ -633,17 +647,151 @@ public class Core extends ASTRAClass {
 						}
 					),
 					new BeliefUpdate('+',
-						"Core", new int[] {91,8,93,5},
+						"Core", new int[] {89,8,91,5},
 						new Predicate("timed_out", new Term[] {})
 					),
 					new BeliefUpdate('-',
-						"Core", new int[] {92,8,93,5},
+						"Core", new int[] {90,8,91,5},
 						new Predicate("timed_out", new Term[] {})
 					)
 				}
 			)
 		));
 		addRule(new Rule(
+			"Core", new int[] {93,9,93,40},
+			new GoalEvent('+',
+				new Goal(
+					new Predicate("timeout", new Term[] {
+						new Variable(Type.INTEGER, "time",false),
+						new Variable(Type.STRING, "X",false)
+					})
+				)
+			),
+			Predicate.TRUE,
+			new Block(
+				"Core", new int[] {93,39,97,5},
+				new Statement[] {
+					new ModuleCall("S",
+						"Core", new int[] {94,8,94,21},
+						new Predicate("sleep", new Term[] {
+							new Variable(Type.INTEGER, "time")
+						}),
+						new DefaultModuleCallAdaptor() {
+							public boolean inline() {
+								return false;
+							}
+
+							public boolean invoke(Intention intention, Predicate predicate) {
+								return ((astra.lang.System) intention.getModule("Core","S")).sleep(
+									(java.lang.Integer) intention.evaluate(predicate.getTerm(0))
+								);
+							}
+						}
+					),
+					new BeliefUpdate('+',
+						"Core", new int[] {95,8,97,5},
+						new Predicate("timed_out", new Term[] {
+							new Variable(Type.STRING, "X")
+						})
+					),
+					new BeliefUpdate('-',
+						"Core", new int[] {96,8,97,5},
+						new Predicate("timed_out", new Term[] {})
+					)
+				}
+			)
+		));
+		addRule(new Rule(
+			"Core", new int[] {99,9,99,40},
+			new GoalEvent('+',
+				new Goal(
+					new Predicate("test_wait2", new Term[] {
+						new Variable(new ObjectType(TestSuite.class), "suite",false)
+					})
+				)
+			),
+			Predicate.TRUE,
+			new Block(
+				"Core", new int[] {99,39,105,5},
+				new Statement[] {
+					new SpawnGoal(
+						"Core", new int[] {100,8,105,5},
+						new Goal(
+							new Predicate("timeout", new Term[] {
+								Primitive.newPrimitive(1000),
+								Primitive.newPrimitive("A")
+							})
+						)
+					),
+					new ModuleCall("C",
+						"Core", new int[] {101,8,101,31},
+						new Predicate("println", new Term[] {
+							Primitive.newPrimitive("waiting...")
+						}),
+						new DefaultModuleCallAdaptor() {
+							public boolean inline() {
+								return true;
+							}
+
+							public boolean invoke(Intention intention, Predicate predicate) {
+								return ((astra.lang.Console) intention.getModule("Core","C")).println(
+									(java.lang.String) intention.evaluate(predicate.getTerm(0))
+								);
+							}
+						}
+					),
+					new Wait(
+						"Core", new int[] {102,8,105,5},
+						new Predicate("timed_out", new Term[] {
+							new Variable(Type.STRING, "X",false)
+						})
+					),
+					new ModuleCall("C",
+						"Core", new int[] {103,8,103,31},
+						new Predicate("println", new Term[] {
+							Operator.newOperator('+',
+								Primitive.newPrimitive("done: "),
+								new Variable(Type.STRING, "X")
+							)
+						}),
+						new DefaultModuleCallAdaptor() {
+							public boolean inline() {
+								return true;
+							}
+
+							public boolean invoke(Intention intention, Predicate predicate) {
+								return ((astra.lang.Console) intention.getModule("Core","C")).println(
+									(java.lang.String) intention.evaluate(predicate.getTerm(0))
+								);
+							}
+						}
+					),
+					new ModuleCall("UT",
+						"Core", new int[] {104,8,104,38},
+						new Predicate("assertEquals", new Term[] {
+							new Variable(new ObjectType(TestSuite.class), "suite"),
+							new Variable(Type.STRING, "X"),
+							Primitive.newPrimitive("A")
+						}),
+						new DefaultModuleCallAdaptor() {
+							public boolean inline() {
+								return true;
+							}
+
+							public boolean invoke(Intention intention, Predicate predicate) {
+								return ((astra.unit.UnitTest) intention.getModule("Core","UT")).assertEquals(
+									(astra.unit.TestSuite) intention.evaluate(predicate.getTerm(0)),
+									(java.lang.String) intention.evaluate(predicate.getTerm(1)),
+									(java.lang.String) intention.evaluate(predicate.getTerm(2))
+								);
+							}
+						}
+					)
+				}
+			)
+		));
+		addRule(new Rule(
+			"Core", new int[] {107,9,107,39},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("test_when", new Term[] {
@@ -653,10 +801,10 @@ public class Core extends ASTRAClass {
 			),
 			Predicate.TRUE,
 			new Block(
-				"Core", new int[] {95,38,102,5},
+				"Core", new int[] {107,38,114,5},
 				new Statement[] {
 					new SpawnGoal(
-						"Core", new int[] {96,8,102,5},
+						"Core", new int[] {108,8,114,5},
 						new Goal(
 							new Predicate("timeout", new Term[] {
 								Primitive.newPrimitive(1000)
@@ -664,7 +812,7 @@ public class Core extends ASTRAClass {
 						)
 					),
 					new ModuleCall("C",
-						"Core", new int[] {97,8,97,31},
+						"Core", new int[] {109,8,109,31},
 						new Predicate("println", new Term[] {
 							Primitive.newPrimitive("waiting...")
 						}),
@@ -681,13 +829,13 @@ public class Core extends ASTRAClass {
 						}
 					),
 					new When(
-						"Core", new int[] {98,8,102,5},
+						"Core", new int[] {110,8,114,5},
 						new Predicate("timed_out", new Term[] {}),
 						new Block(
-							"Core", new int[] {98,26,100,9},
+							"Core", new int[] {110,26,112,9},
 							new Statement[] {
 								new ModuleCall("C",
-									"Core", new int[] {99,12,99,29},
+									"Core", new int[] {111,12,111,29},
 									new Predicate("println", new Term[] {
 										Primitive.newPrimitive("done")
 									}),
@@ -707,7 +855,7 @@ public class Core extends ASTRAClass {
 						)
 					),
 					new ModuleCall("C",
-						"Core", new int[] {101,8,101,26},
+						"Core", new int[] {113,8,113,26},
 						new Predicate("println", new Term[] {
 							Primitive.newPrimitive("after")
 						}),

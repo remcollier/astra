@@ -10,6 +10,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 
+import astra.debugger.Breakpoints;
 import astra.event.Event;
 import astra.event.GoalEvent;
 import astra.event.ModuleEvent;
@@ -171,8 +172,10 @@ public abstract class ASTRAClass implements Queryable {
 			
 			if (_event != null) {
 				Map<Integer, Term> bindings = Unifier.unify(_event, event, agent);
+				Breakpoints.getInstance().check(agent, rule, _event, bindings);
 				if (bindings != null) {
 					List<Map<Integer, Term>> results = agent.query(rule.context, bindings);
+					Breakpoints.getInstance().check(agent, rule, rule.context, results);
 					if (results != null) {
 						if (!results.isEmpty()) {
 							bindings.putAll(results.get(0));

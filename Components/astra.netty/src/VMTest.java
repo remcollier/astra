@@ -1,10 +1,11 @@
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 import com.sun.jdi.Bootstrap;
-import com.sun.jdi.ClassType;
-import com.sun.jdi.ReferenceType;
+import com.sun.jdi.IncompatibleThreadStateException;
+import com.sun.jdi.ObjectReference;
+import com.sun.jdi.StackFrame;
+import com.sun.jdi.ThreadReference;
 import com.sun.jdi.VirtualMachine;
 import com.sun.jdi.VirtualMachineManager;
 import com.sun.jdi.connect.AttachingConnector;
@@ -15,9 +16,28 @@ public class VMTest {
 	public static void main(String[] args) throws IOException {
 		VMTest test = new VMTest();
 		VirtualMachine vm = test.connect(8000);
-		List<ReferenceType> list = vm.classesByName("astra.core.Agent");
-//		((ClassType) list.get(0)).
+		
+		try {
+			for (ThreadReference thread : vm.allThreads()) {
+//				System.out.println(thread.name());
+//				System.out.println("status: "+thread.status());
+				if (thread.name().equals("pool-1-thread-1")) {
+					thread.suspend();
+					
+					for (StackFrame frame : thread.frames()) {
+						System.out.println(frame.thisObject());
+					}
+					StackFrame currentFrame = thread.frame(0);
+					ObjectReference object = currentFrame.thisObject();
+					System.out.println("object: " + object.toString());
+				}
+			}
+		} catch (IncompatibleThreadStateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
 	}
+	
 	/**
 	 * Call this with the localhost port to connect to.
 	 */
@@ -25,8 +45,7 @@ public class VMTest {
 		String strPort = Integer.toString(port);
 		AttachingConnector connector = getConnector();
 		try {
-			VirtualMachine vm = connect(connector, strPort);
-			return vm;
+			return connect(connector, strPort);
 		} catch (IllegalConnectorArgumentsException e) {
 			throw new IllegalStateException(e);
 		}
@@ -35,7 +54,6 @@ public class VMTest {
 	private AttachingConnector getConnector() {
 		VirtualMachineManager vmManager = Bootstrap.virtualMachineManager();
 		for (Connector connector : vmManager.attachingConnectors()) {
-			System.out.println(connector.name());
 			if ("com.sun.jdi.SocketAttach".equals(connector.name())) {
 				return (AttachingConnector) connector;
 			}

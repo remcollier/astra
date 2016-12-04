@@ -9,5 +9,6 @@ public interface Statement {
 	public boolean isLinkedToSource();
 
 	public int beginLine();
+	public int endLine();
 	public String getASTRAClass();
 }

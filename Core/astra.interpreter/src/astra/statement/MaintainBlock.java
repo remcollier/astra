@@ -1,10 +1,15 @@
 package astra.statement;
 
 import astra.core.Agent.Promise;
+
+import java.util.List;
+import java.util.Map;
+
 import astra.core.Intention;
 import astra.formula.Formula;
 import astra.formula.NOT;
 import astra.reasoner.util.ContextEvaluateVisitor;
+import astra.term.Term;
 
 public class MaintainBlock extends AbstractStatement {
 	Statement statement;
@@ -27,7 +32,7 @@ public class MaintainBlock extends AbstractStatement {
 				case 0:
 					intention.makePromise(promise = new Promise((Formula) formula.accept(new ContextEvaluateVisitor(intention)), true) {
 						@Override
-						public void act() {
+						public void act(List<Map<Integer, Term>> bindings) {
 							intention.failed("Maintenance Condition False: "+ formula);
 							intention.resume();
 						}

@@ -55,24 +55,26 @@ public class Send extends AbstractStatement {
 						}
 					}
 					
-					Object parameters = params.accept(visitor);
-					if (ListTerm.class.isInstance(parameters)) {
-//						System.out.println("params: " + parameters);
-						for (Term t : (ListTerm) parameters) {
-							if (Funct.class.isInstance(t)) {
-								Funct funct = (Funct) ((Funct) t).accept(visitor);
-								if (funct.size() > 1) {
-									context.failed("Unexpected Param in send(...): " + funct);
-									return false;
-								}
-								
-								if (funct.functor().equals("protocol")) {
-									message.protocol = ((Primitive<?>) funct.termAt(0)).value().toString();
-								} else if (funct.functor().equals("conversation_id")) {
-									message.conversationId = ((Primitive<?>) funct.termAt(0)).value().toString();
-								} else {
-									context.failed("Unexpected Param in send(...): " + funct);
-									return false;
+					if (params != null) {
+						Object parameters = params.accept(visitor);
+						if (ListTerm.class.isInstance(parameters)) {
+	//						System.out.println("params: " + parameters);
+							for (Term t : (ListTerm) parameters) {
+								if (Funct.class.isInstance(t)) {
+									Funct funct = (Funct) ((Funct) t).accept(visitor);
+									if (funct.size() > 1) {
+										context.failed("Unexpected Param in send(...): " + funct);
+										return false;
+									}
+									
+									if (funct.functor().equals("protocol")) {
+										message.protocol = ((Primitive<?>) funct.termAt(0)).value().toString();
+									} else if (funct.functor().equals("conversation_id")) {
+										message.conversationId = ((Primitive<?>) funct.termAt(0)).value().toString();
+									} else {
+										context.failed("Unexpected Param in send(...): " + funct);
+										return false;
+									}
 								}
 							}
 						}

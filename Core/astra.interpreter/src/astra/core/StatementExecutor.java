@@ -3,6 +3,7 @@ package astra.core;
 import java.util.Map;
 import java.util.Stack;
 
+import astra.debugger.Breakpoints;
 import astra.statement.StatementHandler;
 import astra.term.Term;
 import astra.term.Variable;
@@ -10,6 +11,7 @@ import astra.term.Variable;
 public class StatementExecutor implements Executor {
 	private Map<Integer, Term> bindings;
 	private Stack<StatementHandler> handlers = new Stack<StatementHandler>();
+	private boolean executed = false;
 	
 	public StatementExecutor(StatementHandler handler, Map<Integer, Term> bindings) {
 		this.bindings = bindings;
@@ -21,10 +23,16 @@ public class StatementExecutor implements Executor {
 	}
 
 	public boolean execute(Intention intention) {
-//		System.out.println("excuting: " + handlers.peek());
+//		System.out.println("executing: " + handlers.peek());
+//		if (!executed) {
+			Breakpoints.getInstance().check(intention.agent, handlers.peek().statement());
+//			executed = true;
+//		}
+		
 		if (!handlers.peek().execute(intention)) {
 			handlers.pop();
 		}
+		
 		return !handlers.isEmpty();
 	}
 

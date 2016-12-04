@@ -218,7 +218,7 @@ public class ASTRAParser {
 		// Re-insert left brace and process the statement...
 		tokens.add(0, tok);
 		return new RuleElement(event, context, createStatement(tokens),
-				first, last, tokenizer.getSource(first, last));
+				first, tok, tokenizer.getSource(first, tok));
 	}
 	
 	public RuleElement createSynchronizedRule(List<Token> tokens) throws ParseException {
@@ -427,19 +427,65 @@ public class ASTRAParser {
 		}
 		
 		String token = null;
-		IFormula formula = null;
 		switch ( tok.type ) {
-		case Token.SYNCHRONIZED:
 		case Token.MAINTAIN:
-			Token tok2 = tokens.remove(0);
+			List<Token> list = this.splitAt(tokens, new int[]{Token.RECOVER,Token.RIGHT_BRACE});
+			if (list.get(list.size()-1).type == Token.RECOVER) {
+				list.remove(list.size()-1);
+			}
+//			System.out.println("list: " + list);
+//			System.out.println("tokens: " + tokens);
+			Token tok2 = list.remove(0);
 			if (tok2.type != Token.LEFT_BRACKET) {
 				throw new ParseException("Illegal token: expected ( but got: " + tok2.token, tok2);
 			}
-			if (tok.type == Token.SYNCHRONIZED) {
-				token = tokens.remove(0).token;
-			} else {
-				formula = createFormula(splitAt(tokens, new int[] {Token.RIGHT_BRACKET}));
+			IFormula formula = createFormula(splitAt(list, new int[] {Token.RIGHT_BRACKET}));
+			tok2 = list.remove(0);
+			if (tok2.type != Token.RIGHT_BRACKET) {
+				throw new ParseException("Illegal token: expected ) but got: " + tok2.token, tok2);
 			}
+			tok = list.remove(0);
+			if (tok.type != Token.LEFT_BRACE) {
+				throw new ParseException("Illegal token: expected { but got: " + tok.token, tok);
+			}
+
+			List<IStatement> statements = new LinkedList<IStatement>();
+			if (getLast(list).type != Token.RIGHT_BRACE) {
+				throw new ParseException("Illegal token: expected } but got "+getLast(list).token, first, getLast(list));
+			}
+			
+			tok2 = list.get(0);
+			while ( tok2.type != Token.RIGHT_BRACE ) {
+				statements.add(createStatement(list));
+				if (list.isEmpty()) break;
+				tok2 = list.get(0);
+			}
+
+			List<IStatement> recover = new LinkedList<IStatement>();
+			if (!tokens.isEmpty() && tokens.get(0).type == Token.RECOVER) {
+				tok = tokens.remove(0);
+				if (tok.type != Token.LEFT_BRACE) {
+					throw new ParseException("Illegal token: expected { but got: " + tok.token, tok);
+				}
+	
+				if (getLast(tokens).type != Token.RIGHT_BRACE) {
+					throw new ParseException("Illegal token: expected } but got "+getLast(tokens).token, tok, getLast(tokens));
+				}
+				
+				tok2 = tokens.get(0);
+				while ( tok2.type != Token.RIGHT_BRACE ) {
+					recover.add(createStatement(tokens));
+					if (tokens.isEmpty()) break;
+					tok2 = tokens.get(0);
+				}
+			}			
+			return new MaintainBlockStatement(formula, statements, recover, first, last, tokenizer.getSource(first, last));
+		case Token.SYNCHRONIZED:
+			tok2 = tokens.remove(0);
+			if (tok2.type != Token.LEFT_BRACKET) {
+				throw new ParseException("Illegal token: expected ( but got: " + tok2.token, tok2);
+			}
+			token = tokens.remove(0).token;
 			tok2 = tokens.remove(0);
 			if (tok2.type != Token.RIGHT_BRACKET) {
 				throw new ParseException("Illegal token: expected ) but got: " + tok2.token, tok2);
@@ -448,7 +494,7 @@ public class ASTRAParser {
 		case Token.LEFT_BRACE:
 			// THERE IS AN ERROR IN THIS PART OF THE CODEBASE...
 			// we have a block...
-			List<IStatement> statements = new LinkedList<IStatement>();
+			statements = new LinkedList<IStatement>();
 			tokens.add(0, tok);
 			List<Token> t_list = splitAt(tokens, new int[] {Token.RIGHT_BRACE});
 			if (getLast(t_list).type != Token.RIGHT_BRACE) {
@@ -465,12 +511,10 @@ public class ASTRAParser {
 			
 			if (token != null) {
 				return new SynchronizedBlockStatement(token, statements, first, last, tokenizer.getSource(first, last));
-			} else if (formula != null) {
-				return new MaintainBlockStatement(formula, statements, first, last, tokenizer.getSource(first, last));
 			}
 			return new BlockStatement(statements, first, last, tokenizer.getSource(first, last));
 		case Token.SEND:
-			List<Token> list = splitAt(tokens, new int[] {Token.SEMI_COLON});
+			list = splitAt(tokens, new int[] {Token.SEMI_COLON});
 			semiColonCheck(list);
 			
 			last = getLast(list);
@@ -966,8 +1010,10 @@ public class ASTRAParser {
 			} else if (BRACKET_PAIRINGS.containsValue(token.type)) {
 				// If we have a close bracket and the bracketStack is
 				// empty, then we have a problem...
-				if (bracketStack.isEmpty())
-					throw new ParseException("Unexpected Bracket: " + token.token, first, last);
+				if (bracketStack.isEmpty()) {
+//					throw new ParseException("Unexpected Bracket: " + token.token, first, last);
+					return list;
+				}
 				
 				// Check if the closing bracket type matches the opening bracket type on top
 				// of the bracket stack - if not, we have a problem

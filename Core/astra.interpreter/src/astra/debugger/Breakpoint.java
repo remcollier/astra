@@ -1,10 +1,10 @@
-package astra.core;
+package astra.debugger;
 
 public class Breakpoint implements Comparable<Breakpoint> {
 	private int line;
-	private Class<?> cls;
+	private String cls;
 	
-	public Breakpoint(Class<?> cls, int line) {
+	public Breakpoint(String cls, int line) {
 		this.line = line;
 		this.cls = cls;
 	}
@@ -13,7 +13,7 @@ public class Breakpoint implements Comparable<Breakpoint> {
 		return line;
 	}
 	
-	public Class<?> getTargetClass() {
+	public String getTargetClass() {
 		return cls;
 	}
 	

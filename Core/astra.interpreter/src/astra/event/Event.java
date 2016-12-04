@@ -5,7 +5,7 @@ public interface Event {
 	public static final char REMOVAL = '-';
 	
 	public Object getSource();
-
+	
 	public String signature();
 
 }
