@@ -12,7 +12,7 @@ public class Logic extends Module {
 	}
 
 	@FORMULA
-	public Formula toPredicate(boolean value) {
+	public Formula eval(boolean value) {
 		return value ? Predicate.TRUE:Predicate.FALSE;
 	}
 	

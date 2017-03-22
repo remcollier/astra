@@ -20,6 +20,7 @@ public class FIPARequestProtocol extends ASTRAClass {
 	public FIPARequestProtocol() {
 		setParents(new Class[] {FIPAProtocol.class});
 		addRule(new Rule(
+			"astra.fipa.FIPARequestProtocol", new int[] {4,9,4,114},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("fipa_request", new Term[] {
@@ -50,6 +51,7 @@ public class FIPARequestProtocol extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"astra.fipa.FIPARequestProtocol", new int[] {8,9,8,91},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("fipa_request", new Term[] {
@@ -203,6 +205,7 @@ public class FIPARequestProtocol extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"astra.fipa.FIPARequestProtocol", new int[] {26,22,28,5},
 			new BeliefEvent('+',
 				new Predicate("fipa_timedout", new Term[] {
 					new Variable(Type.STRING, "id",false)
@@ -232,6 +235,7 @@ public class FIPARequestProtocol extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"astra.fipa.FIPARequestProtocol", new int[] {30,9,32,92},
 			new MessageEvent(
 				new Performative("refuse"),
 				new Variable(Type.STRING, "sender",false),
@@ -321,6 +325,7 @@ public class FIPARequestProtocol extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"astra.fipa.FIPARequestProtocol", new int[] {36,9,38,92},
 			new MessageEvent(
 				new Performative("agree"),
 				new Variable(Type.STRING, "sender",false),
@@ -410,6 +415,7 @@ public class FIPARequestProtocol extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"astra.fipa.FIPARequestProtocol", new int[] {42,9,44,92},
 			new MessageEvent(
 				new Performative("inform"),
 				new Variable(Type.STRING, "sender",false),
@@ -527,6 +533,7 @@ public class FIPARequestProtocol extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"astra.fipa.FIPARequestProtocol", new int[] {50,9,52,92},
 			new MessageEvent(
 				new Performative("failure"),
 				new Variable(Type.STRING, "sender",false),
@@ -616,6 +623,7 @@ public class FIPARequestProtocol extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"astra.fipa.FIPARequestProtocol", new int[] {56,9,57,92},
 			new MessageEvent(
 				new Performative("request"),
 				new Variable(Type.STRING, "sender",false),
@@ -677,19 +685,19 @@ public class FIPARequestProtocol extends ASTRAClass {
 					new If(
 						"astra.fipa.FIPARequestProtocol", new int[] {60,8,73,5},
 						new ModuleFormula("fipa_logic",
-							new Predicate("toPredicate", new Term[] {
+							new Predicate("eval", new Term[] {
 								new Variable(Type.BOOLEAN, "outcome")
 							}),
 						new ModuleFormulaAdaptor() {
 								public Formula invoke(BindingsEvaluateVisitor visitor, Predicate predicate) {
-									return ((astra.lang.Logic) visitor.agent().getModule("astra.fipa.FIPARequestProtocol","fipa_logic")).toPredicate(
+									return ((astra.lang.Logic) visitor.agent().getModule("astra.fipa.FIPARequestProtocol","fipa_logic")).eval(
 										(boolean) visitor.evaluate(predicate.getTerm(0))
 									);
 							}
 						}
 							),
 						new Block(
-							"astra.fipa.FIPARequestProtocol", new int[] {60,45,70,9},
+							"astra.fipa.FIPARequestProtocol", new int[] {60,38,70,9},
 							new Statement[] {
 								new TryRecover(
 									"astra.fipa.FIPARequestProtocol", new int[] {61,12,70,9},
@@ -740,6 +748,7 @@ public class FIPARequestProtocol extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"astra.fipa.FIPARequestProtocol", new int[] {75,9,75,87},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("fipa_request_validate", new Term[] {
@@ -762,6 +771,7 @@ public class FIPARequestProtocol extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"astra.fipa.FIPARequestProtocol", new int[] {79,9,79,84},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("fipa_request_execute", new Term[] {

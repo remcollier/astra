@@ -504,7 +504,9 @@ public class ComponentVisitor extends AbstractVisitor {
 	@Override
 	public Object visit(TRStatement statement, Object data)
 			throws ParseException {
-		statement.function().accept(this, data);
+		if (statement.function() != null) {
+			statement.function().accept(this, data);
+		}
 		return null;
 	}
 

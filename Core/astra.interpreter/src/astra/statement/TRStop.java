@@ -2,14 +2,10 @@ package astra.statement;
 
 import astra.core.Intention;
 import astra.formula.Predicate;
-import astra.reasoner.util.ContextEvaluateVisitor;
 
 public class TRStop extends AbstractStatement {
-	Predicate function;
-	
-	public TRStop(String clazz, int[] data, Predicate function) {
+	public TRStop(String clazz, int[] data) {
 		setLocation(clazz, data[0], data[1], data[2], data[3]);
-		this.function = function;
 	}
 
 	@Override
@@ -18,8 +14,10 @@ public class TRStop extends AbstractStatement {
 
 			@Override
 			public boolean execute(Intention context) {
-				ContextEvaluateVisitor visitor = new ContextEvaluateVisitor(context); 
-				context.stopFunction((Predicate) function.accept(visitor));
+				if (!context.stopFunction()) {
+					context.failed("No TR Function running");
+					return true;
+				}
 				return false;
 			}
 

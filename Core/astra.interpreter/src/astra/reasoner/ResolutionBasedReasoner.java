@@ -106,12 +106,18 @@ public class ResolutionBasedReasoner implements Reasoner {
 		return result;
 	}
 	
+	@Override
+	public List<Map<Integer, Term>> query(Formula formula, Map<Integer, Term> bindings) {
+		this.singleResult = false;
+		return doQuery(formula, bindings);
+	}
+
 	private List<Map<Integer, Term>> doQuery(Formula formula, Map<Integer, Term> initial) {
 		stack = new Stack<ReasonerStackEntry>();
 		formulae = new Stack<Formula>();
 		solutions = new LinkedList<Map<Integer, Term>>();
 
-//		System.out.println("\n\n========================== solving ==========================");
+//		System.out.println("\n\n========================== solving: "+formula+" ==========================");
 		stack.push(newStackEntry(formula, initial));
 		while (!stack.isEmpty() && stack.size() < MAX_DEPTH) {
 //			System.out.println("\n\n================================\n" + stack.size() + ": " + stack.peek());
@@ -147,9 +153,4 @@ public class ResolutionBasedReasoner implements Reasoner {
 		return !stack.isEmpty();
 	}
 
-	@Override
-	public List<Map<Integer, Term>> query(Formula formula, Map<Integer, Term> bindings) {
-		this.singleResult = false;
-		return doQuery(formula, bindings);
-	}
 }

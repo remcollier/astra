@@ -60,6 +60,10 @@ public class Agent {
 	public static boolean hasAgent(String name) {
 		return agents.containsKey(name);
 	}
+	
+	public static Set<String> agentNames() {
+		return agents.keySet();
+	}
 
 	// Agent States
 	public static final int NEW 									= 0;
@@ -86,8 +90,8 @@ public class Agent {
 	private Queue<Notification> completed = new LinkedList<Notification>();
 	private Queue<Intention> intentions = new LinkedList<Intention>();
     
-	// TR Functions
-	private List<Predicate> activeFunctions = new LinkedList<Predicate>();
+	// Activated TR Function / null if no function active
+	private Predicate trFunction;
 
 	// Class Hierarchy
     private ASTRAClass clazz;
@@ -263,8 +267,8 @@ public class Agent {
 		}
 
 		// Execute active functions
-		for (Predicate predicate : activeFunctions) {
-			new TRContext(this, predicate).execute();
+		if (trFunction != null) {
+			new TRContext(this, trFunction).execute();
 		}
 		
 		TraceManager.getInstance().recordEvent(new TraceEvent(TraceEvent.END_OF_CYCLE, Calendar.getInstance().getTime(), this));
@@ -437,7 +441,7 @@ public class Agent {
 	
 	public synchronized boolean isActive() {
 		if (!clazz.hasFunctions()) {
-			return !eventQueue.isEmpty() || !intentions.isEmpty() || (!sensorArray.isEmpty()) || beliefManager.hasUpdates() || !activeFunctions.isEmpty();
+			return !eventQueue.isEmpty() || !intentions.isEmpty() || (!sensorArray.isEmpty()) || beliefManager.hasUpdates() || (trFunction != null);
 		}
 		return true;
 	}
@@ -455,12 +459,16 @@ public class Agent {
 		return eventQueue;
 	}
 
-	public void startFunction(Predicate function) {
-		if (!activeFunctions.contains(function)) activeFunctions.add(function);
+	public boolean startFunction(Predicate function) {
+		if (trFunction != null) return false;
+		trFunction = function;
+		return true;
 	}
 
-	public void stopFunction(Predicate function) {
-		activeFunctions.remove(function);
+	public boolean stopFunction() {
+		if (trFunction == null) return false;
+		trFunction = null;
+		return true;
 	}
 
 	public Function getFunction(Predicate predicate) {

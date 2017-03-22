@@ -95,7 +95,7 @@ public class TRContext {
 		agent.schedule(task);
 	}
 
-	public void stopFunction(Predicate function) {
-		agent.stopFunction(function);
+	public void stopFunction() {
+		agent.stopFunction();
 	}
 }

@@ -68,6 +68,9 @@ public class EISAgent implements Queryable {
 		}
 
 		public synchronized void update(Collection<Percept> percepts) {
+			// Hack because EIS has been customised for Goal...
+			if (percepts.isEmpty()) return;
+			
 			incoming.addAll(percepts);
 			
 			// Step 1: Process incoming percepts
@@ -81,7 +84,7 @@ public class EISAgent implements Queryable {
 					next.put(percept.getName(), list = new LinkedList<Percept>());
 				}
 				list.add(percept);
-
+//				System.out.println("[" + agent.name()+"] adding: " + percept.toProlog());
 				
 				// Step 1b: Check if it was in the old percepts
 				list = current.get(percept.getName());

@@ -705,11 +705,15 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 	@Override
 	public Object visit(UpdateStatement statement, Object data)
 			throws ParseException {
-		code.append(data + "new BeliefUpdate('" + statement.op() + "',\n\t"
-				+ data + locationData(statement) + ",\n");
+		if (statement.op().equals("-+")) {
+			code.append(data + "new SpecialBeliefUpdate(\n\t");
+			
+		} else {
+			code.append(data).append("new BeliefUpdate('").append(statement.op()).append("',\n\t");
+		}
+		code.append(data).append(locationData(statement)).append(",\n");
 		statement.formula().accept(this, data + "\t");
 		code.append("\n" + data + ")");
-		;
 		return null;
 	}
 
@@ -811,11 +815,11 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 		if (statement.type().equals("start")) {
 			code.append(data + "new TRStart(\n\t" + data
 					+ locationData(statement) + ",\n");
+			statement.function().accept(this, data + "\t");
 		} else {
 			code.append(data + "new TRStop(\n\t" + data
-					+ locationData(statement) + ",\n");
+					+ locationData(statement) + "\n");
 		}
-		statement.function().accept(this, data + "\t");
 		code.append("\n" + data + ")");
 		return null;
 	}

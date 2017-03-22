@@ -8,6 +8,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.navigator.IDescriptionProvider;
 
 import astra.ast.core.ASTRAClassElement;
+import astra.ast.element.FunctionElement;
 import astra.ast.element.InitialElement;
 import astra.ast.element.ModuleElement;
 import astra.ast.element.PackageElement;
@@ -81,6 +82,8 @@ public class OutlineLabelProvider extends LabelProvider implements ILabelProvide
 			return ((InitialElement) element).formula().toString();
 		} else if (element instanceof RuleElement) {
 			return ((RuleElement) element).event().toString() + " : " + ((RuleElement) element).context().toString();
+		} else if (element instanceof FunctionElement) {
+			return ((FunctionElement) element).signature().toString();
 		} else if (element instanceof PlanElement) {
 			return ((PlanElement) element).signature().toString();
 		}
@@ -103,6 +106,8 @@ public class OutlineLabelProvider extends LabelProvider implements ILabelProvide
     		return JavaUI.getSharedImages().getImage(ISharedImages.IMG_FIELD_PRIVATE);
 		} else if (element instanceof RuleElement) {
             return JavaUI.getSharedImages().getImage(ISharedImages.IMG_OBJS_PUBLIC);
+		} else if (element instanceof FunctionElement) {
+            return JavaUI.getSharedImages().getImage(ISharedImages.IMG_FIELD_PUBLIC);
 		} else if (element instanceof PlanElement) {
 			return JavaUI.getSharedImages().getImage(ISharedImages.IMG_OBJS_PROTECTED);
 		}

@@ -20,6 +20,7 @@ public class Request extends ASTRAClass {
 	public Request() {
 		setParents(new Class[] {astra.fipa.FIPARequestProtocol.class});
 		addRule(new Rule(
+			"astra.fipa.Request", new int[] {6,9,6,28},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("main", new Term[] {

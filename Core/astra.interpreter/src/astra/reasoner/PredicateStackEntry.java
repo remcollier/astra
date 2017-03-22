@@ -20,6 +20,7 @@ public class PredicateStackEntry implements ReasonerStackEntry {
 	Predicate predicate;
 	Queue<Formula> options = new LinkedList<Formula>();
 	boolean solved = false;
+	int solutionCount = 0;
 	List<Map<Integer, Term>> solutions = new LinkedList<Map<Integer, Term>>();
 	Formula nextFormula;
 	Map<Integer, Term> initial;
@@ -54,22 +55,24 @@ public class PredicateStackEntry implements ReasonerStackEntry {
 		}
 		
 		if (options.isEmpty()) {
-//			System.out.println("\tFinished Predicate Matching");
-			if (solved) {
-//				System.out.println("\tSolved");
+			System.out.println("\tFinished Predicate Matching:" + solutionCount);
+			if (solutionCount > 0) {
+				System.out.println("\tSolved");
 				for (Map<Integer, Term> bindings : solutions) {
 					reasoner.propagateBindings(Utilities.merge(initial, bindings));
 				}
 			}
 			reasoner.stack.pop();
-			return solved;
+			return solutionCount > 0;
 		}
 		
 		nextFormula = (Formula) options.remove();
 		if (Predicate.class.isInstance(nextFormula)) {
+//			System.out.println("attempting to match: " + nextFormula);
 			Map<Integer, Term> bindings = Unifier.unify((Predicate) predicate.accept(visitor), (Predicate) nextFormula.accept(visitor), new HashMap<Integer, Term>(initial),reasoner.agent);
 			if (bindings != null) {
 				solved = true;
+				solutionCount++;
 				reasoner.propagateBindings(Utilities.mgu(Utilities.merge(initial, bindings)));
 				if (reasoner.singleResult) options.clear();
 			}
@@ -80,16 +83,21 @@ public class PredicateStackEntry implements ReasonerStackEntry {
 			Inference inference = (Inference) nextFormula;
 			RenameVisitor rvisitor = new RenameVisitor("rn_" + (counter++) + "_");
 			inference = (Inference) inference.accept(rvisitor);
-//			System.out.println("\tinference: " + inference);
+//			System.out.println("\tinference (applied): " + inference);
 			Map<Integer, Term> bindings = Unifier.unify((Predicate) predicate.accept(visitor), inference.head(), new HashMap<Integer, Term>(initial),reasoner.agent);
 //			System.out.println("\tbindings: " + bindings);
 			if (bindings != null) {
 //				System.out.println("SOLVED - " + toString());
 //				System.out.println("\tmerged: " + Utilities.mgu(Utilities.merge(rvisitor.bindings(), bindings)));
-				solved = true;
-//				propagateBindings(Utilities.merge(initial, Utilities.merge(rvisitor.bindings(), bindings)));
-//				System.out.println("\tpushing: " + inference.body().accept(new BindingsEvaluateVisitor(bindings, reasoner.agent)));
-				reasoner.stack.push(reasoner.newStackEntry((Formula) inference.body().accept(new BindingsEvaluateVisitor(bindings, reasoner.agent)), 
+				solutionCount++;
+				
+				// Removed the bindings evaluation here because it causes the module terms 
+				// to be evaluated...
+				// this should be delayed until necessary...
+				// but need to test this..
+				System.out.println("\tpushing: " + inference.body());//.accept(new BindingsEvaluateVisitor(bindings, reasoner.agent)));
+				reasoner.stack.push(reasoner.newStackEntry(
+						(Formula) inference.body(),//.accept(new BindingsEvaluateVisitor(bindings, reasoner.agent)), 
 						Utilities.mgu(Utilities.merge(initial, Utilities.merge(rvisitor.bindings(), bindings)))));
 				if (reasoner.singleResult) options.clear();
 			}
@@ -105,6 +113,7 @@ public class PredicateStackEntry implements ReasonerStackEntry {
 	@Override
 	public boolean failure() {
 //		System.out.println("[PredicateStackEntry]: Failure: " + predicate + " / " + options.size() + " / " + solutions.size());
+		solutionCount--;
 		if (options.isEmpty() && solutions.isEmpty()) return true;
 		// Do nothing, and propagate failure (this is called when a
 		// predicate cannot be solved)

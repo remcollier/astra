@@ -595,18 +595,20 @@ public class ASTRAParser {
 			list = splitAt(tokens, new int[] {Token.RIGHT_BRACE, Token.SEMI_COLON});
 			return new WhileStatement(guard, createStatement(list), 
 					first, last, tokenizer.getSource(first, last));
-		case Token.WHEN:
-			tok2 = tokens.get(0);
-			if (tok2.type != Token.LEFT_BRACKET) {
-				throw new ParseException("Malformed Statement: when(<formula>) <statement>", first, last);
-			}
-			
-			list = splitAt(tokens, new int[] {Token.RIGHT_BRACKET});
-			guard = createFormula(list.subList(1, list.size()-1));
-			
-			list = splitAt(tokens, new int[] {Token.RIGHT_BRACE, Token.SEMI_COLON});
-			return new WhenStatement(guard, createStatement(list), 
-					first, last, tokenizer.getSource(first, last));
+// 		WHEN statements are being removed from the language because they now perform the
+//		same function as wait
+//		case Token.WHEN:
+//			tok2 = tokens.get(0);
+//			if (tok2.type != Token.LEFT_BRACKET) {
+//				throw new ParseException("Malformed Statement: when(<formula>) <statement>", first, last);
+//			}
+//			
+//			list = splitAt(tokens, new int[] {Token.RIGHT_BRACKET});
+//			guard = createFormula(list.subList(1, list.size()-1));
+//			
+//			list = splitAt(tokens, new int[] {Token.RIGHT_BRACE, Token.SEMI_COLON});
+//			return new WhenStatement(guard, createStatement(list), 
+//					first, last, tokenizer.getSource(first, last));
 		case Token.WAIT:
 			
 			list = splitAt(tokens, new int[] {Token.SEMI_COLON});
@@ -655,7 +657,6 @@ public class ASTRAParser {
 			}
 			throw new ParseException("Malformed Statement: there should be a variable before the colon\n\tExpected Syntax: forall(<term> : <formula>))", first, last);
 		case Token.TR_START:
-		case Token.TR_STOP:
 			t_list = splitAt(tokens, new int[] {Token.SEMI_COLON});
 			last = getLast(t_list);
 			if (last.type != Token.SEMI_COLON) throw new ParseException("Missing Semi-colon", first, last);
@@ -667,8 +668,23 @@ public class ASTRAParser {
 			if (t_list.remove(t_list.size()-1).type != Token.RIGHT_BRACKET) {
 				throw new ParseException("Malformed Statement: missing right bracket\n\t" + tok.token + "wait(<formula>)", first, last);
 			}
-			return new TRStatement(tok.token, createPredicateOrVariableFormula(t_list),
-					first, last, tokenizer.getSource(first, last));
+			return new TRStatement(tok.token, createPredicateOrVariableFormula(t_list), first, last, tokenizer.getSource(first, last));
+		case Token.TR_STOP:
+			t_list = splitAt(tokens, new int[] {Token.SEMI_COLON});
+			last = getLast(t_list);
+			if (last.type != Token.SEMI_COLON) throw new ParseException("Missing Semi-colon", first, last);
+			t_list.remove(t_list.size()-1);
+			if (t_list.size() != 2) {
+				throw new ParseException("Malformed Statement: stop() should contain no parameters", first, last);
+			}
+			
+			if (t_list.remove(0).type != Token.LEFT_BRACKET) {
+				throw new ParseException("Malformed Statement: missing left bracket\n\t" + tok.token + "(<formula>)", first, last);
+			}
+			if (t_list.remove(t_list.size()-1).type != Token.RIGHT_BRACKET) {
+				throw new ParseException("Malformed Statement: missing right bracket\n\t" + tok.token + "wait(<formula>)", first, last);
+			}
+			return new TRStatement(tok.token, null, first, last, tokenizer.getSource(first, last));
 		case Token.TRY:
 			list = splitAt(tokens, new int[] {Token.RECOVER});
 			if (list.get(list.size()-1).type != Token.RECOVER) {
@@ -692,9 +708,17 @@ public class ASTRAParser {
 		case Token.MINUS:
 			list = splitAt(tokens, new int[] {Token.SEMI_COLON});
 			semiColonCheck(list);
-			PredicateFormula predicate = createPredicate(list);
-			return new UpdateStatement(tok.token, predicate,
-					first, last, tokenizer.getSource(first, last));
+			if (tok.type == Token.MINUS && list.get(0).type == Token.PLUS) {
+				list.remove(0);
+				PredicateFormula predicate = createPredicate(list);
+				// special case of -+update statement
+				return new UpdateStatement("-+", predicate,
+						first, last, tokenizer.getSource(first, last));
+			} else {
+				PredicateFormula predicate = createPredicate(list);
+				return new UpdateStatement(tok.token, predicate,
+						first, last, tokenizer.getSource(first, last));
+			}
 		case Token.IDENTIFIER:
 			// need to refine this further...
 			// now consider scoped operator + plan module call...
@@ -726,7 +750,7 @@ public class ASTRAParser {
 //				System.out.println("list: " + list);
 				if (tokens.get(0).type == Token.SEMI_COLON) tokens.remove(0);
 //				System.out.println("t_list: " + t_list);
-				predicate = createPredicate(t_list);
+				PredicateFormula predicate = createPredicate(t_list);
 //				System.out.println("t_list: " + t_list);
 				if (!t_list.isEmpty()) throw new ParseException("Unexpected end of statement", t_list.get(0), t_list.get(t_list.size()-1));
 				// we have a module call
@@ -954,8 +978,7 @@ public class ASTRAParser {
 					first, last, tokenizer.getSource(first, last));
 		} else if (tok.type == Token.IDENTIFIER) {
 			if (tokens.size() == 0) {
-				new RuntimeException("tokens is empty").printStackTrace();
-				System.exit(0);
+				throw new ParseException("Expected Formula, but got: " + tok.token, first, last);
 			}
 			Token tok2 = tokens.get(0);
 			if (tok2.type == Token.PERIOD) {

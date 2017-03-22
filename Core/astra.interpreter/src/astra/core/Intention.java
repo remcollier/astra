@@ -322,8 +322,12 @@ public class Intention {
 		return agent.queryAll(formula);
 	}
 
-	public void startFunction(Predicate function) {
-		agent.startFunction(function);
+	public boolean startFunction(Predicate function) {
+		return agent.startFunction(function);
+	}
+
+	public boolean stopFunction() {
+		return agent.stopFunction();
 	}
 
 	public StatementHandler getNextStatement() {
@@ -356,10 +360,6 @@ public class Intention {
 
 	public Plan getPlan(String scope, Predicate id) {
 		return agent.getPlan(scope, id);
-	}
-
-	public void stopFunction(Predicate function) {
-		agent.stopFunction(function);
 	}
 
 	public Term getVariableValue(Integer vid) {

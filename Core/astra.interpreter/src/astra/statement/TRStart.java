@@ -19,7 +19,10 @@ public class TRStart extends AbstractStatement {
 			@Override
 			public boolean execute(Intention context) {
 				ContextEvaluateVisitor visitor = new ContextEvaluateVisitor(context); 
-				context.startFunction((Predicate) function.accept(visitor));
+				if (!context.startFunction((Predicate) function.accept(visitor))) {
+					context.failed("A TR Function is already Active");
+					return true;
+				}
 				return false;
 			}
 

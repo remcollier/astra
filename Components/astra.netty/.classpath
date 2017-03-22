@@ -6,6 +6,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/astra.compiler"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/astra.apis"/>
 	<classpathentry kind="lib" path="lib/netty-all-4.1.5.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/Java/jdk1.8.0_45/lib/tools.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

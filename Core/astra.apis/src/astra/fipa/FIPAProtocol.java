@@ -20,6 +20,7 @@ public class FIPAProtocol extends ASTRAClass {
 	public FIPAProtocol() {
 		setParents(new Class[] {astra.lang.Agent.class});
 		addRule(new Rule(
+			"astra.fipa.FIPAProtocol", new int[] {24,22,31,5},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("fipa_conversation_id", new Term[] {
@@ -91,6 +92,7 @@ public class FIPAProtocol extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"astra.fipa.FIPAProtocol", new int[] {33,9,33,62},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("fipa_timeout", new Term[] {
@@ -110,7 +112,7 @@ public class FIPAProtocol extends ASTRAClass {
 						}),
 						new DefaultModuleCallAdaptor() {
 							public boolean inline() {
-								return true;
+								return false;
 							}
 
 							public boolean invoke(Intention intention, Predicate predicate) {
@@ -136,6 +138,7 @@ public class FIPAProtocol extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"astra.fipa.FIPAProtocol", new int[] {41,9,41,49},
 			new BeliefEvent('+',
 				new Predicate("fipa_timedout", new Term[] {
 					new Variable(Type.STRING, "conversation_id",false)
@@ -149,6 +152,7 @@ public class FIPAProtocol extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"astra.fipa.FIPAProtocol", new int[] {45,22,48,5},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("fipa_set_state", new Term[] {
@@ -186,6 +190,7 @@ public class FIPAProtocol extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"astra.fipa.FIPAProtocol", new int[] {49,22,51,5},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("fipa_set_state", new Term[] {
@@ -213,6 +218,7 @@ public class FIPAProtocol extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"astra.fipa.FIPAProtocol", new int[] {53,22,56,5},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("fipa_failed", new Term[] {
@@ -256,6 +262,7 @@ public class FIPAProtocol extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"astra.fipa.FIPAProtocol", new int[] {58,22,60,5},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("fipa_failed", new Term[] {
@@ -289,6 +296,7 @@ public class FIPAProtocol extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"astra.fipa.FIPAProtocol", new int[] {62,22,64,5},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("fipa_completed", new Term[] {
