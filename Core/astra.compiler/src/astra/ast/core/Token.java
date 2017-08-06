@@ -39,6 +39,7 @@ public class Token {
 	public static final int OBJECT = 29;
 	public static final int SPEECHACT = 30;
 	public static final int FUNCT = 58;
+	public static final int GOAL = 59;
 	
 	// PUNCTUATION
 	public static final int PERIOD = 31;
@@ -80,6 +81,7 @@ public class Token {
 	public static final int BOOLEAN_TYPE = 68;
 	public static final int OBJECT_TYPE = 69;
 	public static final int FUNCT_TYPE = 86;
+	public static final int GOAL_TYPE = 87;
 	public static final int RETURNS = 0;
 	
 	// STATEMENTS
@@ -145,6 +147,7 @@ public class Token {
 		typeMap.put("list", LIST_TYPE);
 		typeMap.put("formula", FORMULA);
 		typeMap.put("funct", FUNCT_TYPE);
+		typeMap.put("goal", GOAL_TYPE);
 		typeMap.put("returns", RETURNS);
 		
 		// Statements
@@ -225,6 +228,7 @@ public class Token {
 		typePrecedence.add(Token.OBJECT);
 		typePrecedence.add(Token.STRING);
 		typePrecedence.add(Token.FORMULA);
+		typePrecedence.add(Token.GOAL);
 		
 		typeToString.put(Token.INTEGER, "int");
 		typeToString.put(Token.LONG, "long");
@@ -247,6 +251,7 @@ public class Token {
 		typeToString.put(Token.LIST_TYPE, "list");
 		typeToString.put(Token.FUNCT_TYPE, "funct");
 		typeToString.put(Token.SPEECHACT_TYPE, "speechact");
+		typeToString.put(Token.GOAL_TYPE, "goal");
 	}
 	
 	protected Token() {

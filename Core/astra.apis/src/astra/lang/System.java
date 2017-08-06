@@ -17,6 +17,7 @@ import astra.core.AgentCreationException;
 import astra.core.Module;
 import astra.core.ModuleException;
 import astra.core.Scheduler;
+import astra.event.GoalEvent;
 import astra.execution.SchedulerStrategy;
 import astra.formula.Formula;
 import astra.formula.Goal;
@@ -46,23 +47,8 @@ public class System extends Module {
 	private static Map<String, AgentEntry> agents = new HashMap<String, AgentEntry>();
 	
 	/**
-	 * Internal method that indicates that the actions in this module not not need 
-	 * to be scheduled, but can be executed directly.
-	 */
-//	@Override
-//	public boolean inline() {
-//		return true;
-//	}
-	
-	@ACTION
-	public boolean setDebugging(boolean state) {
-		agent.setDebugging(state);
-		return true;
-	}
-	
-	/**
 	 * This internal method associates the agent with the module - this is overridden 
-	 * to storea reference to the agent in the agents map
+	 * to store a reference to the agent in the agents map
 	 */
 	@Override
 	public void setAgent(Agent agent) {
@@ -130,7 +116,7 @@ public class System extends Module {
 	 */
 	@ACTION
 	public boolean setMainGoal(String name, ListTerm args) {
-		agents.get(name).agent.initialize(new Goal(new Predicate("main", new Term[] {args})));
+		agents.get(name).agent.addEvent(new GoalEvent(GoalEvent.ADDITION, new Goal(new Predicate("main", new Term[] {args}))));
 		return true;
 	}
 	

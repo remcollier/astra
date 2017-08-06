@@ -2,7 +2,7 @@
 <feature
       id="astra.ide.feature"
       label="ASTRA IDE + JDT Compiler"
-      version="3.6.0.qualifier"
+      version="3.6.1.qualifier"
       provider-name="University College Dublin, Ireland">
 
    <description url="http://www.example.com/description">

@@ -13,7 +13,7 @@ public class BeliefEventUnifier implements EventUnifier<BeliefEvent> {
 
 	@Override
 	public Map<Integer, Term> unify(BeliefEvent source, BeliefEvent target, Agent agent) {
-		return (source.type() == target.type()) ? Unifier.unify((Predicate) source.belief(), (Predicate) source.belief(), agent):null;
+		return (source.type() == target.type()) ? Unifier.unify((Predicate) source.belief(), (Predicate) target.belief(), agent):null;
 	}
 
 }

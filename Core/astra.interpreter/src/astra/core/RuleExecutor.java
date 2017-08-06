@@ -137,7 +137,6 @@ public class RuleExecutor implements Executor {
 		int i=executors.size()-1;
 		while (i >= 0) {
 			StatementExecutor executor = executors.get(i--);
-			
 			if((executor.bindings() != null) && executor.bindings().containsKey(term.id())) {
 				return executor.bindings().get(term.id());
 			}
