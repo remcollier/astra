@@ -44,11 +44,19 @@ public class SpecialBeliefUpdate extends AbstractStatement {
 				Predicate belief = new Predicate(predicate.predicate(), terms);
 				Predicate matcher = new Predicate(predicate.predicate(), variables);
 
+				boolean matched = false;
 				List<Map<Integer, Term>> bindings = context.queryAll(matcher);
-				for (Map<Integer, Term> binding : bindings) {
-					context.removeBelief((Predicate) matcher.accept(new BindingsEvaluateVisitor(binding,context.agent)));
+				if (bindings != null) {
+					for (Map<Integer, Term> binding : bindings) {
+						Predicate bel = (Predicate) matcher.accept(new BindingsEvaluateVisitor(binding,context.agent));
+						if (bel.equals(belief)) {
+							matched = true;
+						} else {
+							context.removeBelief(bel);
+						}
+					}
 				}
-				context.addBelief(belief);
+				if (!matched) context.addBelief(belief);
 				
 				return false;
 			}

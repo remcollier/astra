@@ -1,5 +1,6 @@
 package astra.core;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import astra.event.Event;
 import astra.event.GoalEvent;
@@ -78,12 +81,12 @@ public class Agent {
 	private Intention intention;
 	
 	// Synchronization Fields
-	private Set<String> tokens = new HashSet<String>();
-    private Map<String, LinkedList<Intention>> lockQueueMap = new HashMap<String, LinkedList<Intention>>();
-    private Map<String, Intention> lockMap = new HashMap<String, Intention>();
+	private Set<String> tokens = new TreeSet<String>();
+    private Map<String, LinkedList<Intention>> lockQueueMap = new TreeMap<String, LinkedList<Intention>>();
+    private Map<String, Intention> lockMap = new TreeMap<String, Intention>();
 	
     // Event Queue
-	private Set<String> filter = new HashSet<String>();
+	private Set<String> filter = new TreeSet<String>();
 	private Queue<Event> eventQueue = new LinkedList<Event>();
 	
 	// Intention Management
@@ -95,19 +98,18 @@ public class Agent {
 
 	// Class Hierarchy
     private ASTRAClass clazz;
-	private Map<String, Fragment> linearization = new HashMap<String, Fragment>();
+	private Map<String, Fragment> linearization = new TreeMap<String, Fragment>();
 
 	// Reasoning Engine
 	private Reasoner reasoner;
 	private EventBeliefManager beliefManager;
-	private List<Promise> promises = new LinkedList<Promise>();
+	private List<Promise> promises = new ArrayList<Promise>();
 	
 	private List<SensorAdaptor> sensorArray = new LinkedList<SensorAdaptor>();
 
 	// Message Listeners - listener pattern to notify other classes of
 	// incoming/outgoing messages.
 	private List<AgentMessageListener> messageListeners = new LinkedList<AgentMessageListener>();
-	private boolean debugging = false;
 	
 	/**
 	 * This class models the notifications that are generated when an asynchronously executed action
@@ -216,8 +218,8 @@ public class Agent {
 			System.err.println("Event: " + event +" was not handled");
 			((Intention) event.getSource()).failed("Event was not matched to rule: " + event, null);
 			((Intention) event.getSource()).resume();
-		} else {
-			if (debugging ) System.err.println("Event: " + event +" was not handled");
+//		} else {
+//			System.err.println("Event: " + event +" was not handled");
 		}
 		return false;
 	}
@@ -288,7 +290,6 @@ public class Agent {
 	}
 
 	public List<Map<Integer, Term>> query(Formula formula, Map<Integer, Term> bindings) {
-//		System.out.println("QUery: " + formula);
 		return reasoner.query(formula, bindings);
 	}		
 
@@ -330,6 +331,7 @@ public class Agent {
 	}
 
 	public synchronized void receive(AstraMessage message) {
+//		System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 //		System.out.println("from: "+ message.sender + " to: " + message.receivers + " content: " + message.content);
 		for(AgentMessageListener listener : messageListeners) {
 			listener.receive(message);
@@ -343,26 +345,27 @@ public class Agent {
         if (message.conversationId != null) {
         	list.add(new Funct("conversation_id", new Term[] {Primitive.newPrimitive(message.conversationId) }));
         }
+        
         addEvent( new MessageEvent( new Performative(message.performative), Primitive.newPrimitive( message.sender ), ContentCodec.getInstance().decode(message.content), list ) );
     }
 	
 	public synchronized void addEvent(Event event) {
-//		System.out.println("[" + this.name + "] event: " + event.signature());
-//		System.out.println("[" + this.name + "] filter: " + filter);
 		if (filter.contains(event.signature())) {
-			synchronized (this) {
-//				System.out.println("[" + name + "] state: " + state);
-				if (state == INACTIVE) {
-					state = RESCHEDULE;
-				}
-			}
-			
 			eventQueue.add(event);
-			if (state == RESCHEDULE) {
-//				System.out.println("rescheduling: " + name);
+			
+//			System.out.println("[" + this.name + "] event: " + event);
+//			System.out.println("[" + this.name + "] state: " + Scheduler.getState(this));
+			
+			// Checking if an intelligent scheduling strategy is being used
+			// That pauses agents with nothing to do...
+			if (Scheduler.getState(this) == Scheduler.WAITING) {
+				Scheduler.setState(this, Scheduler.ACTIVE);
 				Scheduler.schedule(this);
+//				System.out.println("RESUMING: " + name);
 			}
 		}
+		
+		
 	}
 
 	public Queue<Intention> intentions() {
@@ -518,10 +521,6 @@ public class Agent {
 		return intention;
 	}
 
-	public void setDebugging(boolean debugging) {
-		this.debugging = debugging;
-	}
-	
 	public void addAgentMessageListener(AgentMessageListener listener) {
 		messageListeners.add(listener);
 	}
@@ -532,5 +531,9 @@ public class Agent {
 
 	public void dropPromise(Promise promise) {
 		promises.remove(promise);
+	}
+
+	public boolean hasActiveFunction() {
+		return this.trFunction != null;
 	}
 }

@@ -6,6 +6,6 @@ import astra.core.Agent;
 import astra.event.Event;
 import astra.term.Term;
 
-public interface EventUnifier {
-	public Map<Integer, Term> unify(Event source, Event target, Agent agent);
+public interface EventUnifier<T extends Event> {
+	public Map<Integer, Term> unify(T source, T target, Agent agent);
 }

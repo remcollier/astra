@@ -6,19 +6,15 @@ import java.util.List;
 import java.util.Map;
 
 import astra.core.Agent;
-import astra.event.Event;
 import astra.messaging.MessageEvent;
 import astra.reasoner.EventUnifier;
 import astra.reasoner.Unifier;
 import astra.term.Term;
 
-public class MessageEventUnifier implements EventUnifier {
+public class MessageEventUnifier implements EventUnifier<MessageEvent> {
 
 	@Override
-	public Map<Integer, Term> unify(Event source, Event target, Agent agent) {
-		MessageEvent s = (MessageEvent) source;
-		MessageEvent t = (MessageEvent) target;
-
+	public Map<Integer, Term> unify(MessageEvent s, MessageEvent t, Agent agent) {
 		List<Term> slist = new ArrayList<Term>();
 		List<Term> tlist = new ArrayList<Term>();
 		slist.add(s.performative());

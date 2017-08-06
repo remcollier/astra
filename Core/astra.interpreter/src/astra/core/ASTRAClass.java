@@ -168,8 +168,8 @@ public abstract class ASTRAClass implements Queryable {
 //			System.out.println("Event: " + _event);
 			if (_event instanceof ModuleEvent) {
 				_event = ((ModuleEvent) _event).adaptor().generate(agent,((ModuleEvent) _event).event());
+//				System.out.println("Module Event: " + _event);
 			}
-			System.out.println("Event: " + _event);
 			
 			if (_event != null) {
 				Map<Integer, Term> bindings = Unifier.unify(_event, event, agent);
@@ -177,7 +177,7 @@ public abstract class ASTRAClass implements Queryable {
 				if (bindings != null) {
 					List<Map<Integer, Term>> results = agent.query(rule.context, bindings);
 					Breakpoints.getInstance().check(agent, rule, rule.context, results);
-					System.out.println("results: " + results);
+//					System.out.println("results: " + results);
 					if (results != null) {
 						if (!results.isEmpty()) {
 							bindings.putAll(results.get(0));

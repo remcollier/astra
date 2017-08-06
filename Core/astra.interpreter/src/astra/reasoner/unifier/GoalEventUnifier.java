@@ -3,23 +3,15 @@ package astra.reasoner.unifier;
 import java.util.Map;
 
 import astra.core.Agent;
-import astra.event.Event;
 import astra.event.GoalEvent;
 import astra.reasoner.EventUnifier;
 import astra.reasoner.Unifier;
 import astra.term.Term;
 
-public class GoalEventUnifier implements EventUnifier {
-
+public class GoalEventUnifier implements EventUnifier<GoalEvent> {
 	@Override
-	public Map<Integer, Term> unify(Event source, Event target, Agent agent) {
-		GoalEvent s = (GoalEvent) source;
-		GoalEvent t = (GoalEvent) target;
-	
-		if  (s.type() == t.type()) {
-			return Unifier.unify(s.goal, t.goal, agent);
-		}
-		return null;
+	public Map<Integer, Term> unify(GoalEvent source, GoalEvent target, Agent agent) {
+		return (source.type() == target.type()) ? Unifier.unify(source.goal, target.goal, agent):null;
 	}
 
 }

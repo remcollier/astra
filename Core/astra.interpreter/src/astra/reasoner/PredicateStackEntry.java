@@ -55,9 +55,9 @@ public class PredicateStackEntry implements ReasonerStackEntry {
 		}
 		
 		if (options.isEmpty()) {
-			System.out.println("\tFinished Predicate Matching:" + solutionCount);
+//			System.out.println("\tFinished Predicate Matching:" + solutionCount);
 			if (solutionCount > 0) {
-				System.out.println("\tSolved");
+//				System.out.println("\tSolved");
 				for (Map<Integer, Term> bindings : solutions) {
 					reasoner.propagateBindings(Utilities.merge(initial, bindings));
 				}
@@ -95,7 +95,7 @@ public class PredicateStackEntry implements ReasonerStackEntry {
 				// to be evaluated...
 				// this should be delayed until necessary...
 				// but need to test this..
-				System.out.println("\tpushing: " + inference.body());//.accept(new BindingsEvaluateVisitor(bindings, reasoner.agent)));
+//				System.out.println("\tpushing: " + inference.body());//.accept(new BindingsEvaluateVisitor(bindings, reasoner.agent)));
 				reasoner.stack.push(reasoner.newStackEntry(
 						(Formula) inference.body(),//.accept(new BindingsEvaluateVisitor(bindings, reasoner.agent)), 
 						Utilities.mgu(Utilities.merge(initial, Utilities.merge(rvisitor.bindings(), bindings)))));

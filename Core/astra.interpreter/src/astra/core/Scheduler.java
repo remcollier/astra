@@ -6,6 +6,7 @@ public class Scheduler {
 	public static final int ACTIVE = 0;
 	public static final int INACTIVE = 1;
 	public static final int STEPPING = 2;
+	public static final int WAITING = 3;
 
 	private static SchedulerStrategy strategy;
 	
