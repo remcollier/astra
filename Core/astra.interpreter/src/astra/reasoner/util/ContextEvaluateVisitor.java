@@ -69,13 +69,41 @@ public class ContextEvaluateVisitor extends AbstractEvaluateVisitor {
 		}
 		return handler.handle(this, term, context);
 	}
+	
 	static {
 		addTermHandler(new Handler<Variable>() {
 			@Override public Class<Variable> getType() { return Variable.class; }
 			@Override public Object handle(LogicVisitor visitor, Variable variable, Intention context) {
 				Term term = context.getValue(variable);
 //				System.out.println(variable + " (" + variable.id() + ") " + term);
-				if (term == null) return variable;
+				
+				
+				// NOTE: Have added "|| term instanceof Variable" here to stop situations
+				// where variables that have been bound to other variables are substituted
+				// for the original variable.
+				// Specifically, this was causing a problem when an unbound variable is passed to
+				// a subgoal, and then the corresponding subgoal variable (which is still unbound)
+				// is passed to another subgoal:
+				//
+				// agent Test {
+				//     module Console C;
+				//
+				//     rule +!main(list args) {
+				//         !subTest(string X);
+				//         C.println("X="+X);
+				//     }
+				// 
+				//     rule +!subTest(string Y) {
+				//         !subsubTest(Y);
+				//         C.println("Y="+Y);
+				//     }
+				// 
+				//     rule +!subsubTest(string Z) {
+				//         Z = "yo! boyo";
+				//     }
+				// }
+				// The error occurs when declaring goal !subsubTest(Y)...				
+				if (term == null || term instanceof Variable) return variable;
 				return term;
 			}
 		});

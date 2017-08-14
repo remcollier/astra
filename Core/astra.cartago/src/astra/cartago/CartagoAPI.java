@@ -94,7 +94,7 @@ public class CartagoAPI implements ICartagoListener {
             	return true;
             }
             
-
+//           System.out.println("Handling: " + evt.getOp());
             // Handle update of the operation here...
     		// Create bindings for any unbound variables
     		Object paramValues[] = evt.getOp().getParamValues();
@@ -103,6 +103,7 @@ public class CartagoAPI implements ICartagoListener {
     			Term term = context.action.termAt(i);
     			if (term instanceof Variable) {
     				Variable var = (Variable) term;
+//    				System.out.println("\tEvaluating: " + var);
     				if (paramValues[i] instanceof OpFeedbackParam<?>){
     					OpFeedbackParam<?> feedbackParam = (OpFeedbackParam<?>) paramValues[i];
     					if (!var.type().equals(Type.getType(feedbackParam.get()))) {
@@ -274,12 +275,14 @@ public class CartagoAPI implements ICartagoListener {
 
 	@SuppressWarnings("rawtypes")
 	public LinkedList<Object> getArguments(Predicate activity) {
+		Term[] terms = activity.terms();
+		
 		LinkedList<Object> list = new LinkedList<Object>();
-		for (int i=0; i<activity.size(); i++) {
-			if (activity.termAt(i) instanceof Variable) {
+		for (int i=0; i<terms.length; i++) {
+			if (terms[i] instanceof Variable) {
 				list.add(new OpFeedbackParam());
-			} else if (activity.termAt(i) instanceof Primitive){
-				Object value = ((Primitive) activity.termAt(i)).value();
+			} else if (terms[i] instanceof Primitive){
+				Object value = ((Primitive) terms[i]).value();
 				if (value instanceof List) {
 					list.add(((List) value).toArray());
 				} else {

@@ -71,7 +71,7 @@ public class Intention {
 		}
 		
 		if (term instanceof Variable) {
-//			System.out.println(executors.peek().variableTrace());
+			System.out.println(executors.peek().variableTrace());
 			Term val = getValue((Variable) term);
 //			System.out.println("variable: " + term + " / value: " + val);
 			if (val instanceof NullTerm) {
@@ -88,6 +88,7 @@ public class Intention {
 		}
 		
 		if (term instanceof Operator || term instanceof ModuleTerm) {
+//			System.out.println("Processing: " + term);
 			Term t = (Term) term.accept(new ContextEvaluateVisitor(this));
 			if (t instanceof Primitive) {
 				return ((Primitive<T>) t).value();

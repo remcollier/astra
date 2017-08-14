@@ -183,6 +183,7 @@ public abstract class ASTRAClass implements Queryable {
 							bindings.putAll(results.get(0));
 						}
 	
+//						System.out.println("Selected Rule: " + rule.statement);
 						if (event.getSource() != null) {
 							Intention intention = (Intention) event.getSource();
 							intention.addSubGoal(event, rule, bindings);

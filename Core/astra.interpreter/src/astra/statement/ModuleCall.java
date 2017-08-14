@@ -42,6 +42,7 @@ public class ModuleCall extends AbstractStatement {
 						public void doTask() {
 							VariableVisitor visitor = new VariableVisitor();
 							method.accept(visitor);
+//							System.out.println("variables: " + visitor.variables());
 							context.addUnboundVariables(visitor.variables());
 							context.resetActionParams();
 							try {
@@ -98,6 +99,10 @@ public class ModuleCall extends AbstractStatement {
 				return ModuleCall.this;
 			}
 		};
+	}
+	
+	public String toString() {
+		return module+"."+method.toString();
 	}
 	
 }
