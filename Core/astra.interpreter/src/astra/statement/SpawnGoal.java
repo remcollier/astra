@@ -24,6 +24,7 @@ public class SpawnGoal extends AbstractStatement {
 			
 			@Override
 			public boolean execute(Intention context) {
+//				System.out.println("goal: " + goal);
 				context.addGoal(gl = (Goal) goal.accept(new ContextEvaluateVisitor(context)));
 				return false;
 			}

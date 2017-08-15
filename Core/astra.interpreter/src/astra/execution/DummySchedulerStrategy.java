@@ -17,7 +17,13 @@ public class DummySchedulerStrategy implements SchedulerStrategy {
 	public void schedule(Agent agent) {}
 
 	@Override
-	public void schedule(Task task) {}
+	public void schedule(Task task) {
+		new Thread() {
+			public void run() {
+				task.doTask();
+			}
+		}.start();
+	}
 
 	@Override
 	public void setThreadPoolSize(int size) {}

@@ -54,6 +54,7 @@ public class ModuleCall extends AbstractStatement {
 								
 								// ALTERNATIVE IS TO SUSPEND THE ACTION (BLOCK) AND 
 								// WAIT TO BE NOTIFIED
+//								System.out.println("[" + ModuleCall.class.getCanonicalName()+"] about to perform: " + method);
 								if (!adaptor.invoke(context, method)) {
 									context.notifyDone("Failed Action: " + module + "." + method);
 								}
@@ -72,9 +73,11 @@ public class ModuleCall extends AbstractStatement {
 					
 					context.suspend();
 					if (adaptor.inline()) {
+//						System.out.println("[" + getClass().getCanonicalName()+"] inline statement: " + method);
 //						if (context.getModule(null, module).inline() || adaptor.inline()) {
 						task.doTask();
 					} else {
+//						System.out.println("[" + ModuleCall.class.getCanonicalName()+"] not inline statement: " + method);
 						context.schedule(task);
 					}
 					state = 1;

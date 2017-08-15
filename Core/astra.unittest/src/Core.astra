@@ -93,7 +93,9 @@ agent Core extends astra.unit.ASTRAUnitTest {
 	}
 
 	rule +!timeout(int time, string X) {
+		C.println("in !timeout("+X+")");
 		S.sleep(time);
+		C.println("slept in !timeout("+X+")");
 		+timed_out(X);
 		-timed_out();
 	}
