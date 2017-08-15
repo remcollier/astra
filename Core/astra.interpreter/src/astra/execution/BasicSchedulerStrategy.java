@@ -13,7 +13,7 @@ import astra.execution.SchedulerStrategy;
 public class BasicSchedulerStrategy implements SchedulerStrategy {
 	private ExecutorService executor = Executors.newFixedThreadPool(2);
 	private Map<String, Integer> agents = new HashMap<String, Integer>();
-	private long sleepTime = 500;
+	private long sleepTime = 50;
 	
 	@Override
 	public void schedule(final Agent agent) {
