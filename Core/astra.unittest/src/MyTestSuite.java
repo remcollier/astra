@@ -1,12 +1,8 @@
 import astra.unit.TestSuite;
 
-public class MyTestSuite extends TestSuite {
-	public MyTestSuite() {
-		testClasses.add("Core");
-	}
-
+public class MyTestSuite {
 	public static void main(String[] args) {
-		MyTestSuite suite = new MyTestSuite();
+		TestSuite suite = new TestSuite(new String[] { "Core" });
 		suite.execute();
 		TestSuite.displayResults(suite);
 	}

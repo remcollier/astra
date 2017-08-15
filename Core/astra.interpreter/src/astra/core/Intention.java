@@ -71,7 +71,7 @@ public class Intention {
 		}
 		
 		if (term instanceof Variable) {
-			System.out.println(executors.peek().variableTrace());
+//			System.out.println(executors.peek().variableTrace());
 			Term val = getValue((Variable) term);
 //			System.out.println("variable: " + term + " / value: " + val);
 			if (val instanceof NullTerm) {
@@ -79,7 +79,7 @@ public class Intention {
 			}
 			
 			if (val == null) {
-				System.out.println("adding action param: " + term);
+//				System.out.println("adding action param: " + term);
 				ActionParam param = new ActionParam();
 				actionParams.put((Variable) term, param);
 				return (T) param;

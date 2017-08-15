@@ -104,7 +104,7 @@ public class Cartago extends Module {
 	}
 	
 	@EVENT( symbols={"+", "-"}, types = {"string", "funct" }, signature="$cpe" )
-	public Event event(String symbol, Term id, Term args) {
+	public Event property(String symbol, Term id, Term args) {
 		return new CartagoPropertyEvent(
 				Primitive.newPrimitive(symbol), 
 				id, 

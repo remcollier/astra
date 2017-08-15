@@ -11,7 +11,7 @@ import astra.core.Intention;
 import astra.core.Rule;
 import astra.core.Scheduler;
 import astra.event.GoalEvent;
-import astra.execution.BasicSchedulerStrategy;
+import astra.execution.DummySchedulerStrategy;
 import astra.formula.Goal;
 import astra.formula.Predicate;
 import astra.term.Primitive;
@@ -40,7 +40,7 @@ public class TestSuite {
 			return "["+(result ? "PASSED":"FAILED") + "] " + agent+"."+goal.formula().predicate()+" (steps: " + steps + ") -> " + message;
 		}
 	}
-
+	
 	/**
 	 * The test classes
 	 */
@@ -56,6 +56,13 @@ public class TestSuite {
 	 */
 	private Test current;
 	
+	
+	public TestSuite(String[] tests) {
+		for(String test : tests) {
+			testClasses.add(test);
+		}
+	}
+	
 	/**
 	 * Execution of the test suite: 
 	 * - for each test class specified in the test set, an agent is created
@@ -65,19 +72,21 @@ public class TestSuite {
 	 *   - the !teardown(TestSuite) goal is executed.
 	 *   - the agent is terminated  
 	 */
-	protected void execute() {
-		Scheduler.setStrategy(new BasicSchedulerStrategy());
+	public void execute() {
+		Scheduler.setStrategy(new DummySchedulerStrategy());
 		
 		try {
 			for (String clazz : testClasses) {
 				// The next line of code create an agent whose name is the key part of the entry and
 				// whose type (class) is the value part of the entry.
-				ASTRAClass cls = ((ASTRAClass) Class.forName(clazz).newInstance());
+				ASTRAClass cls = (ASTRAClass) Class.forName(clazz).newInstance();
 
 				buildTestList(cls);
 				
+				// Create the test agent
+				Agent agent = cls.newInstance(clazz);
+				
 				// Now execute the three goals that correspond to a test: 
-				Agent agent = cls.newInstance("testee");
 				executeIntention(agent, new Goal(new Predicate("setup", new Term[] {Primitive.newPrimitive(this)})));
 				for (int i=0; i<records.size(); i++) {
 					current = records.get(i);

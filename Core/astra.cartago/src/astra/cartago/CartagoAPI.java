@@ -249,10 +249,9 @@ public class CartagoAPI implements ICartagoListener {
         	if (obj != null) terms.add( Primitive.newPrimitive( obj ) );
         }
         
-        Predicate p = null;
         agent.addEvent( new CartagoSignalEvent(
         		Primitive.newPrimitive(artifactId.getName()),
-        		p = new Predicate( signal.getLabel(), terms.toArray( new Term[ terms.size() ] ) )
+        		new Predicate( signal.getLabel(), terms.toArray( new Term[ terms.size() ] ) )
         ) );
     }
 
@@ -292,7 +291,7 @@ public class CartagoAPI implements ICartagoListener {
 		}
 		return list;
 	}
-
+	
 	public ArtifactStore store() {
 		return artifactStore;
 	}
