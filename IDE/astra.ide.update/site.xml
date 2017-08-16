@@ -12,5 +12,8 @@
    <feature url="features/astra.ide.feature_3.6.2.201708150854.jar" id="astra.ide.feature" version="3.6.2.201708150854">
       <category name="astra.ide"/>
    </feature>
+   <feature url="features/astra.ide.feature_3.6.2.201708161902.jar" id="astra.ide.feature" version="3.6.2.201708161902">
+      <category name="astra.ide"/>
+   </feature>
    <category-def name="astra.ide" label="ASTRA IDE"/>
 </site>
