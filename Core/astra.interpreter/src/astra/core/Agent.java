@@ -387,8 +387,10 @@ public class Agent {
 		sensorArray.add(adaptor);
 	}
 	
-	public synchronized void notifyDone(Notification notification) {
-		completed.add(notification);
+	public void notifyDone(Notification notification) {
+		synchronized (completed) {
+			completed.add(notification);
+		}
 	}
 
 	public void schedule(Task task) {

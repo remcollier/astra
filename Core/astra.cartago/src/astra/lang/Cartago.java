@@ -175,23 +175,14 @@ public class Cartago extends Module {
 				// We have an artifact id...
 				Object o = ((Primitive<?>) term).value();
 				if (o instanceof ArtifactId) {
-					cartagoAPI.registerOperation(
-							cartagoAPI.getSession().doAction((ArtifactId) o, op, null, -1), 
-							context, activity
-					);
+					cartagoAPI.doOperation((ArtifactId) o, op, context, activity);
 				} else if (o instanceof String) {
-					cartagoAPI.registerOperation(
-							cartagoAPI.getSession().doAction(o.toString(), op, null, -1), 
-							context, activity
-					);
+					cartagoAPI.doOperation(o.toString(), op, context, activity);
 				} else {
 					throw new RuntimeException("Could not handle artifact id type: " + o.getClass().getName());
 				}
 			} else {
-				cartagoAPI.registerOperation(
-						cartagoAPI.getSession().doAction(op, null, -1), 
-						context, activity
-				);
+				cartagoAPI.doOperation(op, context, activity);
 			}
 			return true;
 		} catch (CartagoException e) {

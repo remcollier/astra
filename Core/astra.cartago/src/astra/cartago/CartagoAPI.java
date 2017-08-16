@@ -23,6 +23,7 @@ import cartago.CartagoException;
 import cartago.CartagoService;
 import cartago.ICartagoListener;
 import cartago.ICartagoSession;
+import cartago.Op;
 import cartago.OpFeedbackParam;
 import cartago.Tuple;
 import cartago.events.ActionFailedEvent;
@@ -88,6 +89,7 @@ public class CartagoAPI implements ICartagoListener {
         if ( ev instanceof ActionSucceededEvent ) {
             ActionSucceededEvent evt = (ActionSucceededEvent) ev;
 
+//            System.out.println("success: " + evt.getActionId());
             OperationContext context = operationRegister.remove( evt.getActionId() );
             if (context == null) {
             	// we have a TR action result (so ignore for now)
@@ -159,6 +161,7 @@ public class CartagoAPI implements ICartagoListener {
             }
         } else if ( ev instanceof ActionFailedEvent ) {
             ActionFailedEvent evt = (ActionFailedEvent) ev;
+//            System.out.println("failed: " + evt.getActionId());
             OperationContext context = operationRegister.remove( evt.getActionId() );
             
             context.intention.notifyDone("CARTAGO Action failed: " + context.intention.getNextStatement() + ": " + evt.getFailureMsg());
@@ -268,10 +271,6 @@ public class CartagoAPI implements ICartagoListener {
         return this.session;
     }
 
-    public synchronized void registerOperation( long actId, Intention context, Predicate action ) {
-        operationRegister.put( actId, new OperationContext(context, action) );
-    }
-
 	@SuppressWarnings("rawtypes")
 	public LinkedList<Object> getArguments(Predicate activity) {
 		Term[] terms = activity.terms();
@@ -294,6 +293,24 @@ public class CartagoAPI implements ICartagoListener {
 	
 	public ArtifactStore store() {
 		return artifactStore;
+	}
+
+	public synchronized void doOperation(ArtifactId artId, Op op, Intention context, Predicate activity) throws CartagoException {
+		long id = session.doAction(artId,op, null, -1);
+//		System.out.println("Registering: " + id);
+		operationRegister.put(id, new OperationContext(context, activity ) );
+	}
+
+	public synchronized void doOperation(String name, Op op, Intention context, Predicate activity) throws CartagoException {
+		long id = session.doAction(name, op, null, -1);
+//		System.out.println("Registering: " + id);
+		operationRegister.put( id, new OperationContext(context, activity ) );
+	}
+
+	public synchronized void doOperation(Op op, Intention context, Predicate activity) throws CartagoException {
+		long id = session.doAction(op, null, -1);
+//		System.out.println("Registering: " + id);
+		operationRegister.put( id, new OperationContext(context, activity ) );
 	}
 
 }
