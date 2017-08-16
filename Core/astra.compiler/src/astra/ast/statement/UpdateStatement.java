@@ -30,4 +30,8 @@ public class UpdateStatement extends AbstractElement implements IStatement {
 	public PredicateFormula formula() {
 		return formula;
 	}
+	
+	public String toString() {
+		return op + formula;
+	}
 }
