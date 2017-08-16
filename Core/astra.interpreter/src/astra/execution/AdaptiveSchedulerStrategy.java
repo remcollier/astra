@@ -33,18 +33,6 @@ public class AdaptiveSchedulerStrategy implements SchedulerStrategy {
 						System.exit(0);
 					}
 					
-//					try {
-//						Thread.sleep(sleepTime);
-//					} catch (InterruptedException e) {
-//						e.printStackTrace();
-//					}
-//			
-//					if (agent.name().equals("a1")) {
-//						System.out.println("[" + agent.name() + "] Events: " + agent.events());
-//						System.out.println("[" + agent.name() + "] Intentions: " + agent.intentions());
-//						System.out.println("[" + agent.name() + "] Has Active Fn: " + agent.hasActiveFunction());
-//					}
-					
 					if (isActive(agent)) {
 						Scheduler.schedule(agent);
 					} else {
