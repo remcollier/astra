@@ -37,16 +37,6 @@ import astra.trace.TraceEvent;
 import astra.trace.TraceManager;
 
 public class Agent {
-	/**
-	 * Promises are used to implement WAIT and WHEN statements. When one of these
-	 * statements is executed, the agent creates a promise and suspends the intention.
-	 * Promises are evaluated on each iteration. When a promise is fulfilled (i.e. the
-	 * associated formula is matched), the agent executes the associated act(ion) which
-	 * typically resumes the intention.
-	 * 
-	 * @author Rem
-	 *
-	 */
 	public static abstract class Promise {
 		public Formula formula;
 		public boolean isTrue;
@@ -202,7 +192,6 @@ public class Agent {
 	}
 
 	public boolean handleEvent(Event event) {
-//		System.out.println("["+getClass().getCanonicalName()+"] handling: "+ event);
 		try {
 			List<ASTRAClass> classList = clazz.getLinearization();
 			
@@ -387,10 +376,8 @@ public class Agent {
 		sensorArray.add(adaptor);
 	}
 	
-	public void notifyDone(Notification notification) {
-		synchronized (completed) {
-			completed.add(notification);
-		}
+	public synchronized void notifyDone(Notification notification) {
+		completed.add(notification);
 	}
 
 	public void schedule(Task task) {

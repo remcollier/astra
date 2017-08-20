@@ -102,7 +102,6 @@ public class ComponentVisitor extends AbstractVisitor {
 						type.start, type.end);
 
 			for (ILanguageDefinition definition : type.definitions()) {
-//				System.out.println("definition: " + definition.toSignature());
 				if (store.signatures.contains(definition.toSignature())) 
 					throw new ParseException("Conflict in ontology: " + type.name() + " for term: " + definition, 
 							type.start, type.end);
@@ -117,7 +116,6 @@ public class ComponentVisitor extends AbstractVisitor {
 		// Record the event part of any events that you find.
 		for (RuleElement rule : element.getRules()) {
 			try {
-//				rule.accept(this, store);
 				String signature = rule.event().toSignature();
 //				System.out.println("signature: " + signature);
 				if (!store.events.contains(signature)) store.events.add(signature);
@@ -271,8 +269,6 @@ public class ComponentVisitor extends AbstractVisitor {
 
 	@Override
 	public Object visit(PredicateFormula formula, Object data) throws ParseException {
-//		System.out.println("------------------------------------------------------");
-//		System.out.println("formula: " + formula);
 		for (ITerm term : formula.terms()) {
 			term.accept(this, data);
 		}
@@ -527,8 +523,6 @@ public class ComponentVisitor extends AbstractVisitor {
 		if (((VariableTypeStack) data).exists(term.identifier())) {
 			throw new ParseException("Duplicate variable declaration: " + term.identifier(), term);
 		}
-//		System.out.println("id: "+term.identifier());
-//		System.out.println("type: "+term.type());
 		((VariableTypeStack) data).addVariable(term.identifier(), term.type());
 		return null;
 	}
@@ -554,6 +548,8 @@ public class ComponentVisitor extends AbstractVisitor {
 
 	@Override
 	public Object visit(Variable term, Object data) throws ParseException {
+//		System.out.println("setting variable: " + term);
+//		((VariableTypeStack) data).dump();
 		IType type = ((VariableTypeStack) data).getType(term.identifier());
 		if (type == null) {
 			throw new ParseException("Undeclared variable: " + term.identifier(), term);
@@ -632,7 +628,6 @@ public class ComponentVisitor extends AbstractVisitor {
 	@Override
 	public Object visit(UpdateStatement statement, Object data)
 			throws ParseException {
-//		System.out.println("Here: "+ statement);
 		statement.formula().accept(this, data);
 		return null;
 	}

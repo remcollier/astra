@@ -80,6 +80,6 @@ public class ObjectType implements IType {
 	}
 	
 	public String toString() {
-		return clazz;
+		return "object<" + clazz + ">";
 	}
 }

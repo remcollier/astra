@@ -4,8 +4,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
-
 import astra.cartago.CartagoAPI;
 import astra.cartago.CartagoProperty;
 import astra.cartago.CartagoPropertyEvent;
@@ -26,7 +24,6 @@ import astra.reasoner.util.LogicVisitor;
 import astra.reasoner.util.RenameVisitor;
 import astra.reasoner.util.VariableVisitor;
 import astra.term.Funct;
-import astra.term.ListTerm;
 import astra.term.Primitive;
 import astra.term.Term;
 import astra.term.Variable;
@@ -104,7 +101,7 @@ public class Cartago extends Module {
 	}
 	
 	@EVENT( symbols={"+", "-"}, types = {"string", "funct" }, signature="$cpe" )
-	public Event property(String symbol, Term id, Term args) {
+	public Event event(String symbol, Term id, Term args) {
 		return new CartagoPropertyEvent(
 				Primitive.newPrimitive(symbol), 
 				id, 
@@ -118,18 +115,6 @@ public class Cartago extends Module {
 				id, 
 				new Predicate(((Funct) args).functor(), ((Funct) args).terms())
 		);
-	}
-	
-	@TERM
-	public Object[] params(ListTerm list) {
-		Object[] array = new Object[list.size()];
-		for (int i=0;i<array.length;i++) {
-			Term term = list.get(i);
-			if (term instanceof Primitive) {
-				array[i] = ((Primitive) term).value();				
-			}
-		}
-		return array;
 	}
 
 	/**
@@ -155,10 +140,8 @@ public class Cartago extends Module {
 			activity = (Predicate) new Predicate(funct.functor(), funct.terms());
 		}
 
-//		System.out.println("Activity (before) = "+ activity);
 		ContextEvaluateVisitor visitor = new ContextEvaluateVisitor(context);
 		activity = (Predicate) activity.accept(visitor);
-//		System.out.println("Activity (after) = "+ activity);
 		LinkedList<Object> list = cartagoAPI.getArguments(activity);
 		op = list.isEmpty() ? new Op(activity.predicate()):new Op(activity.predicate(), list.toArray());
 		
@@ -166,23 +149,30 @@ public class Cartago extends Module {
 		try {
 			context.suspend();
 			if (action.predicate().equals("operation") && action.size() == 2) {
-				// Assume the first argument is the artifact id
 				Term term = (Term) action.termAt(0).accept(visitor);
 				if (!Primitive.class.isInstance(term)) {
-					throw new RuntimeException("Failed to bind ArtifactId for CArtAgO Operation: " + action);
+					throw new RuntimeException("Failed CArtAgO Operation: " + action);
 				}
-				
 				// We have an artifact id...
 				Object o = ((Primitive<?>) term).value();
 				if (o instanceof ArtifactId) {
-					cartagoAPI.doOperation((ArtifactId) o, op, context, activity);
+					cartagoAPI.registerOperation(
+							cartagoAPI.getSession().doAction((ArtifactId) o, op, null, -1), 
+							context, activity
+					);
 				} else if (o instanceof String) {
-					cartagoAPI.doOperation(o.toString(), op, context, activity);
+					cartagoAPI.registerOperation(
+							cartagoAPI.getSession().doAction(o.toString(), op, null, -1), 
+							context, activity
+					);
 				} else {
 					throw new RuntimeException("Could not handle artifact id type: " + o.getClass().getName());
 				}
 			} else {
-				cartagoAPI.doOperation(op, context, activity);
+				cartagoAPI.registerOperation(
+						cartagoAPI.getSession().doAction(op, null, -1), 
+						context, activity
+				);
 			}
 			return true;
 		} catch (CartagoException e) {

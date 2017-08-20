@@ -79,7 +79,7 @@ public class Intention {
 			}
 			
 			if (val == null) {
-//				System.out.println("adding action param: " + term);
+				System.out.println("adding action param: " + term);
 				ActionParam param = new ActionParam();
 				actionParams.put((Variable) term, param);
 				return (T) param;
@@ -88,7 +88,6 @@ public class Intention {
 		}
 		
 		if (term instanceof Operator || term instanceof ModuleTerm) {
-//			System.out.println("Processing: " + term);
 			Term t = (Term) term.accept(new ContextEvaluateVisitor(this));
 			if (t instanceof Primitive) {
 				return ((Primitive<T>) t).value();

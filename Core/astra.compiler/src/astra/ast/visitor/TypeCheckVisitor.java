@@ -205,7 +205,6 @@ public class TypeCheckVisitor implements IElementVisitor {
 		return null;
 	}
 
-	int count=0;
 	@Override
 	public Object visit(PredicateFormula formula, Object data) throws ParseException {
 		if (!skipOntology && !((ComponentStore) data).signatures.contains(formula.toSignature()))

@@ -627,27 +627,10 @@ public class Core extends ASTRAClass {
 			),
 			Predicate.TRUE,
 			new Block(
-				"Core", new int[] {87,29,93,5},
+				"Core", new int[] {87,29,91,5},
 				new Statement[] {
-					new ModuleCall("C",
-						"Core", new int[] {88,8,88,40},
-						new Predicate("println", new Term[] {
-							Primitive.newPrimitive("Starting timeout...")
-						}),
-						new DefaultModuleCallAdaptor() {
-							public boolean inline() {
-								return true;
-							}
-
-							public boolean invoke(Intention intention, Predicate predicate) {
-								return ((astra.lang.Console) intention.getModule("Core","C")).println(
-									(java.lang.String) intention.evaluate(predicate.getTerm(0))
-								);
-							}
-						}
-					),
 					new ModuleCall("S",
-						"Core", new int[] {89,8,89,21},
+						"Core", new int[] {88,8,88,21},
 						new Predicate("sleep", new Term[] {
 							new Variable(Type.INTEGER, "time")
 						}),
@@ -663,36 +646,19 @@ public class Core extends ASTRAClass {
 							}
 						}
 					),
-					new ModuleCall("C",
-						"Core", new int[] {90,8,90,33},
-						new Predicate("println", new Term[] {
-							Primitive.newPrimitive("Timed out...")
-						}),
-						new DefaultModuleCallAdaptor() {
-							public boolean inline() {
-								return true;
-							}
-
-							public boolean invoke(Intention intention, Predicate predicate) {
-								return ((astra.lang.Console) intention.getModule("Core","C")).println(
-									(java.lang.String) intention.evaluate(predicate.getTerm(0))
-								);
-							}
-						}
-					),
 					new BeliefUpdate('+',
-						"Core", new int[] {91,8,93,5},
+						"Core", new int[] {89,8,91,5},
 						new Predicate("timed_out", new Term[] {})
 					),
 					new BeliefUpdate('-',
-						"Core", new int[] {92,8,93,5},
+						"Core", new int[] {90,8,91,5},
 						new Predicate("timed_out", new Term[] {})
 					)
 				}
 			)
 		));
 		addRule(new Rule(
-			"Core", new int[] {95,9,95,40},
+			"Core", new int[] {93,9,93,40},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("timeout", new Term[] {
@@ -703,33 +669,10 @@ public class Core extends ASTRAClass {
 			),
 			Predicate.TRUE,
 			new Block(
-				"Core", new int[] {95,39,101,5},
+				"Core", new int[] {93,39,97,5},
 				new Statement[] {
-					new ModuleCall("C",
-						"Core", new int[] {96,8,96,39},
-						new Predicate("println", new Term[] {
-							Operator.newOperator('+',
-								Primitive.newPrimitive("in !timeout("),
-								Operator.newOperator('+',
-									new Variable(Type.STRING, "X"),
-									Primitive.newPrimitive(")")
-								)
-							)
-						}),
-						new DefaultModuleCallAdaptor() {
-							public boolean inline() {
-								return true;
-							}
-
-							public boolean invoke(Intention intention, Predicate predicate) {
-								return ((astra.lang.Console) intention.getModule("Core","C")).println(
-									(java.lang.String) intention.evaluate(predicate.getTerm(0))
-								);
-							}
-						}
-					),
 					new ModuleCall("S",
-						"Core", new int[] {97,8,97,21},
+						"Core", new int[] {94,8,94,21},
 						new Predicate("sleep", new Term[] {
 							new Variable(Type.INTEGER, "time")
 						}),
@@ -745,44 +688,21 @@ public class Core extends ASTRAClass {
 							}
 						}
 					),
-					new ModuleCall("C",
-						"Core", new int[] {98,8,98,45},
-						new Predicate("println", new Term[] {
-							Operator.newOperator('+',
-								Primitive.newPrimitive("slept in !timeout("),
-								Operator.newOperator('+',
-									new Variable(Type.STRING, "X"),
-									Primitive.newPrimitive(")")
-								)
-							)
-						}),
-						new DefaultModuleCallAdaptor() {
-							public boolean inline() {
-								return true;
-							}
-
-							public boolean invoke(Intention intention, Predicate predicate) {
-								return ((astra.lang.Console) intention.getModule("Core","C")).println(
-									(java.lang.String) intention.evaluate(predicate.getTerm(0))
-								);
-							}
-						}
-					),
 					new BeliefUpdate('+',
-						"Core", new int[] {99,8,101,5},
+						"Core", new int[] {95,8,97,5},
 						new Predicate("timed_out", new Term[] {
 							new Variable(Type.STRING, "X")
 						})
 					),
 					new BeliefUpdate('-',
-						"Core", new int[] {100,8,101,5},
+						"Core", new int[] {96,8,97,5},
 						new Predicate("timed_out", new Term[] {})
 					)
 				}
 			)
 		));
 		addRule(new Rule(
-			"Core", new int[] {103,9,103,40},
+			"Core", new int[] {99,9,99,40},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("test_wait2", new Term[] {
@@ -792,10 +712,10 @@ public class Core extends ASTRAClass {
 			),
 			Predicate.TRUE,
 			new Block(
-				"Core", new int[] {103,39,109,5},
+				"Core", new int[] {99,39,105,5},
 				new Statement[] {
 					new SpawnGoal(
-						"Core", new int[] {104,8,109,5},
+						"Core", new int[] {100,8,105,5},
 						new Goal(
 							new Predicate("timeout", new Term[] {
 								Primitive.newPrimitive(1000),
@@ -804,7 +724,7 @@ public class Core extends ASTRAClass {
 						)
 					),
 					new ModuleCall("C",
-						"Core", new int[] {105,8,105,31},
+						"Core", new int[] {101,8,101,31},
 						new Predicate("println", new Term[] {
 							Primitive.newPrimitive("waiting...")
 						}),
@@ -821,13 +741,13 @@ public class Core extends ASTRAClass {
 						}
 					),
 					new Wait(
-						"Core", new int[] {106,8,109,5},
+						"Core", new int[] {102,8,105,5},
 						new Predicate("timed_out", new Term[] {
 							new Variable(Type.STRING, "X",false)
 						})
 					),
 					new ModuleCall("C",
-						"Core", new int[] {107,8,107,31},
+						"Core", new int[] {103,8,103,31},
 						new Predicate("println", new Term[] {
 							Operator.newOperator('+',
 								Primitive.newPrimitive("done: "),
@@ -847,7 +767,7 @@ public class Core extends ASTRAClass {
 						}
 					),
 					new ModuleCall("UT",
-						"Core", new int[] {108,8,108,38},
+						"Core", new int[] {104,8,104,38},
 						new Predicate("assertEquals", new Term[] {
 							new Variable(new ObjectType(TestSuite.class), "suite"),
 							new Variable(Type.STRING, "X"),
@@ -863,6 +783,90 @@ public class Core extends ASTRAClass {
 									(astra.unit.TestSuite) intention.evaluate(predicate.getTerm(0)),
 									(java.lang.String) intention.evaluate(predicate.getTerm(1)),
 									(java.lang.String) intention.evaluate(predicate.getTerm(2))
+								);
+							}
+						}
+					)
+				}
+			)
+		));
+		addRule(new Rule(
+			"Core", new int[] {107,9,107,39},
+			new GoalEvent('+',
+				new Goal(
+					new Predicate("test_when", new Term[] {
+						new Variable(new ObjectType(TestSuite.class), "suite",false)
+					})
+				)
+			),
+			Predicate.TRUE,
+			new Block(
+				"Core", new int[] {107,38,114,5},
+				new Statement[] {
+					new SpawnGoal(
+						"Core", new int[] {108,8,114,5},
+						new Goal(
+							new Predicate("timeout", new Term[] {
+								Primitive.newPrimitive(1000)
+							})
+						)
+					),
+					new ModuleCall("C",
+						"Core", new int[] {109,8,109,31},
+						new Predicate("println", new Term[] {
+							Primitive.newPrimitive("waiting...")
+						}),
+						new DefaultModuleCallAdaptor() {
+							public boolean inline() {
+								return true;
+							}
+
+							public boolean invoke(Intention intention, Predicate predicate) {
+								return ((astra.lang.Console) intention.getModule("Core","C")).println(
+									(java.lang.String) intention.evaluate(predicate.getTerm(0))
+								);
+							}
+						}
+					),
+					new When(
+						"Core", new int[] {110,8,114,5},
+						new Predicate("timed_out", new Term[] {}),
+						new Block(
+							"Core", new int[] {110,26,112,9},
+							new Statement[] {
+								new ModuleCall("C",
+									"Core", new int[] {111,12,111,29},
+									new Predicate("println", new Term[] {
+										Primitive.newPrimitive("done")
+									}),
+									new DefaultModuleCallAdaptor() {
+										public boolean inline() {
+											return true;
+										}
+
+										public boolean invoke(Intention intention, Predicate predicate) {
+											return ((astra.lang.Console) intention.getModule("Core","C")).println(
+												(java.lang.String) intention.evaluate(predicate.getTerm(0))
+											);
+										}
+									}
+								)
+							}
+						)
+					),
+					new ModuleCall("C",
+						"Core", new int[] {113,8,113,26},
+						new Predicate("println", new Term[] {
+							Primitive.newPrimitive("after")
+						}),
+						new DefaultModuleCallAdaptor() {
+							public boolean inline() {
+								return true;
+							}
+
+							public boolean invoke(Intention intention, Predicate predicate) {
+								return ((astra.lang.Console) intention.getModule("Core","C")).println(
+									(java.lang.String) intention.evaluate(predicate.getTerm(0))
 								);
 							}
 						}

@@ -24,7 +24,7 @@ public class Wait extends AbstractStatement {
 			Promise promise;
 			
 			@Override
-			public boolean execute(Intention intention) {
+			public boolean execute(final Intention intention) {
 				switch (state) {
 				case 1:
 					state = 0;

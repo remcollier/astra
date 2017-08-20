@@ -43,12 +43,4 @@ public class Block extends AbstractStatement {
 			}
 		};
 	}
-	
-	public String toString() {
-		String out = "{\n";
-		for (int i=0; i<statements.length;i++) {
-			out += statements[i].toString()+"\n";
-		}
-		return out+"}";
-	}
 }

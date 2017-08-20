@@ -27,7 +27,7 @@ public class MaintainBlock extends AbstractStatement {
 			int state = 0;
 			Promise promise;
 			
-			public boolean execute(Intention intention) {
+			public boolean execute(final Intention intention) {
 				switch (state) {
 				case 0:
 					intention.makePromise(promise = new Promise((Formula) formula.accept(new ContextEvaluateVisitor(intention)), true) {

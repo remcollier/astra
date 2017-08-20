@@ -142,8 +142,8 @@ public abstract class AbstractEvaluateVisitor implements LogicVisitor {
 				// Need to check if the bindings have been generated yet...
 				Term il = (Term) comparison.left().accept(visitor);
 				Term ir = (Term) comparison.right().accept(visitor);
-//				System.out.println("\til: "+ il);
-//				System.out.println("\tir: "+ ir);
+	//			System.out.println("\til: "+ il);
+	//			System.out.println("\tir: "+ ir);
 				if (il instanceof Variable || ir instanceof Variable) return new Comparison(comparison.operator(), il,ir);
 				
 				if (Type.isNumeric(il) && Type.isNumeric(ir)) {

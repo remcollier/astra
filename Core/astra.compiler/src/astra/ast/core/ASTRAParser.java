@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Stack;
 
 import astra.ast.definition.FormulaDefinition;
-import astra.ast.definition.TypeDefinition;
 import astra.ast.element.FunctionElement;
 import astra.ast.element.InferenceElement;
 import astra.ast.element.InitialElement;
@@ -52,6 +51,7 @@ import astra.ast.statement.TRStatement;
 import astra.ast.statement.TryRecoverStatement;
 import astra.ast.statement.UpdateStatement;
 import astra.ast.statement.WaitStatement;
+import astra.ast.statement.WhenStatement;
 import astra.ast.statement.WhileStatement;
 import astra.ast.term.Brackets;
 import astra.ast.term.Function;
@@ -1343,38 +1343,33 @@ public class ASTRAParser {
 				if (tok.type != Token.IDENTIFIER) throw new ParseException("Identifier expected, but got: " +tok.token, start, end);
 				String identifier = tok.token;
 				
-				List<TypeDefinition> types = new ArrayList<TypeDefinition>();
+				List<Integer> types = new ArrayList<Integer>();
 				tok = list.remove(0);
 				if (tok.type != Token.LEFT_BRACKET) throw new ParseException("Missing left bracket, got: " + tok.token, start, end);
 				tok = list.remove(0);
 				while (!list.isEmpty() && tok.type != Token.RIGHT_BRACKET) {
-					if (tok.type==20) {
-						// This is an identifier - so the type should be a Java classname
-						String cls = tok.token;
-						while ((list.get(0).type != Token.COMMA) && (list.get(0).type != Token.RIGHT_BRACKET)) {
-							cls += list.remove(0).token;
-						}
-						types.add(new TypeDefinition(cls, Token.OBJECT_TYPE));
-					} else {
-						if (Token.isType(tok.type))  {
-							types.add(new TypeDefinition(tok.token, tok.type));
-						} else {
-							throw new ParseException("The arguments of a formula definition must be types, but got: " + tok.token, start, end);
-						}
-					}
+					if (!Token.isType(tok.type)) 
+						throw new ParseException("The arguments of a formula definition must be types, but got: " + tok.token, start, end);
+					types.add(tok.type);
 					tok = list.remove(0);
-					if (tok.type != Token.RIGHT_BRACKET) {
-						if (tok.type != Token.COMMA)
-							throw new ParseException("Error in formula definition: expected a close bracket or a comma, but got: " + tok.token, start, end);
-						tok = list.remove(0);
-					}
+					if (tok.type == Token.RIGHT_BRACKET) break;
+
+					if (tok.type != Token.COMMA)
+						throw new ParseException("Error in formula definition: expected a close bracket or a comma, but got: " + tok.token, start, end);
+					tok = list.remove(0);
 				}
 				
 				if (tok.type != Token.RIGHT_BRACKET) 
 					throw new ParseException("Malformed formula description", start, end);
 				
+				// Convert to int array
+				int[] ptypes = new int[types.size()];
+				for (int i=0; i < ptypes.length; i++) {
+					ptypes[i] = types.get(i);
+				}
+				
 				if (list.size() == 1 && list.get(0).type == Token.SEMI_COLON) 
-					definitions.add(new FormulaDefinition(identifier, types.toArray(new TypeDefinition[types.size()]) , start, end, tokenizer.getSource(start, end)));
+					definitions.add(new FormulaDefinition(identifier, ptypes, start, end, tokenizer.getSource(start, end)));
 				else
 					throw new ParseException("Unexpected termination of formula definition", start, end);
 				break;

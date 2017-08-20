@@ -18,9 +18,9 @@ public class ASTRAPartitionScanner extends RuleBasedPartitionScanner {
 	public final static String ASTRA_PUNCTUATION = "__astra_punctuation";
 	
 	String[] keywords = new String[] {"try", "recover", "if", "else", "rule",
-			"import", "module", "foreach", "forall", "while", "wait", "initial",
+			"import", "module", "foreach", "forall", "while", "when", "wait", "initial",
 			"plan", "agent", "extends", "abstract", "string", "int", "long",
-			"float", "double", "char", "boolean", "list", "start",
+			"float", "double", "char", "boolean", "object", "list", "start",
 			"stop", "active", "count_bindings", "function", "query", "send", 
 			"@message", "package", "synchronized", "true", "false", "speechact",
 			"funct", "formula","inference", "bind", "types", "maintain", "returns"

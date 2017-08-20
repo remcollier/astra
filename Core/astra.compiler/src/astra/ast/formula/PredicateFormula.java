@@ -52,7 +52,7 @@ public class PredicateFormula extends AbstractElement implements IFormula {
 		StringBuffer buf = new StringBuffer();
 		buf.append("formula:" + predicate);
 		for (int i=0; i < terms.size(); i++) {
-			buf.append(":" + terms.get(i).type());
+			buf.append(":" + Token.toTypeString(terms.get(i).type().type()));
 		}
 		return buf.toString();
 	}

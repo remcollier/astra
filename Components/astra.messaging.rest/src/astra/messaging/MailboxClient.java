@@ -34,6 +34,7 @@ public class MailboxClient {
 		Gson gson = new Gson();
 		MailboxClient client = new MailboxClient();
 		
+
 		
 		// Check the sessions
 		System.out.println(client.get(SESSION_URL));

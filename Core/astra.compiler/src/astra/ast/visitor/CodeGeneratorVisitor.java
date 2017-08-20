@@ -228,7 +228,7 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 		}
 //		} else {
 			code.append("\tpublic static void main(String[] args) {\n")
-				.append("\t\tScheduler.setStrategy(new AdaptiveSchedulerStrategy());\n")
+				.append("\t\tScheduler.setStrategy(new BasicSchedulerStrategy());\n")
 				.append("\t\tListTerm argList = new ListTerm();\n")
 				.append("\t\tfor (String arg: args) {\n")
 				.append("\t\t\targList.add(Primitive.newPrimitive(arg));\n")
