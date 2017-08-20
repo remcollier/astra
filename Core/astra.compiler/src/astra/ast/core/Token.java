@@ -143,7 +143,7 @@ public class Token {
 		typeMap.put("string", STRING_TYPE);
 		typeMap.put("boolean", BOOLEAN_TYPE);
 		typeMap.put("speechact", SPEECHACT_TYPE);
-		typeMap.put("object", OBJECT_TYPE);
+//		typeMap.put("object", OBJECT_TYPE);
 		typeMap.put("list", LIST_TYPE);
 		typeMap.put("formula", FORMULA);
 		typeMap.put("funct", FUNCT_TYPE);

@@ -85,13 +85,17 @@ agent Core extends astra.unit.ASTRAUnitTest {
 	}
 	
 	rule +!timeout(int time) {
+		C.println("Starting timeout...");
 		S.sleep(time);
+		C.println("Timed out...");
 		+timed_out();
 		-timed_out();
 	}
 
 	rule +!timeout(int time, string X) {
+		C.println("in !timeout("+X+")");
 		S.sleep(time);
+		C.println("slept in !timeout("+X+")");
 		+timed_out(X);
 		-timed_out();
 	}
@@ -103,13 +107,5 @@ agent Core extends astra.unit.ASTRAUnitTest {
 		C.println("done: " + X);
 		UT.assertEquals(suite, X, "A");
 	}
-	
-	rule +!test_when(TestSuite suite) {
-		!!timeout(1000);
-		C.println("waiting...");
-		when(timed_out()) {
-			C.println("done");
-		}
-		C.println("after");
-	}
+
 }

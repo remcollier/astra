@@ -8,9 +8,9 @@ import astra.ast.core.Token;
 
 public class FormulaDefinition extends AbstractElement implements ILanguageDefinition {
 	private String name;
-	private int[] types;
+	private TypeDefinition[] types;
 	
-	public FormulaDefinition(String name, int[] types, Token start, Token end, String source) {
+	public FormulaDefinition(String name, TypeDefinition[] types, Token start, Token end, String source) {
 		super(start, end, source);
 
 		this.name = name;
@@ -28,7 +28,7 @@ public class FormulaDefinition extends AbstractElement implements ILanguageDefin
 		buf.append("(");
 		for (int i=0; i < types.length; i++) {
 			if (i > 0) buf.append(",");
-			buf.append(Token.toTypeString(types[i]));
+			buf.append(types[i].token);
 		}
 		buf.append(")");
 		return buf.toString();
@@ -38,8 +38,8 @@ public class FormulaDefinition extends AbstractElement implements ILanguageDefin
 	public String toSignature() {
 		StringBuffer buf = new StringBuffer();
 		buf.append("formula:"+name);
-		for (int type : types) {
-			buf.append(":"+Token.toTypeString(type));
+		for (TypeDefinition type : types) {
+			buf.append(":"+type.token);
 		}
 		return buf.toString();
 	}

@@ -24,7 +24,7 @@ public class When extends AbstractStatement {
 		return new StatementHandler() {
 			int state = 0;
 			@Override
-			public boolean execute(final Intention intention) {
+			public boolean execute(Intention intention) {
 				switch(state) {
 				case 0:
 					intention.makePromise(new Promise((Formula) guard.accept(new ContextEvaluateVisitor(intention))) {

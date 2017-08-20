@@ -180,7 +180,7 @@ public class WebServer {
 
 	public static void writeFileResponse(final ChannelHandlerContext ctx, final FullHttpRequest request, String file_uri) throws Exception {
 		File file = new File(file_uri);
-		final RandomAccessFile raf = new RandomAccessFile(file, "r");
+		RandomAccessFile raf = new RandomAccessFile(file, "r");
 		HttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
 		HttpUtil.setContentLength(response, raf.length());
 		

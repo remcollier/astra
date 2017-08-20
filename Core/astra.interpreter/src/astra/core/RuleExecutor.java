@@ -30,6 +30,7 @@ public class RuleExecutor implements Executor {
 		unbound = new HashMap<Integer, Term>();
 		
 		for (Entry<Integer, Term> entry : bindings.entrySet()) {
+//			System.out.println("Checking: " + entry.getKey() + " / "+ entry.getValue());
 			if (entry.getValue() instanceof Variable) {
 				Variable var = ((Variable) entry.getValue());
 				unbound.put(var.id(), new Variable(var.type(), entry.getKey()));
