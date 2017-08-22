@@ -21,6 +21,11 @@ public class Predicate implements Formula {
 		this.id = mapper.toId(predicate);
 		this.terms = terms;
 	}
+	
+	private Predicate(int id, Term[] terms) {
+		this.id = id;
+		this.terms = terms;
+	}
 
 	public Predicate(String predicate) {
 		this(predicate, Term.EMPTY_ARRAY);
@@ -101,5 +106,13 @@ public class Predicate implements Formula {
 
 	public Term termAt(int i) {
 		return terms[i];
+	}
+	
+	public Predicate clone() {
+		Term[] values = new Term[terms.length];
+		for (int i=0;i<terms.length; i++) {
+			values[i] = terms[i].clone();
+		}
+		return new Predicate(id, values);
 	}
 }

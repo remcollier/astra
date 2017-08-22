@@ -83,4 +83,8 @@ public class ModuleTerm implements Term {
 	public String module() {
 		return module;
 	}
+	
+	public ModuleTerm clone() {
+		return this;
+	}
 }

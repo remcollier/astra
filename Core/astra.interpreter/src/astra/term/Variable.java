@@ -63,4 +63,7 @@ public class Variable implements Term {
 		return null;
 	}
 
+	public Variable clone() {
+		return this;
+	}
 }

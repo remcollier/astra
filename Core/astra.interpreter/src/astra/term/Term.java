@@ -18,5 +18,7 @@ public interface Term extends Serializable {
 
 	public String signature();
 
+	public Term clone();
+
 
 }

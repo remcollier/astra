@@ -77,4 +77,8 @@ public class Operator implements Term {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public Operator clone() {
+		return new Operator(op, type, left.clone(), right.clone());
+	}
 }

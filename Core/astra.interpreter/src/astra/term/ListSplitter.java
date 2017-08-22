@@ -52,5 +52,9 @@ public class ListSplitter implements Term {
 	public String toString() {
 		return "[" + head + "|" + tail+ "]";
 	}
+	
+	public ListSplitter clone() {
+		return new ListSplitter((Variable) head.clone(), (Variable) tail.clone());
+	}
 
 }

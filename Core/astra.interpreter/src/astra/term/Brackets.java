@@ -46,5 +46,9 @@ public class Brackets implements Term {
 	public String toString() {
 		return "(" + term + ")";
 	}
+	
+	public Brackets clone() {
+		return new Brackets(term.clone());
+	}
 
 }

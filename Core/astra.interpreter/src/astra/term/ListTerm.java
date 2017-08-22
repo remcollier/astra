@@ -208,4 +208,12 @@ public class ListTerm implements Term, List<Term> {
 	public Term remove(int index) {
 		return terms.remove(index);
 	}
+	
+	public ListTerm clone() {
+		ListTerm values = new ListTerm();
+		for (Term term : this) {
+			values.add(term.clone());
+		}
+		return values;
+	}
 }

@@ -34,14 +34,19 @@ public class ModuleCall extends AbstractStatement {
 		return new StatementHandler() {
 			int state = 0;
 			AbstractTask task;
+			Predicate action;
+			
 			@Override
 			public boolean execute(final Intention context) {
 				switch (state) {
 				case 0:
 					task= new AbstractTask() {
 						public void doTask() {
+//							System.out.println("about to clone");
+							action = method.clone();
+//							System.out.println("cloned");
 							VariableVisitor visitor = new VariableVisitor();
-							method.accept(visitor);
+							action.accept(visitor);
 //							System.out.println("variables: " + visitor.variables());
 							context.addUnboundVariables(visitor.variables());
 							context.resetActionParams();
@@ -55,13 +60,17 @@ public class ModuleCall extends AbstractStatement {
 								// ALTERNATIVE IS TO SUSPEND THE ACTION (BLOCK) AND 
 								// WAIT TO BE NOTIFIED
 //								System.out.println("[" + ModuleCall.class.getCanonicalName()+"] about to perform: " + method);
-								if (!adaptor.invoke(context, method)) {
-									context.notifyDone("Failed Action: " + module + "." + method);
+//								System.out.println("[" + ModuleCall.class.getCanonicalName()+"] about to perform: " + action);
+								if (!adaptor.invoke(context, action)) {
+									context.notifyDone("Failed Action: " + module + "." + action);
 								}
+//								System.out.println("[" + ModuleCall.class.getCanonicalName()+"] done performing: " + method);
+//								System.out.println("[" + ModuleCall.class.getCanonicalName()+"] done performing: " + action);
+								
 								context.applyActionParams();
 								if (!adaptor.suppressNotification()) context.notifyDone(null);
 							} catch (Throwable th) {
-								context.notifyDone("Failed Action: " + module + "." + method, th);
+								context.notifyDone("Failed Action: " + module + "." + action, th);
 							}
 						}
 
@@ -73,11 +82,8 @@ public class ModuleCall extends AbstractStatement {
 					
 					context.suspend();
 					if (adaptor.inline()) {
-//						System.out.println("[" + getClass().getCanonicalName()+"] inline statement: " + method);
-//						if (context.getModule(null, module).inline() || adaptor.inline()) {
 						task.doTask();
 					} else {
-//						System.out.println("[" + ModuleCall.class.getCanonicalName()+"] not inline statement: " + method);
 						context.schedule(task);
 					}
 					state = 1;

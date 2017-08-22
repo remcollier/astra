@@ -32,5 +32,9 @@ public class NullTerm implements Term {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public NullTerm clone() {
+		return this;
+	}
 
 }

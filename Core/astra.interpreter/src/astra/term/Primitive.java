@@ -55,4 +55,8 @@ public class Primitive<T> implements Term {
 	public String signature() {
 		return "PR:"+value;
 	}
+	
+	public Primitive<T> clone() {
+		return this;
+	}
 }

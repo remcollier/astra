@@ -49,4 +49,7 @@ public class QueryTerm implements Term {
 		return "query(" + formula.toString() + ")";
 	}
 
+	public QueryTerm clone() {
+		return null;
+	}
 }

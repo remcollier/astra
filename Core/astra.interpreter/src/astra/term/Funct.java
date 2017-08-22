@@ -1,7 +1,5 @@
 package astra.term;
 
-import astra.formula.Formula;
-import astra.formula.Predicate;
 import astra.reasoner.util.LogicVisitor;
 import astra.reasoner.util.StringMapper;
 import astra.type.Type;
@@ -19,6 +17,11 @@ public class Funct implements Term {
 
 		this.id = mapper.toId(predicate);
 		this.terms = terms;
+	}
+
+	private Funct(int id, Term[] terms) {
+		this.id=id;
+		this.terms=terms;
 	}
 
 	public Term getTerm(int i) {
@@ -111,4 +114,11 @@ public class Funct implements Term {
 		terms[i] = term;
 	}
 
+	public Funct clone() {
+		Term[] values = new Term[terms.length];
+		for (int i=0;i<terms.length; i++) {
+			values[i] = terms[i].clone();
+		}
+		return new Funct(id, terms);
+	}
 }

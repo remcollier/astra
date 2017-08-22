@@ -55,4 +55,7 @@ public class Performative implements Term {
 		return "PE:"+stringId;
 	}
 
+	public Performative clone() {
+		return this;
+	}
 }

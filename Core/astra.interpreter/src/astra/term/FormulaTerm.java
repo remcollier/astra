@@ -38,5 +38,9 @@ public class FormulaTerm implements Term {
 	public String toString() {
 		return formula.toString();
 	}
+	
+	public FormulaTerm clone() {
+		return new FormulaTerm(formula);
+	}
 
 }
