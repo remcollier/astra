@@ -121,7 +121,7 @@ public class Request extends ASTRAClass {
 	}
 
 	public static void main(String[] args) {
-		Scheduler.setStrategy(new BasicSchedulerStrategy());
+		Scheduler.setStrategy(new AdaptiveSchedulerStrategy());
 		ListTerm argList = new ListTerm();
 		for (String arg: args) {
 			argList.add(Primitive.newPrimitive(arg));

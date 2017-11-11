@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import astra.core.ASTRAClass;
 import astra.core.ASTRAClassNotFoundException;
@@ -477,6 +478,20 @@ public class System extends Module {
 	@ACTION
 	public boolean setSleepTime(long time) {
 		Scheduler.setSleepTime(time);
+		return true;
+	}
+	
+	/**
+	 * Displays the agent timings table
+	 */
+	@ACTION
+	public boolean displayTimings() {
+		for (Entry<String, Long> entry : Agent.timings.entrySet()) {
+			java.lang.System.out.println("| " + 
+					String.format("%1$-20s", entry.getKey() + " | ") +
+					String.format("%1$-20s", (""+((double) entry.getValue())/Agent.iterations.get(entry.getKey())) + " |")
+			);
+		}
 		return true;
 	}
 }

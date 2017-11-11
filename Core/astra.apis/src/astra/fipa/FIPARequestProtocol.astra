@@ -13,13 +13,13 @@ agent FIPARequestProtocol extends FIPAProtocol {
 		
 		!!fipa_timeout(id, timeout);
 		
-		when(fipa_state(id, string state) & fipa_prelude.contains(["COMPLETED", "FAILED", "REFUSED", "CANCELLED"], state)) {
-			if (fipa_prelude.contains(["REFUSED", "CANCELLED", "FAILED"], state)) {
-				!fipa_failed(id);
-			} else if (fipa_completed(id, answer)) {
-				-fipa_completed(id, answer);
-				!fipa_completed(id);
-			}
+		wait(fipa_state(id, string state) & fipa_prelude.contains(["COMPLETED", "FAILED", "REFUSED", "CANCELLED"], state));
+		
+		if (fipa_prelude.contains(["REFUSED", "CANCELLED", "FAILED"], state)) {
+			!fipa_failed(id);
+		} else if (fipa_completed(id, answer)) {
+			-fipa_completed(id, answer);
+			!fipa_completed(id);
 		}
 	}
 	
