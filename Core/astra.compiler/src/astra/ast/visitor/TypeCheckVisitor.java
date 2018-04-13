@@ -56,6 +56,7 @@ import astra.ast.statement.WaitStatement;
 import astra.ast.statement.WhenStatement;
 import astra.ast.statement.WhileStatement;
 import astra.ast.term.Brackets;
+import astra.ast.term.CountTerm;
 import astra.ast.term.Function;
 import astra.ast.term.InlineVariableDeclaration;
 import astra.ast.term.ListSplitterTerm;
@@ -575,6 +576,12 @@ public class TypeCheckVisitor implements IElementVisitor {
 
 	@Override
 	public Object visit(BindFormula formula, Object data) throws ParseException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object visit(CountTerm term, Object data) throws ParseException {
 		// TODO Auto-generated method stub
 		return null;
 	}

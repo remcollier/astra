@@ -15,6 +15,7 @@ import astra.formula.NOT;
 import astra.formula.OR;
 import astra.formula.Predicate;
 import astra.term.Brackets;
+import astra.term.Count;
 import astra.term.FormulaTerm;
 import astra.term.Funct;
 import astra.term.ListSplitter;
@@ -62,12 +63,15 @@ public abstract class AbstractEvaluateVisitor implements LogicVisitor {
 
 	public Object visit(Formula formula) {
 		Handler<Formula> handler = getFormulaHandler(formula.getClass());
+//		System.out.println("AEV Formula:" + formula + " / handler="+ handler);
 		if (handler == null) return null;
 		return handler.handle(this, formula, passByValue);
 	}
 	
 	public Object visit(Term term) {
+//		System.out.println("AEV: Term: " + term.getClass().getCanonicalName());
 		Handler<Term> handler = getTermHandler(term.getClass());
+//		System.out.println("AEV: Term: " + term + " / handler="+ handler);
 		if (handler == null) return null;
 		return handler.handle(this, term, passByValue);
 	}
@@ -140,9 +144,12 @@ public abstract class AbstractEvaluateVisitor implements LogicVisitor {
 			@SuppressWarnings("unchecked")
 			@Override public Object handle(LogicVisitor visitor, Comparison comparison,boolean passByValue) {
 				// Need to check if the bindings have been generated yet...
+//				System.out.println("\tvisitor: " + visitor.getClass().getCanonicalName());
+//				System.out.println("\tl: "+ comparison.left());
 				Term il = (Term) comparison.left().accept(visitor);
-				Term ir = (Term) comparison.right().accept(visitor);
 //				System.out.println("\til: "+ il);
+//				System.out.println("\tr: "+ comparison.right());
+				Term ir = (Term) comparison.right().accept(visitor);
 //				System.out.println("\tir: "+ ir);
 				if (il instanceof Variable || ir instanceof Variable) return new Comparison(comparison.operator(), il,ir);
 				
@@ -323,6 +330,20 @@ public abstract class AbstractEvaluateVisitor implements LogicVisitor {
 			@Override public Class<ListSplitter> getType() { return ListSplitter.class; }
 			@Override public Object handle(LogicVisitor visitor, ListSplitter term, boolean passByValue) {
 				return term;
+			}
+		});
+		addTermHandler(new Handler<Count>() {
+			@Override public Class<Count> getType() { return Count.class; }
+			@Override public Object handle(LogicVisitor visitor, Count count, boolean passByValue) {
+//				System.out.println("(AEV) Handling count: " + count);
+				Term c = count.term();
+				if (c instanceof Variable) {
+					c = (Term) count.term().accept(visitor);
+				}
+				if (c instanceof ListTerm) {
+					return Primitive.newPrimitive(((ListTerm) c).size());
+				}
+				return count;
 			}
 		});
 	}

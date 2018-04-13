@@ -9,6 +9,7 @@ import astra.formula.FormulaVariable;
 import astra.formula.Inference;
 import astra.formula.IsNull;
 import astra.formula.Predicate;
+import astra.term.Count;
 import astra.term.FormulaTerm;
 import astra.term.Funct;
 import astra.term.ListTerm;

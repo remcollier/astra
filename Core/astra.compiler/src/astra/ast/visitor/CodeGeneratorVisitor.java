@@ -58,6 +58,7 @@ import astra.ast.statement.WaitStatement;
 import astra.ast.statement.WhenStatement;
 import astra.ast.statement.WhileStatement;
 import astra.ast.term.Brackets;
+import astra.ast.term.CountTerm;
 import astra.ast.term.Function;
 import astra.ast.term.InlineVariableDeclaration;
 import astra.ast.term.ListSplitterTerm;
@@ -1317,6 +1318,14 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 		code.append(data + "new Bind(\n");
 		formula.variable().accept(this, data+"\t");
 		code.append(",\n");
+		formula.term().accept(this, data+"\t");
+		code.append("\n" + data + ")");
+		return null;
+	}
+	
+	@Override
+	public Object visit(CountTerm formula, Object data) throws ParseException {
+		code.append(data + "new Count(\n");
 		formula.term().accept(this, data+"\t");
 		code.append("\n" + data + ")");
 		return null;

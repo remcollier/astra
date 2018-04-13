@@ -14,9 +14,9 @@ agent Main {
 	initial is("rem", "happy");
 	
 	rule +!main(list args) {
-		//http.setup();
-		//http.exportFolder("/view", "view");
-		//S.createAgent("user", "astra.http.UserController");
+		http.setup();
+		http.exportFolder("/view", "view");
+		S.createAgent("user", "astra.http.UserController");
 	}
 	
 	rule +!test() {

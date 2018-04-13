@@ -144,14 +144,18 @@ public class EISAgent implements Queryable {
 		return agent.name();
 	}
 	
+	private Map<String, Collection<Percept>> perceptBuffer;
+	
 	/**
 	 * Get the next set of perceptions from EIS and update the entity belief bases...
 	 */
 	public void sense() {
+		perceptBuffer = service.collectBeliefs(this);
+	}
+	
+	public void updatePercepts() {
 		try {
-			Map<String, Collection<Percept>> percepts = service.collectBeliefs(this);
-			
-			for (Entry<String, Collection<Percept>> entry : percepts.entrySet()) {
+			for (Entry<String, Collection<Percept>> entry : perceptBuffer.entrySet()) {
 				EISBeliefBase base = beliefSets.get(entry.getKey());
 				if (base == null) {
 					beliefSets.put(entry.getKey(), base = new EISBeliefBase(entry.getKey()));

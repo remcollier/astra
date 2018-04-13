@@ -162,6 +162,7 @@ public class CartagoAPI implements ICartagoListener {
         } else if ( ev instanceof ActionFailedEvent ) {
             ActionFailedEvent evt = (ActionFailedEvent) ev;
 //            System.out.println("failed: " + evt.getActionId());
+//            System.out.println(evt.getFailureMsg());
             OperationContext context = operationRegister.remove( evt.getActionId() );
             
             context.intention.notifyDone("CARTAGO Action failed: " + context.intention.getNextStatement() + ": " + evt.getFailureMsg());
@@ -297,19 +298,19 @@ public class CartagoAPI implements ICartagoListener {
 
 	public synchronized void doOperation(ArtifactId artId, Op op, Intention context, Predicate activity) throws CartagoException {
 		long id = session.doAction(artId,op, null, -1);
-//		System.out.println("Registering: " + id);
+//		System.out.println("AID Registering: " + id);
 		operationRegister.put(id, new OperationContext(context, activity ) );
 	}
 
 	public synchronized void doOperation(String name, Op op, Intention context, Predicate activity) throws CartagoException {
 		long id = session.doAction(name, op, null, -1);
-//		System.out.println("Registering: " + id);
+//		System.out.println("AStr Registering: " + id);
 		operationRegister.put( id, new OperationContext(context, activity ) );
 	}
 
 	public synchronized void doOperation(Op op, Intention context, Predicate activity) throws CartagoException {
 		long id = session.doAction(op, null, -1);
-//		System.out.println("Registering: " + id);
+//		System.out.println("Blind Registering: " + id);
 		operationRegister.put( id, new OperationContext(context, activity ) );
 	}
 

@@ -107,7 +107,7 @@ public class FIPARequestProtocol extends ASTRAClass {
 							})
 						)
 					),
-					new Wait(
+					new When(
 						"astra.fipa.FIPARequestProtocol", new int[] {16,8,24,5},
 						new AND(
 							new Predicate("fipa_state", new Term[] {
@@ -133,67 +133,72 @@ public class FIPARequestProtocol extends ASTRAClass {
 								}
 							}
 								)
-						)
-					),
-					new If(
-						"astra.fipa.FIPARequestProtocol", new int[] {18,8,24,5},
-						new ModuleFormula("fipa_prelude",
-							new Predicate("contains", new Term[] {
-								new ListTerm(new Term[] {
-									Primitive.newPrimitive("REFUSED"),
-									Primitive.newPrimitive("CANCELLED"),
-									Primitive.newPrimitive("FAILED")
-								}),
-								new Variable(Type.STRING, "state")
-							}),
-						new ModuleFormulaAdaptor() {
-								public Formula invoke(BindingsEvaluateVisitor visitor, Predicate predicate) {
-									return ((astra.lang.Prelude) visitor.agent().getModule("astra.fipa.FIPARequestProtocol","fipa_prelude")).contains(
-										(astra.term.ListTerm) visitor.evaluate(predicate.getTerm(0)),
-										(java.lang.String) visitor.evaluate(predicate.getTerm(1))
-									);
-							}
-						}
-							),
-						new Block(
-							"astra.fipa.FIPARequestProtocol", new int[] {18,78,20,9},
-							new Statement[] {
-								new Subgoal(
-									"astra.fipa.FIPARequestProtocol", new int[] {19,12,20,9},
-									new Goal(
-										new Predicate("fipa_failed", new Term[] {
-											new Variable(Type.STRING, "id")
-										})
-									)
-								)
-							}
 						),
-						new If(
-							"astra.fipa.FIPARequestProtocol", new int[] {20,15,24,5},
-							new Predicate("fipa_completed", new Term[] {
-								new Variable(Type.STRING, "id"),
-								new Variable(Type.FUNCTION, "answer")
-							}),
-							new Block(
-								"astra.fipa.FIPARequestProtocol", new int[] {20,47,23,9},
-								new Statement[] {
-									new BeliefUpdate('-',
-										"astra.fipa.FIPARequestProtocol", new int[] {21,12,23,9},
+						new Block(
+							"astra.fipa.FIPARequestProtocol", new int[] {16,123,23,9},
+							new Statement[] {
+								new If(
+									"astra.fipa.FIPARequestProtocol", new int[] {17,12,23,9},
+									new ModuleFormula("fipa_prelude",
+										new Predicate("contains", new Term[] {
+											new ListTerm(new Term[] {
+												Primitive.newPrimitive("REFUSED"),
+												Primitive.newPrimitive("CANCELLED"),
+												Primitive.newPrimitive("FAILED")
+											}),
+											new Variable(Type.STRING, "state")
+										}),
+									new ModuleFormulaAdaptor() {
+											public Formula invoke(BindingsEvaluateVisitor visitor, Predicate predicate) {
+												return ((astra.lang.Prelude) visitor.agent().getModule("astra.fipa.FIPARequestProtocol","fipa_prelude")).contains(
+													(astra.term.ListTerm) visitor.evaluate(predicate.getTerm(0)),
+													(java.lang.String) visitor.evaluate(predicate.getTerm(1))
+												);
+										}
+									}
+										),
+									new Block(
+										"astra.fipa.FIPARequestProtocol", new int[] {17,82,19,13},
+										new Statement[] {
+											new Subgoal(
+												"astra.fipa.FIPARequestProtocol", new int[] {18,16,19,13},
+												new Goal(
+													new Predicate("fipa_failed", new Term[] {
+														new Variable(Type.STRING, "id")
+													})
+												)
+											)
+										}
+									),
+									new If(
+										"astra.fipa.FIPARequestProtocol", new int[] {19,19,23,9},
 										new Predicate("fipa_completed", new Term[] {
 											new Variable(Type.STRING, "id"),
 											new Variable(Type.FUNCTION, "answer")
-										})
-									),
-									new Subgoal(
-										"astra.fipa.FIPARequestProtocol", new int[] {22,12,23,9},
-										new Goal(
-											new Predicate("fipa_completed", new Term[] {
-												new Variable(Type.STRING, "id")
-											})
+										}),
+										new Block(
+											"astra.fipa.FIPARequestProtocol", new int[] {19,51,22,13},
+											new Statement[] {
+												new BeliefUpdate('-',
+													"astra.fipa.FIPARequestProtocol", new int[] {20,16,22,13},
+													new Predicate("fipa_completed", new Term[] {
+														new Variable(Type.STRING, "id"),
+														new Variable(Type.FUNCTION, "answer")
+													})
+												),
+												new Subgoal(
+													"astra.fipa.FIPARequestProtocol", new int[] {21,16,22,13},
+													new Goal(
+														new Predicate("fipa_completed", new Term[] {
+															new Variable(Type.STRING, "id")
+														})
+													)
+												)
+											}
 										)
 									)
-								}
-							)
+								)
+							}
 						)
 					)
 				}
@@ -799,7 +804,7 @@ public class FIPARequestProtocol extends ASTRAClass {
 	}
 
 	public static void main(String[] args) {
-		Scheduler.setStrategy(new AdaptiveSchedulerStrategy());
+		Scheduler.setStrategy(new BasicSchedulerStrategy());
 		ListTerm argList = new ListTerm();
 		for (String arg: args) {
 			argList.add(Primitive.newPrimitive(arg));

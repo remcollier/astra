@@ -1,6 +1,5 @@
 package astra.term;
 
-import astra.formula.Formula;
 import astra.reasoner.util.LogicVisitor;
 import astra.type.Type;
 
@@ -9,10 +8,10 @@ public class ListSplitter implements Term {
 	 * 
 	 */
 	private static final long serialVersionUID = -3531850681574434943L;
-	Variable head;
+	Term head;
 	Variable tail;
 	
-	public ListSplitter(Variable head, Variable tail) {
+	public ListSplitter(Term head, Variable tail) {
 		this.head = head;
 		this.tail = tail;
 	}
@@ -26,7 +25,7 @@ public class ListSplitter implements Term {
 		return Type.LIST;
 	}
 	
-	public Variable head() {
+	public Term head() {
 		return head;
 	}
 

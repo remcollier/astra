@@ -49,6 +49,8 @@ public class PredicateFormula extends AbstractElement implements IFormula {
 	}
 	
 	public String toSignature() {
+//		System.out.println("predicate: " + predicate);
+//		System.out.println("terms: " + terms);
 		StringBuffer buf = new StringBuffer();
 		buf.append("formula:" + predicate);
 		for (int i=0; i < terms.size(); i++) {

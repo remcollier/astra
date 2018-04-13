@@ -23,7 +23,8 @@ public class ASTRAPartitionScanner extends RuleBasedPartitionScanner {
 			"float", "double", "char", "boolean", "list", "start",
 			"stop", "active", "count_bindings", "function", "query", "send", 
 			"@message", "package", "synchronized", "true", "false", "speechact",
-			"funct", "formula","inference", "bind", "types", "maintain", "returns"
+			"funct", "formula","inference", "bind", "types", "maintain", "returns",
+			"count"
 	};
 	
 	String[] constants = new String[] {

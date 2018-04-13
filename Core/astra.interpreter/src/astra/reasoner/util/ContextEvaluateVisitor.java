@@ -8,6 +8,8 @@ import astra.formula.Formula;
 import astra.formula.FormulaVariable;
 import astra.formula.IsNull;
 import astra.formula.Predicate;
+import astra.term.Count;
+import astra.term.ListTerm;
 import astra.term.ModuleTerm;
 import astra.term.NullTerm;
 import astra.term.Primitive;

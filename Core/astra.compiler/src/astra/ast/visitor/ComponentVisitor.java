@@ -54,6 +54,7 @@ import astra.ast.statement.WaitStatement;
 import astra.ast.statement.WhenStatement;
 import astra.ast.statement.WhileStatement;
 import astra.ast.term.Brackets;
+import astra.ast.term.CountTerm;
 import astra.ast.term.Function;
 import astra.ast.term.InlineVariableDeclaration;
 import astra.ast.term.ListSplitterTerm;
@@ -572,6 +573,7 @@ public class ComponentVisitor extends AbstractVisitor {
 		}
 		
 		MethodSignature signature = new MethodSignature(term.method(), IJavaHelper.TERM);
+//		System.out.println("signature: " + signature);
 		if (!helper.validate(element.className(), signature))
 			throw new ParseException("Could not match term to a method: " + term.toString() + " for module: "+term.module(), term);
 
@@ -685,6 +687,12 @@ public class ComponentVisitor extends AbstractVisitor {
 	public Object visit(BindFormula formula, Object data) throws ParseException {
 		formula.variable().accept(this, data);
 		formula.term().accept(this, data);
+		return null;
+	}
+	
+	@Override
+	public Object visit(CountTerm term, Object data) throws ParseException {
+		term.term().accept(this, data);
 		return null;
 	}
 }

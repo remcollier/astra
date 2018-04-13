@@ -109,6 +109,7 @@ public class EIS extends Module {
 
 	private EISService service;
 	private String defaultEntity;
+	private boolean blocking = true;
 	
 	/**
 	 * Action that launches a new EIS environment from the specified url 
@@ -450,11 +451,36 @@ public class EIS extends Module {
 		);
 	}
 	
+	private int sensorState = 0;
+	
 	@SENSOR
 	public void sense() {
 		if (service == null) return;
 		if (service.get(agent.name()) == null) return;
-		service.get(agent.name()).sense();
+		
+		if (blocking) {
+			switch (sensorState) {
+			case 0:
+				sensorState = 1;
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						service.get(agent.name()).sense();
+						sensorState = 2;
+					}
+				}).start();
+				break;
+			case 2:
+				service.get(agent.name()).updatePercepts();
+				sensorState = 0;
+			}
+		}
+	}
+	
+	@ACTION
+	public boolean sensorBlocking(boolean blocking) {
+		this.blocking = blocking;
+		return true;
 	}
 
 	/**

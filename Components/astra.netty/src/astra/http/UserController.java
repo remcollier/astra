@@ -24,6 +24,7 @@ public class UserController extends ASTRAClass {
 	public UserController() {
 		setParents(new Class[] {astra.lang.Agent.class});
 		addRule(new Rule(
+			"astra.http.UserController", new int[] {19,9,19,19},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("init", new Term[] {})
@@ -51,6 +52,7 @@ public class UserController extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"astra.http.UserController", new int[] {23,9,23,101},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("validate", new Term[] {
@@ -139,6 +141,7 @@ public class UserController extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"astra.http.UserController", new int[] {28,9,28,101},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("register", new Term[] {
@@ -286,6 +289,7 @@ public class UserController extends ASTRAClass {
 			)
 		));
 		addRule(new Rule(
+			"astra.http.UserController", new int[] {40,9,40,68},
 			new GoalEvent('+',
 				new Goal(
 					new Predicate("validateUser", new Term[] {
@@ -402,7 +406,7 @@ public class UserController extends ASTRAClass {
 	}
 
 	public static void main(String[] args) {
-		Scheduler.setStrategy(new BasicSchedulerStrategy());
+		Scheduler.setStrategy(new AdaptiveSchedulerStrategy());
 		ListTerm argList = new ListTerm();
 		for (String arg: args) {
 			argList.add(Primitive.newPrimitive(arg));

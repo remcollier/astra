@@ -102,6 +102,8 @@ public class Token {
 	public static final int BIND = 86;
 	public static final int MAINTAIN = 87;
 	
+	public static final int COUNT = 100;
+	
 	public String token;
 	public int beginLine;
 	public int beginColumn;
@@ -195,6 +197,8 @@ public class Token {
 		typeMap.put("]", RIGHT_SQ_BRACKET);
 		typeMap.put("%", MODULO);
 		typeMap.put("$", DOLLAR);
+		
+		typeMap.put("count", COUNT);
 		
 		// Speech Acts
 		typeMap.put("accept-proposal", SPEECHACT);

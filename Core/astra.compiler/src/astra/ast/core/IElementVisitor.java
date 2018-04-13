@@ -47,6 +47,7 @@ import astra.ast.statement.WaitStatement;
 import astra.ast.statement.WhenStatement;
 import astra.ast.statement.WhileStatement;
 import astra.ast.term.Brackets;
+import astra.ast.term.CountTerm;
 import astra.ast.term.Function;
 import astra.ast.term.InlineVariableDeclaration;
 import astra.ast.term.ListSplitterTerm;
@@ -150,4 +151,5 @@ public interface IElementVisitor {
 	public Object visit(FormulaDefinition formulaDefinition, Object data) throws ParseException;
 	public Object visit(ListSplitterTerm term, Object data) throws ParseException;
 	public Object visit(BindFormula formula, Object data) throws ParseException;
+	public Object visit(CountTerm countTerm, Object data) throws ParseException;
 }

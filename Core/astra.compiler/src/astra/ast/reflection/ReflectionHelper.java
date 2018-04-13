@@ -163,6 +163,7 @@ public class ReflectionHelper extends AbstractHelper {
 				if (mthd.getName().equals(signature.name())
 						&& signature.termCount() == (mthd.getParameterTypes().length-(signature.symbol() ? 1:0))) {
 					if (signature.type() == -1) {
+//						System.out.println("signature type is -1: " + mthd.getName());
 						return validate(signature, mthd) ? mthd:null;
 					} else {
 						for (Annotation ann : mthd.getAnnotations()) {
@@ -278,7 +279,9 @@ public class ReflectionHelper extends AbstractHelper {
 		}
 
 		// validate raw types...
+//		System.out.println("method.type="+methodType.type());
 		Class<?> cl = resolveClass(methodType.type());
+//		System.out.println("cl: " + cl);
 		if ((cl != null) && ((Class<?>) cls).isAssignableFrom(cl)) {
 			methodType.primitiveType(cl.getCanonicalName());
 			return true;

@@ -54,6 +54,7 @@ import astra.ast.statement.UpdateStatement;
 import astra.ast.statement.WaitStatement;
 import astra.ast.statement.WhileStatement;
 import astra.ast.term.Brackets;
+import astra.ast.term.CountTerm;
 import astra.ast.term.Function;
 import astra.ast.term.InlineVariableDeclaration;
 import astra.ast.term.ListSplitterTerm;
@@ -735,12 +736,57 @@ public class ASTRAParser {
 				return new ScopedStatement(getQualifiedName(list),
 						createStatement(m_list), first, last, tokenizer.getSource(first, last));
 			}
+	
+			String qualifiedName = tok.token;
+			Token l = null;
+			Token t = tok2 = list.remove(0);
+			while (list.size() > 1 && (t.type == Token.PERIOD)) {
+				l = list.remove(0);
+				t = list.remove(0);
+				qualifiedName += "."+l.token;
+			}
+//			System.out.println("QName: " + qualifiedName);
 			
-			tok2 = list.remove(0);
+			if (t.type != Token.IDENTIFIER) {
+//				System.out.println("Not a qualified name!");
+				list.add(0, t);
+				list.add(0, l);
+			} else {
+				// We have a Java class declaration...
+				IType type = new ObjectType(Token.OBJECT_TYPE, qualifiedName);
+
+				if (list.remove(list.size()-1).type != Token.SEMI_COLON) {
+					throw new ParseException("Missing Semi Colon", list.get(0), list.get(list.size()-1));
+				}
+				if (list.isEmpty()) {
+					// we have a declaration (minus assignment)
+					return new DeclarationStatement(type, t.token, 
+							first, last, tokenizer.getSource(first, last));
+				}
+				
+				// Check if it is an assignment...
+				Token tok3 = list.remove(0);
+				if (tok3.type == Token.ASSIGNMENT) {
+					return new DeclarationStatement(type, t.token, createTerm(list), 
+							first, last, tokenizer.getSource(first, last));
+				} else {
+					throw new ParseException("Incomplete Statement", first, last);
+				}
+			}
+
+			
 			switch (tok2.type) {
 			case Token.PERIOD:
+				//its either <module_id>.<action> or <type> <id> =
+				
 				if (list.isEmpty())
-					throw new ParseException("Malformed Statement: <module-id>.<action>", first, last);
+					throw new ParseException("Incomplete Statement", first, last);
+				
+				// need to iterate through the tokens until the PERIOD <Id> pattern stops. If the
+				// pattern is followed by a ( we have a predicate; if we have and <Id> it is an
+				// assignment otherwise it is a syntax error...
+				
+				// Code below assumes predicate...
 				t_list = splitAt(list, new int[] {Token.RIGHT_BRACKET});
 				if (list.get(0).type != Token.SEMI_COLON) {
 					throw new ParseException("Syntax Error: Missing semi-colon.", t_list.get(0), t_list.get(t_list.size()-1));
@@ -1131,6 +1177,16 @@ public class ASTRAParser {
 				}
 				if (!tokens.isEmpty()) throw new ParseException("Unexpected Tokens after inline variable declaration" , getLast(tokens));
 				return new InlineVariableDeclaration(type, tok2.token, tok, tok2, tokenizer.getSource(tok, tok2));
+			} else if (tok.type == Token.COUNT) {
+				Token tok2 = tokens.remove(0);
+				if (tok2.type == Token.LEFT_BRACKET) {
+					if (getLast(tokens).type != Token.RIGHT_BRACKET)
+						throw new ParseException("Unexpected Tokens", tok2, getLast(tokens));
+					tokens.remove(tokens.size()-1);
+					List<ITerm> list2 = this.getTermList(tokens, false);
+					if (list.size() > 2) throw new ParseException("Malformed bind formula: count(<variable>|<list>)", first, last);
+					return new CountTerm(list2.get(0), first, last, tokenizer.getSource(first, last));
+				}
 			} else if (tok.type == Token.LEFT_BRACKET) {
 				if (tokens.get(tokens.size()-1).type != Token.RIGHT_BRACKET) {
 					throw new ParseException("Bracket mismatch for term", tok, tokens.get(tokens.size()-1));
@@ -1191,8 +1247,13 @@ public class ASTRAParser {
 					throw new ParseException("Malformed ASTRA list", tok, getLast(tokens));
 				}
 				tokens.remove(tokens.size()-1);
-				if (tokens.size() > 2 && tokens.get(2).type == Token.OR) {
-					return createListSplitter(new LinkedList<Token>(tokens.subList(0, 2)), new LinkedList<Token>(tokens.subList(3, tokens.size())), first, last, tokenizer.getSource(first, last));
+//				System.out.println("{A} tokens: " + tokens);
+				int sIndex = getSplitterIndex(tokens);
+				if (sIndex > -1) {
+//				if (tokens.size() > 2 && tokens.get(2).type == Token.OR) {
+//					System.out.println("left: " + tokens.subList(0, sIndex));
+//					System.out.println("right: " + tokens.subList(sIndex+1, tokens.size()));
+					return createListSplitter(new LinkedList<Token>(tokens.subList(0, sIndex)), new LinkedList<Token>(tokens.subList(sIndex+1, tokens.size())), first, last, tokenizer.getSource(first, last));
 				}
 				return new ListTerm(getTermList(tokens, false), tok, last, tokenizer.getSource(tok, last));
 			} else if (tok.type == Token.MINUS) {
@@ -1216,9 +1277,28 @@ public class ASTRAParser {
 		throw new ParseException("Unknown Term", first, last);
 	}
 	
+	private int getSplitterIndex(List<Token> tokens) {
+		int i = 0;
+		int brackets = 0;
+		while (i < tokens.size()) {
+			switch (tokens.get(i).type) {
+			case Token.LEFT_SQ_BRACKET: 
+				brackets++;
+				break;
+			case Token.RIGHT_SQ_BRACKET: 
+				brackets--;
+				break;
+			case Token.OR:
+				if (brackets == 0) return i;
+			}
+			i++;
+		}
+		return -1;
+	}
+
 	private ITerm createListSplitter(List<Token> subList, List<Token> subList2, Token first, Token last, String source) throws ParseException {
 		ITerm head = createTerm(subList);
-		if (head instanceof InlineVariableDeclaration) {
+		if (head instanceof InlineVariableDeclaration  || head instanceof Function) {
 			ITerm tail = createTerm(subList2);
 			if (tail instanceof InlineVariableDeclaration && tail.type().type()==Token.LIST) {
 				return new ListSplitterTerm(head, tail, first, last, source);

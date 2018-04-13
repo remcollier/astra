@@ -4,8 +4,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
-
 import astra.cartago.CartagoAPI;
 import astra.cartago.CartagoProperty;
 import astra.cartago.CartagoPropertyEvent;
@@ -120,13 +118,14 @@ public class Cartago extends Module {
 		);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@TERM
 	public Object[] params(ListTerm list) {
 		Object[] array = new Object[list.size()];
 		for (int i=0;i<array.length;i++) {
 			Term term = list.get(i);
 			if (term instanceof Primitive) {
-				array[i] = ((Primitive) term).value();				
+				array[i] = ((Primitive<Object>) term).value();				
 			}
 		}
 		return array;

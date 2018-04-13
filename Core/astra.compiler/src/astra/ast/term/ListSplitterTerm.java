@@ -34,7 +34,7 @@ public class ListSplitterTerm extends AbstractElement implements ITerm {
 
 	@Override
 	public IType type() {
-		return tail.type();
+		return new BasicType(Token.LIST);
 	}
 	
 	@Override

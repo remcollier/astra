@@ -1,8 +1,4 @@
-/astra/
 /CompileTestCode.class
-/Core.class
-/MyModule.class
-/MyTestSuite.class
 /Core$1.class
 /Core$10.class
 /Core$11.class
@@ -21,6 +17,8 @@
 /Core$23.class
 /Core$24.class
 /Core$25.class
+/Core$26.class
+/Core$27.class
 /Core$3.class
 /Core$4.class
 /Core$5.class
@@ -29,5 +27,7 @@
 /Core$8.class
 /Core$9.class
 /Core.astra
-/Core$26.class
-/Core$27.class
+/Core.class
+/MyModule.class
+/MyTestSuite.class
+/astra/

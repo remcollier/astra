@@ -1,9 +1,10 @@
 package astra.core;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,11 @@ import astra.trace.TraceEvent;
 import astra.trace.TraceManager;
 
 public class Agent {
+	public static Map<String, Long> timings = Collections.synchronizedMap(new HashMap<String, Long>());
+	public static Map<String, Long> iterations = Collections.synchronizedMap(new HashMap<String, Long>());
+	
+	private static final DecimalFormat df = new DecimalFormat("#.000000"); 
+
 	/**
 	 * Promises are used to implement WAIT and WHEN statements. When one of these
 	 * statements is executed, the agent creates a promise and suspends the intention.
@@ -101,7 +107,8 @@ public class Agent {
 	
 	// Intention Management
 	private Queue<Notification> completed = new LinkedList<Notification>();
-	private Queue<Intention> intentions = new LinkedList<Intention>();
+	private ArrayList<Intention> intentions = new ArrayList<Intention>();
+	private int intentionNumber = 0;
     
 	// Activated TR Function / null if no function active
 	private Predicate trFunction;
@@ -155,6 +162,11 @@ public class Agent {
 	
 	public Agent(String name) {
 		this.name = name;
+
+		// initialize the timings table
+		timings.put(name, 0l);
+		iterations.put(name, 0l);
+		
 		beliefManager = new EventBeliefManager(this); 
 		reasoner = new ResolutionBasedReasoner(this);
 		reasoner.addSource(beliefManager);
@@ -235,7 +247,11 @@ public class Agent {
 		return false;
 	}
 
+	private long sum = 0;
+	private long count = 0;
+	
 	public void execute() {
+		long start = System.currentTimeMillis();
 		for (SensorAdaptor adaptor : sensorArray) {
 			adaptor.sense(this);
 		}
@@ -265,17 +281,15 @@ public class Agent {
 			intention = getNextIntention();
 			if (intention != null) {
 				if (intention.isFailed()) {
-					if (intention.rollback()) {
-						intentions.add(intention);
-					} else {
+					if (!intention.rollback()) {
 						intention.printStackTrace();
+						intentions.remove(intention);
 					}
 				} else {
-					if (intention.execute()) {
-						intentions.add(intention);
+					if (!intention.execute()) {
+						intentions.remove(intention);
 					}
 				}
-				intentions.poll();
 			}			
 		}
 
@@ -285,19 +299,27 @@ public class Agent {
 		}
 		
 		TraceManager.getInstance().recordEvent(new TraceEvent(TraceEvent.END_OF_CYCLE, Calendar.getInstance().getTime(), this));
+
+		// Record Interpreter Timings
+		long duration = System.currentTimeMillis()-start;
+//		if(duration > 0) {
+			timings.put(name, sum = timings.get(name) + duration);
+			iterations.put(name, count = iterations.get(name) + 1);
+//		}
 	}
 	
 	private synchronized Intention getNextIntention() {
 		if (intentions.isEmpty()) return null;
 		
 		int i = 0;
-		while (i < intentions.size() && intentions.peek().isSuspended()) {
-			intentions.add(intentions.poll());
+		while (i < intentions.size() && intentions.get((i+intentionNumber) % intentions.size()).isSuspended()) {
 			i++;
 		}
 		
+		
+		intentionNumber = (intentionNumber +i+1) % intentions.size();
 		if (i == intentions.size()) return null;
-		return intentions.peek();
+		return intentions.get(i);
 	}
 
 	public List<Map<Integer, Term>> query(Formula formula, Map<Integer, Term> bindings) {
@@ -361,6 +383,7 @@ public class Agent {
     }
 	
 	public synchronized void addEvent(Event event) {
+//		System.out.println("[" + this.name + "] unfiltered event: " + event);
 		if (filter.contains(event.signature())) {
 			eventQueue.add(event);
 			
@@ -379,7 +402,7 @@ public class Agent {
 		
 	}
 
-	public Queue<Intention> intentions() {
+	public ArrayList<Intention> intentions() {
 		return intentions;
 	}
 
