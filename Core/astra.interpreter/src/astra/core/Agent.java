@@ -279,6 +279,7 @@ public class Agent {
         
 		if (!intentions.isEmpty()) {
 			intention = getNextIntention();
+//			System.out.println("["+name+"] Processing: " + intention.event);
 			if (intention != null) {
 				if (intention.isFailed()) {
 					if (!intention.rollback()) {
@@ -290,7 +291,7 @@ public class Agent {
 						intentions.remove(intention);
 					}
 				}
-			}			
+			}
 		}
 
 		// Execute active functions
@@ -311,15 +312,19 @@ public class Agent {
 	private synchronized Intention getNextIntention() {
 		if (intentions.isEmpty()) return null;
 		
+//		System.out.println("Intention number: " + intentionNumber + "/" + intentions.size());
+//		for (int i=0;i<intentions.size(); i++) {
+//			System.out.println("("+i+") "+intentions.get(i).event);
+//		}
 		int i = 0;
 		while (i < intentions.size() && intentions.get((i+intentionNumber) % intentions.size()).isSuspended()) {
 			i++;
 		}
 		
-		
-		intentionNumber = (intentionNumber +i+1) % intentions.size();
 		if (i == intentions.size()) return null;
-		return intentions.get(i);
+		Intention intent = intentions.get((intentionNumber+i) % intentions.size());
+		intentionNumber = (intentionNumber +i+1) % intentions.size();
+		return intent;
 	}
 
 	public List<Map<Integer, Term>> query(Formula formula, Map<Integer, Term> bindings) {
