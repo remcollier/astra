@@ -3,7 +3,16 @@
    <description name="ASTRA Language Update Centre" url="http://astralanguage.com/update">
       This site contains the most recent release of the ASTRA Programming Lanuage plugin for Eclipse
    </description>
-   <feature url="features/astra.ide.feature_3.7.0.201804131252.jar" id="astra.ide.feature" version="3.7.0.201804131252">
+   <feature url="features/astra.ide.feature_3.7.0.201804131638.jar" id="astra.ide.feature" version="3.7.0.201804131638">
+      <category name="astra.ide"/>
+   </feature>
+   <feature url="features/astra.ide.feature_3.7.0.201804170735.jar" id="astra.ide.feature" version="3.7.0.201804170735">
+      <category name="astra.ide"/>
+   </feature>
+   <feature url="features/astra.ide.feature_3.7.0.201804170848.jar" id="astra.ide.feature" version="3.7.0.201804170848">
+      <category name="astra.ide"/>
+   </feature>
+   <feature url="features/astra.ide.feature_3.7.0.201804170939.jar" id="astra.ide.feature" version="3.7.0.201804170939">
       <category name="astra.ide"/>
    </feature>
    <category-def name="astra.ide" label="ASTRA IDE"/>

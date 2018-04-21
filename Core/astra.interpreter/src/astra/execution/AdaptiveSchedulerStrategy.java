@@ -16,9 +16,12 @@ public class AdaptiveSchedulerStrategy implements SchedulerStrategy {
 	
 	@Override
 	public void schedule(final Agent agent) {
-		Integer state = agents.get(agent.name());
-		if (state == null) {
-			agents.put(agent.name(), state = Scheduler.ACTIVE);
+		Integer state = null;
+		synchronized (this) {
+			state = agents.get(agent.name());
+			if (state == null) {
+				agents.put(agent.name(), state = Scheduler.ACTIVE);
+			}
 		}
 		
 		if (state == Scheduler.ACTIVE) {
@@ -44,7 +47,7 @@ public class AdaptiveSchedulerStrategy implements SchedulerStrategy {
 		}
 	}
 
-	private boolean isActive(Agent agent) {
+	private synchronized boolean isActive(Agent agent) {
 		return !(agent.events().isEmpty() && agent.intentions().isEmpty()) || agent.hasActiveFunction();
 	}
 	
@@ -70,7 +73,7 @@ public class AdaptiveSchedulerStrategy implements SchedulerStrategy {
 	}
 
 	@Override
-	public int getState(Agent agent) {
+	public synchronized int getState(Agent agent) {
 		return agents.get(agent.name());
 	}
 

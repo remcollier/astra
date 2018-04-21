@@ -596,22 +596,8 @@ public class ASTRAParser {
 			list = splitAt(tokens, new int[] {Token.RIGHT_BRACE, Token.SEMI_COLON});
 			return new WhileStatement(guard, createStatement(list), 
 					first, last, tokenizer.getSource(first, last));
-// 		WHEN statements are being removed from the language because they now perform the
-//		same function as wait
-//		case Token.WHEN:
-//			tok2 = tokens.get(0);
-//			if (tok2.type != Token.LEFT_BRACKET) {
-//				throw new ParseException("Malformed Statement: when(<formula>) <statement>", first, last);
-//			}
-//			
-//			list = splitAt(tokens, new int[] {Token.RIGHT_BRACKET});
-//			guard = createFormula(list.subList(1, list.size()-1));
-//			
-//			list = splitAt(tokens, new int[] {Token.RIGHT_BRACE, Token.SEMI_COLON});
-//			return new WhenStatement(guard, createStatement(list), 
-//					first, last, tokenizer.getSource(first, last));
+
 		case Token.WAIT:
-			
 			list = splitAt(tokens, new int[] {Token.SEMI_COLON});
 			if (getLast(list).type == Token.SEMI_COLON) list.remove(list.size()-1);
 			if (list.get(0).type != Token.LEFT_BRACKET) {
@@ -740,6 +726,7 @@ public class ASTRAParser {
 			String qualifiedName = tok.token;
 			Token l = null;
 			Token t = tok2 = list.remove(0);
+//			System.out.println("t='" + t.token+"'");
 			while (list.size() > 1 && (t.type == Token.PERIOD)) {
 				l = list.remove(0);
 				t = list.remove(0);
@@ -749,8 +736,13 @@ public class ASTRAParser {
 			
 			if (t.type != Token.IDENTIFIER) {
 //				System.out.println("Not a qualified name!");
-				list.add(0, t);
-				list.add(0, l);
+				if (l != null) {
+					list.add(0, t);
+					list.add(0, l);
+				}
+//				list.add(0, t);
+//				if (l != null) list.add(0, l);
+//				System.out.println("list: "+list);
 			} else {
 				// We have a Java class declaration...
 				IType type = new ObjectType(Token.OBJECT_TYPE, qualifiedName);
@@ -803,6 +795,7 @@ public class ASTRAParser {
 				return new ModuleCallStatement(tok.token, predicate, 
 						first, last, tokenizer.getSource(first, last));
 			case Token.PLUS:
+//				System.out.println("list: " + list);
 				if (list.get(0).type == Token.PLUS) {
 					return new PlusPlusStatement(tok.token, first, list.get(0), tokenizer.getSource(first, list.get(0)));
 				}
@@ -1112,6 +1105,7 @@ public class ASTRAParser {
 	}
 
 	public PredicateFormula createPredicate(List<Token> tokens) throws ParseException {
+//		System.out.println("tokens: " + tokens);
 		Token first = tokens.get(0);
 		Token last = tokens.get(tokens.size()-1);
 		

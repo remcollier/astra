@@ -389,7 +389,7 @@ public class Agent {
 	
 	public synchronized void addEvent(Event event) {
 //		System.out.println("[" + this.name + "] unfiltered event: " + event);
-		if (filter.contains(event.signature())) {
+//		if (filter.contains(event.signature())) {
 			eventQueue.add(event);
 			
 //			System.out.println("[" + this.name + "] event: " + event);
@@ -402,9 +402,7 @@ public class Agent {
 				Scheduler.schedule(this);
 //				System.out.println("RESUMING: " + name);
 			}
-		}
-		
-		
+//		}
 	}
 
 	public ArrayList<Intention> intentions() {
