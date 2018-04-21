@@ -3,6 +3,7 @@ package astra.core;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
 
@@ -36,8 +37,13 @@ public class Intention {
 	private Throwable exception;
 	public Agent agent;
 	Event event;
+	private Rule rule;
+	Map<Integer, Term> bindings;
+	
 	boolean suspended = false;
 	boolean failed = false;
+	boolean recovering = false;
+	boolean dead = false;
 	int age = 0;
 	
 	Stack<RuleExecutor> executors = new Stack<RuleExecutor>();
@@ -45,18 +51,15 @@ public class Intention {
 	public Intention(Agent agent, Event event, Rule rule, Map<Integer, Term> bindings) {
 		this.agent = agent;
 		this.event = event;
+		this.bindings = bindings;
+		this.rule = rule;
 		
 		executors.push(new RuleExecutor(event, rule, bindings));
 	}
 	
 	public synchronized boolean execute() {
-		if (!executors.peek().execute(this)) {
-			RuleExecutor executor = executors.pop();
-			if (!executors.isEmpty()) {
-				executors.peek().updateRuleBindings(executor.getUnboundBindings());
-			}
-		}
-		return !executors.isEmpty();
+		if (executors.isEmpty()) return true;
+		return executors.peek().execute(this);
 	}
 
 	public Module getModule(String classname, String key) {
@@ -127,7 +130,7 @@ public class Intention {
 		executors.push(new RuleExecutor(event, rule, bindings));
 	}
 	
-	public void addSubGoal(Goal gl) {
+	public boolean addSubGoal(Goal gl) {
 		VariableVisitor visitor = new VariableVisitor();
 		gl.accept(visitor);
 		for (Variable variable : visitor.variables()) {
@@ -136,11 +139,11 @@ public class Intention {
 				addVariable(variable);
 			}
 		}
-		agent.addEvent(new GoalEvent(Event.ADDITION, gl, this));		
+		return agent.addEvent(new GoalEvent(Event.ADDITION, gl, this));
 	}
 	
-	public void addScopedSubGoal(String scope, Goal gl) {
-		agent.addEvent(new ScopedGoalEvent(Event.ADDITION, new ScopedGoal(scope, gl), this));		
+	public boolean addScopedSubGoal(String scope, Goal gl) {
+		return agent.addEvent(new ScopedGoalEvent(Event.ADDITION, new ScopedGoal(scope, gl), this));		
 	}
 
 	/**
@@ -190,6 +193,8 @@ public class Intention {
 	}
 	
 	public void failed(String reason, Throwable exception) {
+//		System.out.println("failure: " +reason);
+//		exception.printStackTrace();
 		failed = true;
 		failureTrace = new Stack<StatementHandler>();
 		for (RuleExecutor executor : executors) {
@@ -222,7 +227,7 @@ public class Intention {
 		}
 	}
 
-	public boolean rollback() {
+	public synchronized boolean rollback() {
 		// DEAL WITH ROLLBACK...
 		while (!executors.isEmpty()) {
 			RuleExecutor executor = executors.peek();
@@ -231,7 +236,27 @@ public class Intention {
 				resume();
 				return true;
 			}
+			
 			executors.pop();
+			
+			if (failed) {
+//				System.out.println("failed rule: " + executor.event());
+				if (executor.event() instanceof GoalEvent) {
+					GoalEvent ge = (GoalEvent) executor.event();
+					if (ge.type == GoalEvent.ADDITION) {
+//						System.out.println("Handling Failure..."); 
+						if (agent.addEvent(ge = new GoalEvent(GoalEvent.REMOVAL, ge.goal(), this))) {
+							recovering = true;
+//							System.out.println("added failure goal: " + ge);
+							failed = false;
+							return true;
+//						} else {
+//							System.out.println("Failed to add recovery goal...");
+						}
+						
+					}
+				}
+			}
 		}
 		return false;
 	}
@@ -252,7 +277,12 @@ public class Intention {
 		return suspended;
 	}
 
+	public boolean isRecovering() {
+		return recovering;
+	}
+
 	public void resume() {
+		if (recovering) recovering = false;
 		suspended = false;
 	}
 
@@ -288,12 +318,12 @@ public class Intention {
 //		System.out.println(event.toString());
 	}
 
-	public void addGoal(Goal goal) {
-		agent.addEvent(new GoalEvent(GoalEvent.ADDITION, goal));
+	public boolean addGoal(Goal goal) {
+		return agent.addEvent(new GoalEvent(GoalEvent.ADDITION, goal));
 	}
 
-	public void addScopedGoal(String scope, Goal goal) {
-		agent.addEvent(new ScopedGoalEvent(GoalEvent.ADDITION, new ScopedGoal(scope, goal)));
+	public boolean addScopedGoal(String scope, Goal goal) {
+		return agent.addEvent(new ScopedGoalEvent(GoalEvent.ADDITION, new ScopedGoal(scope, goal)));
 	}
 
 	public void notifyDone(String message) {
@@ -415,6 +445,73 @@ public class Intention {
 	public void dropPromise(Promise promise) {
 //		System.out.println("dropped promise: " + promise.formula);
 		agent.dropPromise(promise);
+	}
+
+	public boolean handleEvent(Event event, Agent agent) {
+		boolean success = false;
+		int i=executors.size()-1;
+		while (!success && i>=0) {
+			success = Helper.handleEvent(event, agent, executors.get(i).rule().rules(), this);
+			i--;
+		}
+		return success;
+	}
+
+	public Rule rule() {
+		if (executors.isEmpty()) return rule;
+		return executors.peek().rule();
+	}
+
+	public boolean isDone() {
+		return this.executors.isEmpty();
+	}
+
+	public boolean isGoalCompleted() {
+//		System.out.println("checking completed: " + event + " / " + executors.peek().event() + " / " + executors.peek().isDone());
+//		if (!executors.peek().isDone()) executors.peek().printStackTrace();
+		if (executors.isEmpty()) return true;
+		return executors.peek().isDone();
+	}
+
+	public synchronized void dropRule() {
+//		System.out.println("Dropping: " + executors.peek().event());
+		executors.pop();
+//		if (!executors.isEmpty()) System.out.println("["+executors.size()+"] " + executors.peek().event());
+	}
+
+	public boolean isActive() {
+		return !suspended && !failed;
+	}
+
+	public synchronized boolean checkEvent(Event event) {
+		String signature = event.signature();
+		for (int i=executors.size()-1; i>=0; i--) {
+			if (executors.get(i).rule().filter().contains(signature)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void setDead(boolean dead) {
+		this.dead = dead;
+	}
+	
+	public boolean isDead() {
+		return this.dead;
+	}
+
+	public Map<Integer,Term> getBindings() {
+		Map<Integer, Term> b = new HashMap<Integer,Term>();
+		for(Entry<Integer, Term> entry : bindings.entrySet()) {
+			b.put(entry.getKey(), entry.getValue());
+		}
+		for (RuleExecutor executor : executors) {
+			for(Entry<Integer, Term> entry : executor.bindings().entrySet()) {
+				b.put(entry.getKey(), entry.getValue());
+			}
+		}
+		return b;
 	}
 
 }

@@ -2,6 +2,7 @@ package astra.ast.core;
 
 import astra.ast.definition.FormulaDefinition;
 import astra.ast.element.FunctionElement;
+import astra.ast.element.GRuleElement;
 import astra.ast.element.InferenceElement;
 import astra.ast.element.InitialElement;
 import astra.ast.element.ModuleElement;
@@ -18,6 +19,7 @@ import astra.ast.formula.BracketFormula;
 import astra.ast.formula.ComparisonFormula;
 import astra.ast.formula.FormulaVariable;
 import astra.ast.formula.GoalFormula;
+import astra.ast.formula.IsDoneFormula;
 import astra.ast.formula.ModuleFormula;
 import astra.ast.formula.NOTFormula;
 import astra.ast.formula.OrFormula;
@@ -80,6 +82,7 @@ public interface IElementVisitor {
 	public Object visit(InferenceElement element, Object data) throws ParseException;
 	public Object visit(FunctionElement element, Object data) throws ParseException;
 	public Object visit(TypesElement element, Object data) throws ParseException;
+	public Object visit(GRuleElement element, Object data) throws ParseException;
 	
 	// TR Components
 	public Object visit(TRRuleElement element, Object data) throws ParseException;
@@ -152,4 +155,5 @@ public interface IElementVisitor {
 	public Object visit(ListSplitterTerm term, Object data) throws ParseException;
 	public Object visit(BindFormula formula, Object data) throws ParseException;
 	public Object visit(CountTerm countTerm, Object data) throws ParseException;
+	public Object visit(IsDoneFormula isDoneFormula, Object data) throws ParseException;
 }

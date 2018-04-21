@@ -25,10 +25,11 @@ public class ComponentStore {
 	
 	public void checkForEvent(GoalFormula formula) throws ParseException {
 //		System.out.println("events: " + events);
-		if (!events.contains("update:+:"+formula.toSignature()) && !events.contains("update:-:"+formula.toSignature())) {
+		if (!events.contains("update:+:"+formula.toSignature())) {
+			// REM: This condition is now commented out because
+			// -goal events are failure events. 
+			// && !events.contains("update:-:"+formula.toSignature())) {
 			throw new ParseException("No rule has been declared to handle the goal: " + formula, formula);
 		}
-		
 	}
-
 }

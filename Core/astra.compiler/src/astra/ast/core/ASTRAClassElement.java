@@ -10,13 +10,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import astra.ast.element.FunctionElement;
+import astra.ast.element.GRuleElement;
 import astra.ast.element.InferenceElement;
 import astra.ast.element.InitialElement;
 import astra.ast.element.ModuleElement;
-import astra.ast.element.TypesElement;
 import astra.ast.element.PackageElement;
 import astra.ast.element.PlanElement;
 import astra.ast.element.RuleElement;
+import astra.ast.element.TypesElement;
 import astra.ast.visitor.Utilities;
 
 public class ASTRAClassElement implements IElement {
@@ -30,6 +31,7 @@ public class ASTRAClassElement implements IElement {
 	List<PlanElement> plans = new LinkedList<PlanElement>();
 	List<FunctionElement> functions = new LinkedList<FunctionElement>();
 	List<InferenceElement> inferences = new LinkedList<InferenceElement>();
+	List<GRuleElement> grules = new LinkedList<GRuleElement>();
 	List<RuleElement> rules = new LinkedList<RuleElement>();
 	List<ModuleElement> modules = new LinkedList<ModuleElement>();
 
@@ -115,6 +117,11 @@ public class ASTRAClassElement implements IElement {
 				case Token.INFERENCE:
 					list = parser.readTo(Token.SEMI_COLON);
 					inferences.add((InferenceElement) parser.createInference(list.subList(0, list.size()-1)).setParent(this));
+					break;
+				case Token.GRULE:
+				case Token.GOAL_TYPE:
+					list = parser.readTo(Token.RIGHT_BRACE);
+					grules.add((GRuleElement) parser.createGRule(list).setParent(this));
 					break;
 				case Token.SYNCHRONIZED:
 					list = parser.readTo(Token.RIGHT_BRACE);
@@ -417,5 +424,9 @@ public class ASTRAClassElement implements IElement {
 	
 	public boolean local() {
 		return local;
+	}
+	
+	public List<GRuleElement> getGRules() {
+		return grules;
 	}
 }

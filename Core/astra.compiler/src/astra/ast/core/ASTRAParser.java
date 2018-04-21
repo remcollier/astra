@@ -10,6 +10,7 @@ import java.util.Stack;
 import astra.ast.definition.FormulaDefinition;
 import astra.ast.definition.TypeDefinition;
 import astra.ast.element.FunctionElement;
+import astra.ast.element.GRuleElement;
 import astra.ast.element.InferenceElement;
 import astra.ast.element.InitialElement;
 import astra.ast.element.ModuleElement;
@@ -26,6 +27,7 @@ import astra.ast.formula.BracketFormula;
 import astra.ast.formula.ComparisonFormula;
 import astra.ast.formula.FormulaVariable;
 import astra.ast.formula.GoalFormula;
+import astra.ast.formula.IsDoneFormula;
 import astra.ast.formula.ModuleFormula;
 import astra.ast.formula.NOTFormula;
 import astra.ast.formula.OrFormula;
@@ -221,6 +223,79 @@ public class ASTRAParser {
 		return new RuleElement(event, context, createStatement(tokens),
 				first, tok, tokenizer.getSource(first, tok));
 	}
+	
+	public GRuleElement createGRule(List<Token> tokens) throws ParseException {
+		Token first = tokens.get(0);
+		Token last = tokens.get(tokens.size() - 1);
+		List<Token> list = splitAt(tokens, new int[] {Token.COLON, Token.LESS_THAN, Token.LEFT_BRACE});
+		Token tok = list.remove(list.size()-1);
+
+		IEvent event = createEvent(list);
+//		System.out.println("Event: " + event);
+		
+		// If we split on a COLON, then we have a context...
+		IFormula context = new PredicateFormula("true", new LinkedList<ITerm>(), tok, tok, tokenizer.getSource(tok, tok));;
+		if (tok.type == Token.COLON) {
+			list = splitAt(tokens, new int[] {Token.LEFT_BRACE, Token.LESS_THAN});
+			// Now we have to have terminated with a LEFT_BRACE, so get it...
+			tok = list.remove(list.size()-1);
+			if (list.isEmpty()) throw new ParseException("Unexpected token: ':'", tok, tok);
+			context = createFormula(list);
+		} 
+//		System.out.println("Context: " + context);
+		
+		IFormula dropCondition = new IsDoneFormula(tok, tok, "");
+		if (tok.type == Token.LESS_THAN) {
+			// Remove the next token to check for a COLON (:)
+			tok = tokens.remove(0);
+			if (tok.type != Token.COLON) throw new ParseException("Unexpected token: "+tok.token, tok, tok);
+			
+			list = splitAt(tokens, new int[] {Token.LEFT_BRACE});
+			// Now we have to have terminated with a LEFT_BRACE, so get it...
+			tok = list.remove(list.size()-1);
+			if (list.isEmpty()) throw new ParseException("Unexpected token: ':'", tok, tok);
+			dropCondition = createFormula(list);
+		}
+//		System.out.println("Drop Condition: " + dropCondition);
+		
+		IStatement body = null;
+		List<RuleElement> rules = new LinkedList<RuleElement>();
+		
+		// Re-insert left brace and process the statement...
+		// tokens.add(0, tok);
+		tok = tokens.remove(0);
+		while (tok.type != Token.RIGHT_BRACE) {
+			switch (tok.type) {
+			case Token.BODY:
+				body = createStatement(tokens);
+//				System.out.println("body: " + body);
+				break;
+			case Token.RULE:
+				RuleElement rule = this.createRule(tokens);
+//				System.out.println("rule: " + rule);
+				rules.add(rule);
+				break;
+			case Token.GRULE:
+				rule = this.createGRule(tokens);
+//				System.out.println("grule: " + rule);
+				rules.add(rule);
+				break;
+			default:
+				throw new ParseException("Not a valid rule: " +tok.token, tok);
+
+			}
+			
+			tok = tokens.remove(0);
+		}
+		if (body == null) {
+			body = new BlockStatement(new LinkedList<IStatement>(), first, last, "");
+		}
+		
+		System.out.println("FINAL: " + event + " / " + context + " / " + dropCondition + " / " + body);
+		return new GRuleElement(event, context, dropCondition, body, rules,
+				first, tok, tokenizer.getSource(first, tok));
+	}
+	
 	
 	public RuleElement createSynchronizedRule(List<Token> tokens) throws ParseException {
 		if (tokens.remove(0).type != Token.RULE) {

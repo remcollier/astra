@@ -7,6 +7,7 @@ import astra.ast.core.ImportElement;
 import astra.ast.core.ParseException;
 import astra.ast.definition.FormulaDefinition;
 import astra.ast.element.FunctionElement;
+import astra.ast.element.GRuleElement;
 import astra.ast.element.InferenceElement;
 import astra.ast.element.InitialElement;
 import astra.ast.element.ModuleElement;
@@ -23,6 +24,7 @@ import astra.ast.formula.BracketFormula;
 import astra.ast.formula.ComparisonFormula;
 import astra.ast.formula.FormulaVariable;
 import astra.ast.formula.GoalFormula;
+import astra.ast.formula.IsDoneFormula;
 import astra.ast.formula.ModuleFormula;
 import astra.ast.formula.NOTFormula;
 import astra.ast.formula.OrFormula;
@@ -488,4 +490,15 @@ public class AbstractVisitor implements IElementVisitor {
 		return null;
 	}
 
+	@Override
+	public Object visit(IsDoneFormula formula, Object data) throws ParseException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object visit(GRuleElement element, Object data) throws ParseException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

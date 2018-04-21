@@ -14,6 +14,7 @@ import astra.ast.core.ImportElement;
 import astra.ast.core.ParseException;
 import astra.ast.core.Token;
 import astra.ast.element.FunctionElement;
+import astra.ast.element.GRuleElement;
 import astra.ast.element.InferenceElement;
 import astra.ast.element.InitialElement;
 import astra.ast.element.ModuleElement;
@@ -28,6 +29,7 @@ import astra.ast.formula.BracketFormula;
 import astra.ast.formula.ComparisonFormula;
 import astra.ast.formula.FormulaVariable;
 import astra.ast.formula.GoalFormula;
+import astra.ast.formula.IsDoneFormula;
 import astra.ast.formula.MethodSignature;
 import astra.ast.formula.ModuleFormula;
 import astra.ast.formula.NOTFormula;
@@ -178,6 +180,10 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 			rule.accept(this, "\t\t");
 		}
 
+		for (GRuleElement rule : element.getGRules()) {
+			rule.accept(this, "\t\t");
+		}
+
 		for (PlanElement plan : element.getPlans()) {
 			plan.accept(this, "\t\t");
 		}
@@ -269,6 +275,38 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 		code.append(",\n");
 		element.statement().accept(this, data + "\t");
 		code.append("\n" + data + "));\n");
+		return null;
+	}
+
+	@Override
+	public Object visit(GRuleElement element, Object data) throws ParseException {
+		code.append(data.toString() + "addRule(new Rule(\n");
+		code.append(data+"\t"+locationData(element)+",\n");
+		element.event().accept(this, data + "\t");
+		code.append(",\n");
+		element.context().accept(this, data + "\t");
+		code.append(",\n");
+		element.dropCondition().accept(this, data + "\t");
+		code.append(",\n");
+		element.statement().accept(this, data + "\t");
+		code.append(", new Rule[] {\n\t");
+		boolean first = true;
+		for (RuleElement rule : element.rules()) {
+			if (first) {
+				first=false;
+			} else {
+				code.append(",\n\t");
+			}
+			code.append(data.toString() + "\tnew Rule(\n");
+			code.append(data+"\t\t\t"+locationData(element)+",\n");
+			rule.event().accept(this, data + "\t\t\t");
+			code.append(",\n");
+			rule.context().accept(this, data + "\t\t\t");
+			code.append(",\n");
+			rule.statement().accept(this, data + "\t\t\t");
+			code.append("\n" + data + "\t\t)");
+		}
+		code.append("\n" + data + "}));\n");
 		return null;
 	}
 
@@ -1330,4 +1368,11 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 		code.append("\n" + data + ")");
 		return null;
 	}
+	
+	@Override
+	public Object visit(IsDoneFormula formula, Object data) throws ParseException {
+		code.append(data + "new IsDone()");
+		return null;
+	}
+	
 }

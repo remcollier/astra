@@ -24,6 +24,7 @@ public class Token {
 	public static final int FUNCTION = 15;
 	public static final int CONSTANT = 16;
 	public static final int TYPES = 17;
+	public static final int GRULE = 18;
 
 	// BASIC LITERALS
 	public static final int BOOLEAN = 19;
@@ -101,6 +102,8 @@ public class Token {
 	public static final int FORALL = 85;
 	public static final int BIND = 86;
 	public static final int MAINTAIN = 87;
+	public static final int BODY = 88;
+	public static final int IS_DONE = 89;
 	
 	public static final int COUNT = 100;
 	
@@ -130,6 +133,7 @@ public class Token {
 		typeMap.put("module", MODULE);
 		typeMap.put("initial", INITIAL);
 		typeMap.put("rule", RULE);
+		typeMap.put("g-rule", GRULE);
 		typeMap.put("plan", PLAN);
 		typeMap.put("function", FUNCTION);
 		typeMap.put("inference", INFERENCE);
@@ -169,6 +173,8 @@ public class Token {
 		typeMap.put("synchronized", SYNCHRONIZED);
 		typeMap.put("bind", BIND);
 		typeMap.put("maintain", MAINTAIN);
+		typeMap.put("body", BODY);
+		typeMap.put("is_done", IS_DONE);
 		
 		// Basic Punctuation
 		typeMap.put(".", PERIOD);

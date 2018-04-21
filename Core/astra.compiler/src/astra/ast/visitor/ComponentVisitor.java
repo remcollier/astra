@@ -10,6 +10,7 @@ import astra.ast.core.IType;
 import astra.ast.core.ParseException;
 import astra.ast.core.Token;
 import astra.ast.element.FunctionElement;
+import astra.ast.element.GRuleElement;
 import astra.ast.element.InferenceElement;
 import astra.ast.element.ModuleElement;
 import astra.ast.element.PlanElement;
@@ -128,6 +129,18 @@ public class ComponentVisitor extends AbstractVisitor {
 			}
 		}
 		
+		for (GRuleElement rule : element.getGRules()) {
+			try {
+//				rule.accept(this, store);
+				String signature = rule.event().toSignature();
+//				System.out.println("grule signature: " + signature);
+				if (!store.events.contains(signature)) store.events.add(signature);
+			} catch (NullPointerException npe) {
+				npe.printStackTrace();
+				throw new ParseException("Illegal variable use in: " + rule.event(), rule.event());
+			}
+		}
+
 		// Record all partial plans that you find
 		for (PlanElement plan : element.getPlans()) {
 			String signature = plan.signature().toSignature();
@@ -143,6 +156,10 @@ public class ComponentVisitor extends AbstractVisitor {
 			rule.accept(this, new VariableTypeStack());
 		}
 		
+		for (GRuleElement rule : element.getGRules()) {
+			rule.accept(this, new VariableTypeStack());
+		}
+
 		for (PlanElement plan : element.getPlans()) {
 			plan.accept(this, new VariableTypeStack());
 		}
@@ -173,6 +190,24 @@ public class ComponentVisitor extends AbstractVisitor {
 		element.event().accept(this, data);
 		element.context().accept(this, data);
 		element.statement().accept(this, data);
+		return null;
+	}
+
+	@Override
+	public Object visit(GRuleElement element, Object data) throws ParseException {
+//		System.out.println("grule: " + element);
+		element.event().accept(this, data);
+		element.context().accept(this, data);
+		element.dropCondition().accept(this, data);
+		element.statement().accept(this, data);
+		
+		// NOT SURE WHAT THIS WILL DO - WILL IT WORK?
+		VariableTypeStack stk = (VariableTypeStack) data;
+		for(RuleElement rule : element.rules()) {
+			stk.addScope();
+			rule.accept(this, data);
+			stk.removeScope();
+		}
 		return null;
 	}
 

@@ -11,6 +11,7 @@ import astra.ast.core.ParseException;
 import astra.ast.core.Token;
 import astra.ast.definition.FormulaDefinition;
 import astra.ast.element.FunctionElement;
+import astra.ast.element.GRuleElement;
 import astra.ast.element.InferenceElement;
 import astra.ast.element.InitialElement;
 import astra.ast.element.ModuleElement;
@@ -27,6 +28,7 @@ import astra.ast.formula.BracketFormula;
 import astra.ast.formula.ComparisonFormula;
 import astra.ast.formula.FormulaVariable;
 import astra.ast.formula.GoalFormula;
+import astra.ast.formula.IsDoneFormula;
 import astra.ast.formula.ModuleFormula;
 import astra.ast.formula.NOTFormula;
 import astra.ast.formula.OrFormula;
@@ -95,6 +97,10 @@ public class TypeCheckVisitor implements IElementVisitor {
 			rule.accept(this, data);
 		}
 		
+		for (GRuleElement rule : element.getGRules()) {
+			rule.accept(this, data);
+		}
+		
 		for (PlanElement plan : element.getPlans()) {
 			plan.accept(this, data);
 		}
@@ -124,6 +130,18 @@ public class TypeCheckVisitor implements IElementVisitor {
 		element.event().accept(this, data);
 		element.context().accept(this, data);
 		element.statement().accept(this, data);
+		return null;
+	}
+
+	@Override
+	public Object visit(GRuleElement element, Object data) throws ParseException {
+		element.event().accept(this, data);
+		element.context().accept(this, data);
+		element.statement().accept(this, data);
+		element.dropCondition().accept(this, data);
+		for (RuleElement rule : element.rules()) {
+			rule.accept(this, data);
+		}
 		return null;
 	}
 
@@ -582,6 +600,12 @@ public class TypeCheckVisitor implements IElementVisitor {
 
 	@Override
 	public Object visit(CountTerm term, Object data) throws ParseException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public Object visit(IsDoneFormula formula, Object data) throws ParseException {
 		// TODO Auto-generated method stub
 		return null;
 	}

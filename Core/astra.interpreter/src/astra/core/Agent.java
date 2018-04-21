@@ -258,14 +258,16 @@ public class Agent {
 		
 		this.beliefManager.update();
 
+		// Check for satisfied promises...
 		for (int i=0; i<promises.size(); i++) {
 			Promise promise = promises.get(i);
 			List<Map<Integer, Term>> bindings = query(promise.formula, new HashMap<Integer, Term>());
 			if ((promise.isTrue && (bindings == null)) || (!promise.isTrue && (bindings != null))) {
-//				System.out.println("promise met: " + promise.formula);
 				promises.remove(i).act(bindings);
 			}
 		}
+		
+		// Check for notifications of completed actions
 		synchronized (completed) {
 			while (!completed.isEmpty()) {
 				Notification notif = completed.poll();
@@ -273,23 +275,56 @@ public class Agent {
 			}
 		}
 		
+		// HANDLE DROP CONDITIONS FOR ACTIVE INTENTIONS
+		// This is done here because you don't want to waste resource
+		// evaluating an event w.r.t. an intention if it is to be dropped...
+		int i=0;
+		while (i < intentions.size()) {
+			intention = intentions.get(i);
+			
+			// So, check the top rule executor in the intention stack to see whether
+			// or not the current subgoal has been achieved. If it has, drop that subgoal
+			// if the intention is done (no more rule executors), then drop the intention.
+			if (intention.isDone() && query(intention.rule().dropCondition,new HashMap<Integer, Term>()) != null) {
+				intention.setDead(true);
+			} else if ((intention.isGoalCompleted() || intention.isActive()) && query(intention.rule().dropCondition,new HashMap<Integer, Term>()) != null) {
+//				System.out.println("Dropping: " + intention.event);
+//				System.out.println("\tgoal condition: " + intention.rule().dropCondition);
+//				System.out.println("\toutcome: " + query(intention.rule().dropCondition,new HashMap<Integer, Term>()));
+				intention.dropRule();
+			}
+			
+			if (intention.isDead()) {
+//				if (name.charAt(0) == 'a') {
+//					System.out.println("[" + name + "] Intentions: " + intentions.size());
+//					System.out.println("[" + name + "] Dropping: " + intention.event);
+//				}
+				intentions.remove(i);
+				
+				// if we are removing an intention that is before the
+				// the next intention to be checked, need to decrement
+				// intentionNumber to reflect its new location...
+				if (i < intentionNumber) intentionNumber--;
+			} else {
+				i++;
+			}
+		}
+		
+//		System.out.println("Intentions: " + intentions.size());
         synchronized (this) {
 	        while (!eventQueue.isEmpty() && !handleEvent(eventQueue.poll()));
         }
         
 		if (!intentions.isEmpty()) {
 			intention = getNextIntention();
-//			System.out.println("["+name+"] Processing: " + intention.event);
 			if (intention != null) {
 				if (intention.isFailed()) {
 					if (!intention.rollback()) {
+						intention.setDead(true);
 						intention.printStackTrace();
-						intentions.remove(intention);
 					}
 				} else {
-					if (!intention.execute()) {
-						intentions.remove(intention);
-					}
+					intention.execute();
 				}
 			}
 		}
@@ -300,12 +335,12 @@ public class Agent {
 		}
 		
 		TraceManager.getInstance().recordEvent(new TraceEvent(TraceEvent.END_OF_CYCLE, Calendar.getInstance().getTime(), this));
-
+		
 		// Record Interpreter Timings
 		long duration = System.currentTimeMillis()-start;
 //		if(duration > 0) {
-			timings.put(name, sum = timings.get(name) + duration);
-			iterations.put(name, count = iterations.get(name) + 1);
+			timings.put(name, timings.get(name) + duration);
+			iterations.put(name, iterations.get(name) + 1);
 //		}
 	}
 	
@@ -387,9 +422,8 @@ public class Agent {
         addEvent( new MessageEvent( new Performative(message.performative), Primitive.newPrimitive( message.sender ), ContentCodec.getInstance().decode(message.content), list ) );
     }
 	
-	public synchronized void addEvent(Event event) {
-//		System.out.println("[" + this.name + "] unfiltered event: " + event);
-//		if (filter.contains(event.signature())) {
+	public synchronized boolean addEvent(Event event) {
+		if (checkEvent(event)) {
 			eventQueue.add(event);
 			
 //			System.out.println("[" + this.name + "] event: " + event);
@@ -402,7 +436,30 @@ public class Agent {
 				Scheduler.schedule(this);
 //				System.out.println("RESUMING: " + name);
 			}
-//		}
+			return true;
+		}
+		
+		return false;
+	}
+
+	private synchronized boolean checkEvent(Event event) {
+		// Class Level check
+		if (filter.contains(event.signature())) {
+			return true;
+		}
+		
+		// Intention level check
+		if (event.getSource() != null) {
+			boolean result = ((Intention) event.getSource()).checkEvent(event);
+			return result;
+		} else {
+			
+			// Check for active intention level events...
+			for (int i=0; i < intentions.size(); i++) {
+				if (intentions.get(i).checkEvent(event)) return true;
+			}
+		}
+		return false;
 	}
 
 	public ArrayList<Intention> intentions() {

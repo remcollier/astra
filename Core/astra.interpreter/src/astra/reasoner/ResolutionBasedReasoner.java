@@ -14,6 +14,7 @@ import astra.formula.Bind;
 import astra.formula.BracketFormula;
 import astra.formula.Comparison;
 import astra.formula.Formula;
+import astra.formula.IsDone;
 import astra.formula.ModuleFormula;
 import astra.formula.NOT;
 import astra.formula.OR;
@@ -42,6 +43,7 @@ public class ResolutionBasedReasoner implements Reasoner {
 		ResolutionBasedReasoner.register(NOT.class, new NOTStackEntryFactory());
 		ResolutionBasedReasoner.register(OR.class, new ORStackEntryFactory());
 		ResolutionBasedReasoner.register(Predicate.class, new PredicateStackEntryFactory());
+		ResolutionBasedReasoner.register(IsDone.class, new IsDoneStackEntryFactory());
 	}
 	
 	List<Queryable> sources = Collections.synchronizedList(new LinkedList<Queryable>());

@@ -64,13 +64,16 @@ public class RuleExecutor implements Executor {
 	}
 
 	public boolean execute(Intention intention) {
+		if (executors.isEmpty()) return false;
+		
 		if (!executors.peek().execute(intention)) {
 			executors.pop();
 		}
-
-//		System.out.println(variableTrace());
-//		System.out.println("-----------------------------------------------");
 		return !executors.isEmpty();
+	}
+	
+	public boolean isDone() {
+		return executors.isEmpty();
 	}
 
 	public void addStatement(StatementHandler handler) {
@@ -195,5 +198,17 @@ public class RuleExecutor implements Executor {
 				b.put(entry.getKey(), entry.getValue());
 			}
 		}
+	}
+
+	public Rule rule() {
+		return rule;
+	}
+
+	public void printStackTrace() {
+		System.out.println("stack size: " + executors.size());
+		for(int i=executors.size()-1;i>=0;i--) {
+			System.out.println("("+i+") " + executors.get(i).toString());
+		}
+		
 	}
 }

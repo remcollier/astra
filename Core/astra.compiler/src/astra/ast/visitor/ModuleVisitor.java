@@ -4,10 +4,11 @@ import astra.ast.core.ASTRAClassElement;
 import astra.ast.core.IJavaHelper;
 import astra.ast.core.ILanguageDefinition;
 import astra.ast.core.ParseException;
+import astra.ast.element.GRuleElement;
 import astra.ast.element.ModuleElement;
-import astra.ast.element.TypesElement;
 import astra.ast.element.PlanElement;
 import astra.ast.element.RuleElement;
+import astra.ast.element.TypesElement;
 
 /**
  * This class iterates through the parse tree adding types where necessary.
@@ -61,6 +62,12 @@ public class ModuleVisitor extends AbstractVisitor {
 			if (!store.events.contains(signature)) store.events.add(signature);
 		}
 		
+		// Record the event part of any events that you find.
+		for (GRuleElement rule : element.getGRules()) {
+			String signature = rule.event().toSignature();
+			if (!store.events.contains(signature)) store.events.add(signature);
+		}
+
 		// Record all partial plans that you find
 		for (PlanElement plan : element.getPlans()) {
 			String signature = plan.signature().toSignature();

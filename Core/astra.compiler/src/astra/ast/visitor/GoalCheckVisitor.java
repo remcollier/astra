@@ -3,6 +3,7 @@ package astra.ast.visitor;
 import astra.ast.core.ASTRAClassElement;
 import astra.ast.core.IStatement;
 import astra.ast.core.ParseException;
+import astra.ast.element.GRuleElement;
 import astra.ast.element.InitialElement;
 import astra.ast.element.PlanElement;
 import astra.ast.element.RuleElement;
@@ -40,6 +41,10 @@ public class GoalCheckVisitor extends AbstractVisitor {
 			rule.accept(this, data);
 		}
 		
+		for (GRuleElement rule : element.getGRules()) {
+			rule.accept(this, data);
+		}
+
 		for (PlanElement plan : element.getPlans()) {
 			plan.accept(this, data);
 		}
@@ -60,8 +65,17 @@ public class GoalCheckVisitor extends AbstractVisitor {
 	}
 
 	@Override
+	public Object visit(GRuleElement element, Object data) throws ParseException {
+		element.statement().accept(this, data);
+		for(RuleElement rule : element.rules()) {
+			rule.accept(this, data);
+		}
+		return null;
+	}
+
+	@Override
 	public Object visit(GoalFormula formula, Object data) throws ParseException {
-		((ComponentStore) data).checkForEvent(formula);
+//		((ComponentStore) data).checkForEvent(formula);
 		return null;
 	}
 
