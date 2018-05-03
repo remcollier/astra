@@ -388,10 +388,26 @@ public class CodeGeneratorVisitor extends AbstractVisitor {
 
 		MethodSignature signature = new MethodSignature(action.method(), IJavaHelper.ACTION);
 		if (!helper.validate(element.qualifiedName(), signature)) {
-			throw new ParseException(
-					"Could not find matching method for action call: "
-							+ action.method() + " on module: "
-							+ action.module(), action);
+			if (helper.hasTRAutoAction(element.className())) {
+				// Insert code here... below is module call code...
+				code.append(",\n\t" + data + "new DefaultModuleActionAdaptor() {\n");
+				code.append(data 
+						+ "\t\tpublic boolean invoke(TRContext context, Predicate predicate) {\n");
+				code
+					.append(data + "\t\t\treturn ((" + element.qualifiedName()
+						+ ") context.getModule(\"" + fullName + "\",\""
+						+ action.module() + "\")).auto_action(context, evaluate(context, predicate));\n")
+					.append(data + "\t\t}\n")
+					.append(data + "\t}").append("\n" + data + ")");
+				return null;
+				
+			} else {
+				System.out.println("class: " + element.className());
+				throw new ParseException(
+						"Could not find matching method for action call: "
+								+ action.method() + " on module: "
+								+ action.module(), action);
+			}
 		}
 
 		code.append(",\n\t" + data + "new ModuleActionAdaptor() {\n");

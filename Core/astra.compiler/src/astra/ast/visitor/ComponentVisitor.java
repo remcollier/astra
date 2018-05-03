@@ -213,9 +213,9 @@ public class ComponentVisitor extends AbstractVisitor {
 
 	@Override
 	public Object visit(FunctionElement element, Object data) throws ParseException {
-		element.signature().accept(this, data);
 //		System.out.println("element: " + element.signature());
 //		System.out.println("stk: " + data);
+		element.signature().accept(this, data);
 		for (TRRuleElement rule : element.rules()) {
 			VariableTypeStack stk = (VariableTypeStack) data;
 			stk.addScope();

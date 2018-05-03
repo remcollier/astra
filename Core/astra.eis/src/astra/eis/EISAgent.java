@@ -151,6 +151,7 @@ public class EISAgent implements Queryable {
 	 */
 	public void sense() {
 		perceptBuffer = service.collectBeliefs(this);
+//		System.out.println("perceptBuffer: " + perceptBuffer);
 	}
 	
 	public void updatePercepts() {
@@ -246,7 +247,12 @@ public class EISAgent implements Queryable {
 		// Invoke the action using EIS
 		Map<String, Percept> percepts = service.performAction(agent.name(), entity, new eis.iilang.Action(actionId, list));
 
-		beliefSets.get(entity).incoming(percepts.values());
+		// Lazy initialization of belief base
+		EISBeliefBase base = beliefSets.get(entity);
+		if (base == null) {
+			beliefSets.put(entity, base = new EISBeliefBase(entity));
+		}
+		base.incoming(percepts.values());
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -364,7 +364,10 @@ public class ASTRAParser {
 			} while (!tokens.isEmpty());
 		}
 		
-		return new FunctionElement(createPredicate(list),
+//		System.out.println("list: "+ list);
+		PredicateFormula pred = createPredicate(list);
+//		System.out.println("Pred: " + pred);
+		return new FunctionElement(pred,
 				rules.toArray(new TRRuleElement[rules.size()]),
 				first, last, tokenizer.getSource(first, last));
 	}
@@ -386,34 +389,6 @@ public class ASTRAParser {
 			} else {
 				return new FunctionCallAction(createPredicate(tokens), first, last,tokenizer.getSource(first,last));
 			}
-//		} else if (first.type == Token.EIS) {
-//			ITerm id = null;
-//			ITerm entity = null;
-//			if (last.type != Token.RIGHT_BRACKET) throw new ParseException("Malformed Formula: EIS(<env-id>[,<entity>])->predicate(...)", first, last);
-//			
-//			List<Token> list = splitAt(tokens, new int[] {Token.PERIOD});
-//			Token tok2 = list.get(0);
-//			if (tok2.type == Token.LEFT_BRACKET) {
-//				List<ITerm> terms = getTermList(list.subList(1, list.size()-2), false);
-//				if (terms.size() > 2) throw new ParseException("Malformed Formula: EIS(<env-id>[,<entity>])->predicate(...)", first, last);
-//
-//				if (terms.get(0) instanceof Variable || (terms.get(0) instanceof Literal && terms.get(0).type().type() == Token.STRING)) {
-//					id = terms.get(0);
-//				} else {
-//					throw new ParseException("Malformed Formula: EIS(<env-id>[,<entity>])->predicate(...)", first, last);
-//				}
-//				
-//				if (terms.size() == 2) {
-//					if (terms.get(1) instanceof Variable || (terms.get(1) instanceof Literal && terms.get(1).type().type() == Token.STRING)) {
-//						entity = terms.get(1);
-//					} else {
-//						new ParseException("Second argument of the EIS formula must be a bound Variable or a String", first, last);
-//					}
-//				}
-//			}
-//			
-//			return new EISAction(id, entity, createPredicate(tokens), 
-//					first, last, tokenizer.getSource(first, last));
 		} else if (first.type == Token.PLUS || first.type == Token.MINUS) {
 			tokens.remove(0);
 			return new UpdateAction(first.token, createPredicate(tokens),
@@ -1201,6 +1176,7 @@ public class ASTRAParser {
 	}
 	
 	public ITerm createTerm(List<Token> tokens) throws ParseException {
+//		System.out.println("createTerm: " + tokens);
 		Token first = tokens.get(0);
 		Token last = tokens.get(tokens.size()-1);
 
@@ -1373,7 +1349,7 @@ public class ASTRAParser {
 				return new ListSplitterTerm(head, tail, first, last, source);
 			}
 		}
-		return null;
+		throw new ParseException("List Splitter should contain new variables.", first, last);
 	}
 
 	private Token getLast(List<Token> tokens) {
@@ -1381,6 +1357,7 @@ public class ASTRAParser {
 	}
 	
 	private List<ITerm> getTermList(List<Token> tokens, boolean ignoreLast) throws ParseException {
+//		System.out.println("term tokens: " + tokens);
 		List<ITerm> list = new LinkedList<ITerm>();
 		if (tokens.isEmpty()) return list;
 		

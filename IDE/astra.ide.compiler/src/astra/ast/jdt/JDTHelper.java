@@ -434,11 +434,30 @@ public class JDTHelper extends AbstractHelper {
 		return validate(className, getAutoMethodSignature()); 
 	}
 
+	@Override
+	public boolean hasTRAutoAction(String className) {
+		return validate(className, getAutoTRMethodSignature()); 
+	}
+
 	private MethodSignature getAutoMethodSignature() {
 		Variable V = new Variable("X",null,null,null);
 		V.setType(new ObjectType(Token.OBJECT_TYPE, "astra.formula.Predicate"));
 		Variable V2 = new Variable("Y",null,null,null);
 		V2.setType(new ObjectType(Token.OBJECT_TYPE, "astra.core.Intention"));
+		return new MethodSignature(
+				new PredicateFormula("auto_action", 
+						Arrays.asList((ITerm) V2, (ITerm) V),
+						null, null, null
+				),
+				-1
+		);
+	}
+	
+	private MethodSignature getAutoTRMethodSignature() {
+		Variable V = new Variable("X",null,null,null);
+		V.setType(new ObjectType(Token.OBJECT_TYPE, "astra.formula.Predicate"));
+		Variable V2 = new Variable("Y",null,null,null);
+		V2.setType(new ObjectType(Token.OBJECT_TYPE, "astra.tr.TRContext"));
 		return new MethodSignature(
 				new PredicateFormula("auto_action", 
 						Arrays.asList((ITerm) V2, (ITerm) V),

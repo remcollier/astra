@@ -40,7 +40,7 @@ public class AdaptiveSchedulerStrategy implements SchedulerStrategy {
 						Scheduler.schedule(agent);
 					} else {
 						agents.put(agent.name(), Scheduler.WAITING);
-//						System.out.println("SUSPENDING: " + agent.name());
+						System.out.println("SUSPENDING: " + agent.name());
 					}
 				}
 			});
@@ -48,6 +48,7 @@ public class AdaptiveSchedulerStrategy implements SchedulerStrategy {
 	}
 
 	private synchronized boolean isActive(Agent agent) {
+		if (agent.hasSensors()) return true;
 		return !(agent.events().isEmpty() && agent.intentions().isEmpty()) || agent.hasActiveFunction();
 	}
 	

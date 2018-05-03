@@ -540,6 +540,7 @@ public class Agent {
 	
 	public synchronized boolean isActive() {
 		if (!clazz.hasFunctions()) {
+			System.out.println("sa: " + sensorArray.isEmpty());
 			return !eventQueue.isEmpty() || !intentions.isEmpty() || (!sensorArray.isEmpty()) || beliefManager.hasUpdates() || (trFunction != null);
 		}
 		return true;
@@ -631,5 +632,9 @@ public class Agent {
 
 	public boolean hasActiveFunction() {
 		return this.trFunction != null;
+	}
+
+	public boolean hasSensors() {
+		return !sensorArray.isEmpty();
 	}
 }

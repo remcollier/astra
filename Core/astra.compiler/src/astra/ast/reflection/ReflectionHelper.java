@@ -155,7 +155,7 @@ public class ReflectionHelper extends AbstractHelper {
 
 	private Method getMatchingMethod(String moduleClass, MethodSignature signature) {
 		Class<?> cls = resolveClass(moduleClass);
-//		System.out.println("matched class: " + moduleClass + " to: " + cls);
+		System.out.println("matched class: " + moduleClass + " to: " + cls);
 
 //		System.out.println("Matching: " + signature);
 		while (cls.getSuperclass() != null) {
@@ -207,8 +207,8 @@ public class ReflectionHelper extends AbstractHelper {
 
 	@Override
 	public boolean validate(String moduleClass, MethodSignature signature) {
-//		System.out.println("handling: " + moduleClass);
-//		System.out.println("signature: " + signature);
+		System.out.println("handling: " + moduleClass);
+		System.out.println("signature: " + signature);
 		return getMatchingMethod(moduleClass, signature) != null;
 	}
 	
@@ -340,11 +340,30 @@ public class ReflectionHelper extends AbstractHelper {
 		return validate(className, getAutoMethodSignature()); 
 	}
 
+	@Override
+	public boolean hasTRAutoAction(String className) {
+		return validate(className, getAutoTRMethodSignature()); 
+	}
+
 	private MethodSignature getAutoMethodSignature() {
 		Variable V = new Variable("X",null,null,null);
 		V.setType(new ObjectType(Token.OBJECT_TYPE, "astra.formula.Predicate"));
 		Variable V2 = new Variable("Y",null,null,null);
 		V2.setType(new ObjectType(Token.OBJECT_TYPE, "astra.core.Intention"));
+		return new MethodSignature(
+				new PredicateFormula("auto_action", 
+						Arrays.asList((ITerm) V2, (ITerm) V),
+						null, null, null
+				),
+				-1
+		);
+	}
+	
+	private MethodSignature getAutoTRMethodSignature() {
+		Variable V = new Variable("X",null,null,null);
+		V.setType(new ObjectType(Token.OBJECT_TYPE, "astra.formula.Predicate"));
+		Variable V2 = new Variable("Y",null,null,null);
+		V2.setType(new ObjectType(Token.OBJECT_TYPE, "astra.tr.TRContext"));
 		return new MethodSignature(
 				new PredicateFormula("auto_action", 
 						Arrays.asList((ITerm) V2, (ITerm) V),

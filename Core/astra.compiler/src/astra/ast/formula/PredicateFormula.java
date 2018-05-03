@@ -33,6 +33,7 @@ public class PredicateFormula extends AbstractElement implements IFormula {
 	}
 	
 	public String toString() {
+		System.out.println(predicate+ "/ "+terms);
 		if (predicate.equals("true") || predicate.equals("false")) return predicate;
 		String out = predicate + "(";
 		if (terms.size() > 0) out += " ";

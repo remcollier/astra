@@ -44,6 +44,11 @@ public class System extends Module {
 		}
 	}
 	
+	@ACTION
+	public boolean skip() {
+		return true;
+	}
+	
 	// Static map of agents on the platform.
 	private static Map<String, AgentEntry> agents = new HashMap<String, AgentEntry>();
 	

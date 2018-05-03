@@ -26,6 +26,7 @@ import astra.term.ListTerm;
 import astra.term.Primitive;
 import astra.term.Term;
 import astra.term.Variable;
+import astra.tr.TRContext;
 import astra.type.Type;
 import eis.exceptions.ActException;
 import eis.exceptions.NoEnvironmentException;
@@ -108,8 +109,7 @@ public class EIS extends Module {
 	}
 
 	private EISService service;
-	private String defaultEntity;
-	private boolean blocking = true;
+	private boolean blocking = false;
 	
 	/**
 	 * Action that launches a new EIS environment from the specified url 
@@ -276,22 +276,32 @@ public class EIS extends Module {
 		EISAgent agt = service.get(agent.name());
 		
 		if (agt == null) throw new RuntimeException("No EIS Agent available.");;
-		defaultEntity = entity;
 		return agt.associcateEntity(entity);
 	}
 
 	/**
-	 * Action that starts the default environment if it is in a 
+	 * Action that starts the environment if it is in a 
 	 * paused state. The action fails if the agent is not registered
 	 * with the environment.
 	 * 
 	 * @return
 	 */
 	@ACTION
-	public boolean startEnv() {
+	public boolean start() {
 		if (service == null) throw new RuntimeException("No EIS Service available.");
-		service.eisStart();
-		return true;
+		return service.start();
+	}
+	
+	/**
+	 * Action that pauses the environment.
+	 * The action fails if the agent is not registered with the environment.
+	 * 
+	 * @return
+	 */
+	@ACTION
+	public boolean pause() {
+		if (service == null) throw new RuntimeException("No EIS Service available.");
+		return service.pause();
 	}
 
 	/**
@@ -459,6 +469,7 @@ public class EIS extends Module {
 		if (service.get(agent.name()) == null) return;
 		
 		if (blocking) {
+//			System.out.println("Blocking");
 			switch (sensorState) {
 			case 0:
 				sensorState = 1;
@@ -472,8 +483,12 @@ public class EIS extends Module {
 				break;
 			case 2:
 				service.get(agent.name()).updatePercepts();
+				System.out.println("Done");
 				sensorState = 0;
 			}
+		} else {
+			service.get(agent.name()).sense();
+			service.get(agent.name()).updatePercepts();
 		}
 	}
 	
@@ -502,11 +517,28 @@ public class EIS extends Module {
 		return true;
 	}
 	
+	/**
+	 * This method supports intention driven auto_actions
+	 * @param context
+	 * @param action
+	 * @return
+	 */
 	public boolean auto_action(Intention context, Predicate action) {
+		return perform(new Funct(action.predicate(), action.terms()));
+	}
+	
+	/**
+	 * This method supports TR driven auto_actions
+	 * @param context
+	 * @param action
+	 * @return
+	 */
+	public boolean auto_action(TRContext context, Predicate action) {
 		return perform(new Funct(action.predicate(), action.terms()));
 	}
 	
 	public Formula auto_formula(Predicate formula) {
 		return check(service.get(agent.name()).defaultEntity(), new Funct(formula.predicate(), formula.terms()));
 	}
+
 }

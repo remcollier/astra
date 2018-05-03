@@ -96,9 +96,20 @@ public class EISService {
 		}
 	}
 
-	public boolean eisStart() {
+	public boolean start() {
 		try {
 			ei.start();
+		} catch (ManagementException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public boolean pause() {
+		try {
+			ei.pause();
 		} catch (ManagementException e) {
 			e.printStackTrace();
 			return false;
@@ -186,6 +197,7 @@ public class EISService {
 			if (ei.getState().equals(EnvironmentState.RUNNING)) {
 				try {
 					Collection<String> entities = ei.getAssociatedEntities(agent.name());
+//					System.out.println("entities: " + entities);
 					if (!entities.isEmpty()) {
 				    	return ei.getAllPercepts(agent.name(), entities.toArray(new String[entities.size()]));
 					}

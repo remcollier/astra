@@ -34,11 +34,13 @@ public interface IJavaHelper {
 	public boolean getEventSymbols(String className, MethodSignature signature, String symbol);
 
 	public boolean hasAutoAction(String className);
+	public boolean hasTRAutoAction(String className);
 	public boolean hasAutoFormula(String className);
 	public boolean suppressAutoActionNotifications(String className);
 
 	long lastModified(String clazz, String type);
 
 	public void createTarget(ASTRAClassElement element, String string);
+
 
 }
