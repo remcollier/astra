@@ -530,13 +530,14 @@ public class JDTHelper extends AbstractHelper {
 
 	private IMethod getMatchingMethod(String moduleClass, MethodSignature signature) {
 		org.eclipse.jdt.core.IType cls = getType(moduleClass);
-		
+		System.out.println("Class: " + cls);
+		System.out.println("signature: " + signature);
 		try {
 			while (cls != null) {
 				for (IMethod mthd : cls.getMethods()) {
 					if (mthd.getElementName().equals(signature.name()) && signature.termCount() == mthd.getParameterTypes().length-(signature.symbol() ? 1:0)) {
 						if (signature.type() == -1) {
-							return validate(signature, mthd) ? mthd:null;
+							if (validate(signature, mthd)) return mthd;
 						} else {
 							for (IAnnotation ann : mthd.getAnnotations()) {
 								String annot = ANNOTATIONS.get(signature.type());

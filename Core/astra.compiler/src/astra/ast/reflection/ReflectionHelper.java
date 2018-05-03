@@ -155,7 +155,7 @@ public class ReflectionHelper extends AbstractHelper {
 
 	private Method getMatchingMethod(String moduleClass, MethodSignature signature) {
 		Class<?> cls = resolveClass(moduleClass);
-		System.out.println("matched class: " + moduleClass + " to: " + cls);
+//		System.out.println("matched class: " + moduleClass + " to: " + cls);
 
 //		System.out.println("Matching: " + signature);
 		while (cls.getSuperclass() != null) {
@@ -164,7 +164,7 @@ public class ReflectionHelper extends AbstractHelper {
 						&& signature.termCount() == (mthd.getParameterTypes().length-(signature.symbol() ? 1:0))) {
 					if (signature.type() == -1) {
 //						System.out.println("signature type is -1: " + mthd.getName());
-						return validate(signature, mthd) ? mthd:null;
+						if (validate(signature, mthd)) return mthd;
 					} else {
 						for (Annotation ann : mthd.getAnnotations()) {
 							if (ann.annotationType().getCanonicalName().equals(annotations.get(signature.type()))) {
@@ -207,8 +207,6 @@ public class ReflectionHelper extends AbstractHelper {
 
 	@Override
 	public boolean validate(String moduleClass, MethodSignature signature) {
-		System.out.println("handling: " + moduleClass);
-		System.out.println("signature: " + signature);
 		return getMatchingMethod(moduleClass, signature) != null;
 	}
 	
