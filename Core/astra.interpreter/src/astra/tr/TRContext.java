@@ -61,7 +61,10 @@ public class TRContext {
 				Formula cond = (Formula) rule.condition.accept(new BindingsEvaluateVisitor(b, agent));
 				List<Map<Integer,Term>> result = agent.query(cond, b);
 				if (result != null) {
-					bindings.putAll(result.get(0));
+					if (!result.isEmpty()) {
+						bindings.putAll(result.get(0));
+					}
+//					System.out.println("\tselected: " + rule);
 					rule.execute(this, bindings);
 					break;
 				}

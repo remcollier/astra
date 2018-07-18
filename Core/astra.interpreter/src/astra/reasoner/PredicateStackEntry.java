@@ -38,6 +38,7 @@ public class PredicateStackEntry implements ReasonerStackEntry {
 			if (list != null) options.addAll(list);
 		}
 		
+//		System.out.println("singleResult: " + reasoner.singleResult);
 		total = options.size();
 	}
 	
@@ -53,6 +54,10 @@ public class PredicateStackEntry implements ReasonerStackEntry {
 			reasoner.stack.pop();
 			return true;
 		}
+
+//		System.out.println("SOLVING: " + predicate);
+//		predicate = (Predicate) predicate.accept(visitor);
+//		System.out.println("SOLVING (bound): " + predicate);
 		
 		if (options.isEmpty()) {
 //			System.out.println("\tFinished Predicate Matching:" + solutionCount);
@@ -68,13 +73,19 @@ public class PredicateStackEntry implements ReasonerStackEntry {
 		
 		nextFormula = (Formula) options.remove();
 		if (Predicate.class.isInstance(nextFormula)) {
+//			System.out.println("predicate: " + predicate);
 //			System.out.println("attempting to match: " + nextFormula);
 			Map<Integer, Term> bindings = Unifier.unify((Predicate) predicate.accept(visitor), (Predicate) nextFormula.accept(visitor), new HashMap<Integer, Term>(initial),reasoner.agent);
 			if (bindings != null) {
+//				System.out.println("\tmatched");
 				solved = true;
 				solutionCount++;
 				reasoner.propagateBindings(Utilities.mgu(Utilities.merge(initial, bindings)));
-				if (reasoner.singleResult) options.clear();
+//				System.out.println("singleResult: " + reasoner.singleResult);
+				if (reasoner.singleResult) {
+//					System.out.println("Clearing options");
+					options.clear();
+				}
 			}
 		} else if (Inference.class.isInstance(nextFormula)) {
 //			System.out.println("\tPredicate: " + predicate);

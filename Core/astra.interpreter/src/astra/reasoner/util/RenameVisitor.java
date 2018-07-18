@@ -17,14 +17,17 @@ import astra.formula.NOT;
 import astra.formula.OR;
 import astra.formula.Predicate;
 import astra.formula.ScopedGoal;
+import astra.term.AtIndex;
 import astra.term.Brackets;
 import astra.term.Funct;
+import astra.term.Head;
 import astra.term.ListSplitter;
 import astra.term.ListTerm;
 import astra.term.ModuleTerm;
 import astra.term.Operator;
 import astra.term.Primitive;
 import astra.term.QueryTerm;
+import astra.term.Tail;
 import astra.term.Term;
 import astra.term.Variable;
 
@@ -228,6 +231,24 @@ public class RenameVisitor implements LogicVisitor {
 			@Override public Class<ListSplitter> getType() { return ListSplitter.class; }
 			@Override public Object handle(LogicVisitor visitor, ListSplitter term, String modifier, Map<Integer, Term> bindings) {
 				return new ListSplitter((Variable) term.head().accept(visitor), (Variable) term.tail().accept(visitor));
+			}
+		});
+		addTermHandler(new Handler<Head>() {
+			@Override public Class<Head> getType() { return Head.class; }
+			@Override public Object handle(LogicVisitor visitor, Head term, String modifier, Map<Integer, Term> bindings) {
+				return new Head((Term) term.term().accept(visitor), term.type());
+			}
+		});
+		addTermHandler(new Handler<Tail>() {
+			@Override public Class<Tail> getType() { return Tail.class; }
+			@Override public Object handle(LogicVisitor visitor, Tail term, String modifier, Map<Integer, Term> bindings) {
+				return new Tail((Term) term.term().accept(visitor));
+			}
+		});
+		addTermHandler(new Handler<AtIndex>() {
+			@Override public Class<AtIndex> getType() { return AtIndex.class; }
+			@Override public Object handle(LogicVisitor visitor, AtIndex term, String modifier, Map<Integer, Term> bindings) {
+				return new AtIndex((Term) term.term().accept(visitor), (Term) term.index().accept(visitor), term.type());
 			}
 		});
 	}

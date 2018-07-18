@@ -3,20 +3,40 @@ package astra.http;
  * GENERATED CODE - DO NOT CHANGE
  */
 
-import astra.core.*;
-import astra.execution.*;
-import astra.event.*;
-import astra.messaging.*;
-import astra.formula.*;
-import astra.lang.*;
-import astra.statement.*;
-import astra.term.*;
-import astra.type.*;
-import astra.tr.*;
-import astra.reasoner.util.*;
-
-import astra.util.DB;
-import astra.netty.Http;
+import astra.core.ASTRAClass;
+import astra.core.ASTRAClassNotFoundException;
+import astra.core.AgentCreationException;
+import astra.core.Fragment;
+import astra.core.Intention;
+import astra.core.Rule;
+import astra.core.Scheduler;
+import astra.event.GoalEvent;
+import astra.execution.AdaptiveSchedulerStrategy;
+import astra.formula.Comparison;
+import astra.formula.Goal;
+import astra.formula.Predicate;
+import astra.reasoner.util.BindingsEvaluateVisitor;
+import astra.statement.Assignment;
+import astra.statement.BeliefUpdate;
+import astra.statement.Block;
+import astra.statement.Declaration;
+import astra.statement.DefaultModuleCallAdaptor;
+import astra.statement.If;
+import astra.statement.ModuleCall;
+import astra.statement.Query;
+import astra.statement.Statement;
+import astra.statement.Subgoal;
+import astra.statement.TryRecover;
+import astra.term.Funct;
+import astra.term.ListTerm;
+import astra.term.ModuleTerm;
+import astra.term.ModuleTermAdaptor;
+import astra.term.Operator;
+import astra.term.Primitive;
+import astra.term.Term;
+import astra.term.Variable;
+import astra.type.ObjectType;
+import astra.type.Type;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 

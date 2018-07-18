@@ -21,7 +21,10 @@ import astra.formula.OR;
 import astra.formula.Predicate;
 import astra.reasoner.util.Utilities;
 import astra.reasoner.util.VariableVisitor;
+import astra.term.Primitive;
 import astra.term.Term;
+import astra.term.Variable;
+import astra.type.Type;
 
 public class ResolutionBasedReasoner implements Reasoner {
 	public static final int MAX_DEPTH 										= 200;
@@ -94,6 +97,7 @@ public class ResolutionBasedReasoner implements Reasoner {
 	}
 	
 	public List<Map<Integer, Term>> queryAll(Formula formula) {
+//		System.out.println("SETTING MULTI-RESULT");
 		this.singleResult = false;
 		List<Map<Integer, Term>> list = doQuery(formula, new HashMap<Integer, Term>());
 //		System.out.println("list: " + list);
@@ -101,6 +105,7 @@ public class ResolutionBasedReasoner implements Reasoner {
 	}
 	
 	public List<Map<Integer, Term>> query(Formula formula) {
+//		System.out.println("SETTING SINGLE RESULT...");
 //		stats = new Stats();
 		this.singleResult = true;
 		List<Map<Integer, Term>> result = doQuery(formula, new HashMap<Integer, Term>());
@@ -110,11 +115,13 @@ public class ResolutionBasedReasoner implements Reasoner {
 	
 	@Override
 	public List<Map<Integer, Term>> query(Formula formula, Map<Integer, Term> bindings) {
-		this.singleResult = false;
+//		System.out.println("SETTING SINGLE RESULT...");
+		this.singleResult = true;
 		return doQuery(formula, bindings);
 	}
 
 	private List<Map<Integer, Term>> doQuery(Formula formula, Map<Integer, Term> initial) {
+//		System.out.println("[doQuery]singleResult: " + singleResult);
 		stack = new Stack<ReasonerStackEntry>();
 		formulae = new Stack<Formula>();
 		solutions = new LinkedList<Map<Integer, Term>>();
@@ -124,7 +131,6 @@ public class ResolutionBasedReasoner implements Reasoner {
 		while (!stack.isEmpty() && stack.size() < MAX_DEPTH) {
 //			System.out.println("\n\n================================\n" + stack.size() + ": " + stack.peek());
 //			System.out.println("\tsolutions: " + solutions);
-//			stats.steps++;
 			if (!stack.peek().solve()) {
 //				System.out.println("Failure");
 				if (!propogateFailure()) return null;
@@ -155,4 +161,19 @@ public class ResolutionBasedReasoner implements Reasoner {
 		return !stack.isEmpty();
 	}
 
+	public static void main(String[] args) {
+		Reasoner reasoner = new ResolutionBasedReasoner(null);
+		reasoner.addSource(new Queryable() {
+			@Override
+			public List<Formula> getMatchingFormulae(Formula predicate) {
+				List<Formula> formulae = new LinkedList<Formula>();
+				formulae.add(new Predicate("on", new Term[] {Primitive.newPrimitive("a"), Primitive.newPrimitive("b")}));
+				formulae.add(new Predicate("on", new Term[] {Primitive.newPrimitive("b"), Primitive.newPrimitive("table")}));
+				formulae.add(new Predicate("on", new Term[] {Primitive.newPrimitive("c"), Primitive.newPrimitive("table")}));
+				return formulae;
+			}
+		});
+		
+		reasoner.query(new Predicate("on", new Term[] {new Variable(Type.STRING, "X"), new Variable(Type.STRING, "Y")}));
+	}
 }

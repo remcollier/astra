@@ -438,6 +438,7 @@ public class Agent {
 			}
 			return true;
 		}
+		System.err.println("["+getClass().getCanonicalName()+"] Ignoring event: " + event);
 		
 		return false;
 	}

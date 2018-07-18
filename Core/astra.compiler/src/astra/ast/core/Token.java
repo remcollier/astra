@@ -106,6 +106,9 @@ public class Token {
 	public static final int IS_DONE = 89;
 	
 	public static final int COUNT = 100;
+	public static final int HEAD = 101;
+	public static final int TAIL = 102;
+	public static final int AT_INDEX = 103;
 	
 	public String token;
 	public int beginLine;
@@ -204,7 +207,11 @@ public class Token {
 		typeMap.put("%", MODULO);
 		typeMap.put("$", DOLLAR);
 		
-		typeMap.put("count", COUNT);
+		typeMap.put("count", COUNT); // TODO: Remove this 
+		typeMap.put("list_count", COUNT);
+		typeMap.put("head", HEAD);
+		typeMap.put("tail", TAIL);
+		typeMap.put("at_index", AT_INDEX);
 		
 		// Speech Acts
 		typeMap.put("accept-proposal", SPEECHACT);

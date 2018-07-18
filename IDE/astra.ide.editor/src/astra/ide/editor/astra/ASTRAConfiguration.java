@@ -61,6 +61,10 @@ public class ASTRAConfiguration extends SourceViewerConfiguration {
 		reconciler.setDamager(ndr, ASTRAPartitionScanner.ASTRA_COMMENT);
 		reconciler.setRepairer(ndr, ASTRAPartitionScanner.ASTRA_COMMENT);
 
+		ndr = new NonRuleBasedDamagerRepairer(new TextAttribute(colorManager.getColor(IASTRAColorConstants.TYPE)));
+		reconciler.setDamager(ndr, ASTRAPartitionScanner.ASTRA_TYPE);
+		reconciler.setRepairer(ndr, ASTRAPartitionScanner.ASTRA_TYPE);
+
 		ndr = new NonRuleBasedDamagerRepairer(new TextAttribute(colorManager.getColor(IASTRAColorConstants.KEYWORD)));
 		reconciler.setDamager(ndr, ASTRAPartitionScanner.ASTRA_KEYWORD);
 		reconciler.setRepairer(ndr, ASTRAPartitionScanner.ASTRA_KEYWORD);

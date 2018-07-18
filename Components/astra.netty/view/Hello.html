@@ -34,7 +34,8 @@
 				password : $("#pass").val()
 			};
 			
-			$.post("/user/validate", data, function(response) {
+			$.post("/main/validate", data, function(response) {
+//			$.post("/user/validate", data, function(response) {
 				console.log(response);
 				$("#text").html(show_response(response));
 			},"json");

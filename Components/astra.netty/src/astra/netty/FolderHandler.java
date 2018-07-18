@@ -1,20 +1,13 @@
 package astra.netty;
 
 import java.io.File;
-import java.io.RandomAccessFile;
 
 import astra.netty.server.Handler;
 import astra.netty.server.WebServer;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.DefaultFileRegion;
-import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpUtil;
-import io.netty.handler.codec.http.HttpVersion;
-import io.netty.handler.codec.http.LastHttpContent;
 
 public class FolderHandler implements Handler {
 	private String base_url;

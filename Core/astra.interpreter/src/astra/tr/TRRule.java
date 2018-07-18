@@ -15,7 +15,6 @@ public class TRRule {
 	}
 
 	public void execute(TRContext Context, Map<Integer, Term> bindings) {
-//		System.out.println("executing: " + condition);
 		action.getStatementHandler().execute(Context, bindings);
 	}
 }

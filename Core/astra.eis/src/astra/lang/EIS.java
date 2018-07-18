@@ -483,7 +483,7 @@ public class EIS extends Module {
 				break;
 			case 2:
 				service.get(agent.name()).updatePercepts();
-				System.out.println("Done");
+//				System.out.println("Done");
 				sensorState = 0;
 			}
 		} else {

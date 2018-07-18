@@ -1,29 +1,40 @@
 package astra.netty;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
+import astra.core.ActionParam;
 import astra.core.Module;
+import astra.event.Event;
 import astra.netty.server.WebServer;
+import astra.reasoner.Unifier;
 import astra.term.Funct;
 import astra.term.ListTerm;
 import astra.term.Primitive;
 import astra.term.Term;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.util.CharsetUtil;
 
 public class Http extends Module {
+	static {
+		Unifier.eventFactory.put(GETEvent.class, new GETEventUnifier());
+		Unifier.eventFactory.put(POSTEvent.class, new POSTEventUnifier());
+		Unifier.eventFactory.put(PUTEvent.class, new PUTEventUnifier());
+		Unifier.eventFactory.put(DELETEEvent.class, new DELETEEventUnifier());
+	}
+
 	public static WebServer server;
 
 	@ACTION
 	public boolean setup() {
 		return setup(9000);
 	}
-
+	
 	@ACTION
 	public boolean setup(int port) {
 		server = new WebServer(port);
@@ -132,5 +143,85 @@ public class Http extends Module {
 			e.printStackTrace();
 			return false;
 		}
+	}
+	
+	@EVENT(types = { "ChannelHandlerContext", "FullHttpRequest", "list" }, signature = "$ge", symbols = {})
+	public Event get(Term context, Term request, Term arguments) {
+		return new GETEvent(context, request, arguments);
+	}
+
+	@EVENT(types = { "ChannelHandlerContext", "FullHttpRequest", "list", "list" }, signature = "$pe", symbols = {})
+	public Event post(Term context, Term request, Term arguments, Term fields) {
+		return new POSTEvent(context, request, arguments, fields);
+	}
+	
+	@EVENT(types = { "ChannelHandlerContext", "FullHttpRequest", "list", "list" }, signature = "$pte", symbols = {})
+	public Event put(Term context, Term request, Term arguments, Term fields) {
+		return new PUTEvent(context, request, arguments, fields);
+	}
+	
+	@EVENT(types = { "ChannelHandlerContext", "FullHttpRequest", "list" }, signature = "$de", symbols = {})
+	public Event delete(Term context, Term request, Term arguments) {
+		return new DELETEEvent(context, request, arguments);
+	}
+	
+	@ACTION
+	public boolean plain_get(String url, ActionParam<String> response, ActionParam<Integer> code) {
+		try {
+			HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+			
+			connection.setRequestMethod("GET");
+			connection.setRequestProperty("User-Agent", "ASTRA/1.0");
+			int responseCode = connection.getResponseCode();
+			
+			BufferedReader in = new BufferedReader(
+			        new InputStreamReader(connection.getInputStream()));
+			String inputLine;
+			StringBuffer buf = new StringBuffer();
+
+			while ((inputLine = in.readLine()) != null) {
+				buf.append(inputLine);
+			}
+			in.close();
+			
+			code.set(responseCode);
+			response.set(buf.toString());
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
+	}
+	
+	@ACTION
+	public boolean json_get(String url, ActionParam<Funct> response, ActionParam<Integer> code) {
+		try {
+			HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+			
+			connection.setRequestMethod("GET");
+			connection.setRequestProperty("User-Agent", "ASTRA/1.0");
+			int responseCode = connection.getResponseCode();
+			
+			BufferedReader in = new BufferedReader(
+			        new InputStreamReader(connection.getInputStream()));
+			String inputLine;
+			StringBuffer buf = new StringBuffer();
+
+			while ((inputLine = in.readLine()) != null) {
+				buf.append(inputLine);
+			}
+			in.close();
+			
+			code.set(responseCode);
+			// TODO: JSON conversion
+//			response.set(buf.toString());
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
 	}
 }

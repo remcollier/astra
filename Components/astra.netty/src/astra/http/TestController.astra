@@ -23,15 +23,15 @@ agent TestController {
 		http.exportFolder("/view", "view");
 	}
 	
-	rule +!test2("GET", object<ChannelHandlerContext> ctx, object<FullHttpRequest> req, list args) {
+	rule +!test2("GET", ChannelHandlerContext ctx, FullHttpRequest req, list args) {
 		http.loadView(ctx, req, "/Hello.html");
 	}
 
-	rule +!test3("GET", ChannelHandlerContext ctx, object<FullHttpRequest> req, list args) {
+	rule +!test3("GET", ChannelHandlerContext ctx, FullHttpRequest req, list args) {
 		http.sendJSON(ctx, req, is([happy("rem"), "bob"]));
 	}
 
-	rule +!validate("POST", object<ChannelHandlerContext> ctx, object<FullHttpRequest> req, list args, list fields) {
+	rule +!validate("POST", ChannelHandlerContext ctx, FullHttpRequest req, list args, list fields) {
 		!validateUser(P.stringValueFor(fields, "username"),P.stringValueFor(fields, "password"), funct response);
 		http.sendJSON(ctx, req, response);
 	}

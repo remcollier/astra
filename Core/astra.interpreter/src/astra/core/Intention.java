@@ -111,6 +111,12 @@ public class Intention {
 		if (term instanceof astra.term.Funct) {
 			return (T) term.accept(new ContextEvaluateVisitor(this));
 		}
+
+		if ((term instanceof astra.term.Head) || (term instanceof astra.term.Tail) || (term instanceof astra.term.AtIndex)) {
+			Term _term = (Term) term.accept(new ContextEvaluateVisitor(this));
+			return evaluate(_term);
+		}
+		
 		
 		System.out.println("term: " + term);
 		System.out.println("EVALUATE: " + term.getClass().getName());

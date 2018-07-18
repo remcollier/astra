@@ -54,15 +54,18 @@ import astra.ast.statement.UpdateStatement;
 import astra.ast.statement.WaitStatement;
 import astra.ast.statement.WhenStatement;
 import astra.ast.statement.WhileStatement;
+import astra.ast.term.AtIndexTerm;
 import astra.ast.term.Brackets;
 import astra.ast.term.CountTerm;
 import astra.ast.term.Function;
+import astra.ast.term.HeadTerm;
 import astra.ast.term.InlineVariableDeclaration;
 import astra.ast.term.ListSplitterTerm;
 import astra.ast.term.ListTerm;
 import astra.ast.term.ModuleTerm;
 import astra.ast.term.Operator;
 import astra.ast.term.QueryTerm;
+import astra.ast.term.TailTerm;
 import astra.ast.term.Variable;
 import astra.ast.tr.BlockAction;
 import astra.ast.tr.FunctionCallAction;
@@ -727,6 +730,24 @@ public class ComponentVisitor extends AbstractVisitor {
 	
 	@Override
 	public Object visit(CountTerm term, Object data) throws ParseException {
+		term.term().accept(this, data);
+		return null;
+	}
+	
+	@Override
+	public Object visit(HeadTerm term, Object data) throws ParseException {
+		term.term().accept(this, data);
+		return null;
+	}
+	
+	@Override
+	public Object visit(TailTerm term, Object data) throws ParseException {
+		term.term().accept(this, data);
+		return null;
+	}
+
+	@Override
+	public Object visit(AtIndexTerm term, Object data) throws ParseException {
 		term.term().accept(this, data);
 		return null;
 	}

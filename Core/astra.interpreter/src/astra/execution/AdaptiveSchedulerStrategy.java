@@ -40,7 +40,7 @@ public class AdaptiveSchedulerStrategy implements SchedulerStrategy {
 						Scheduler.schedule(agent);
 					} else {
 						agents.put(agent.name(), Scheduler.WAITING);
-						System.out.println("SUSPENDING: " + agent.name());
+//						System.out.println("SUSPENDING: " + agent.name());
 					}
 				}
 			});

@@ -1,0 +1,29 @@
+package astra.http;
+
+import astra.netty.Http;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.FullHttpRequest;
+
+agent Test {
+	module Http http;
+	module Console C;
+	module System S;
+	
+	rule +!main(list args) {
+		http.setup();
+		http.register();
+		S.sleep(1000);
+		http.plain_get("http://www.google.com/search?q=rem", string content, int code);
+		C.println("content: " + content);
+		C.println("code: " + code);
+	}
+	
+	rule $http.get(ChannelHandlerContext ctx, FullHttpRequest req, ["hello","world"]) {
+		C.println("hello World");
+		http.loadView(ctx, req, "/Hello.html");
+	}
+	
+	rule $http.post(ChannelHandlerContext ctx, FullHttpRequest req, ["validate"], list fields) {
+		C.println("received login request");
+	}
+}

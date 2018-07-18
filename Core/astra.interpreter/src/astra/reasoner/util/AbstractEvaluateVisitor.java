@@ -14,15 +14,18 @@ import astra.formula.ModuleFormula;
 import astra.formula.NOT;
 import astra.formula.OR;
 import astra.formula.Predicate;
+import astra.term.AtIndex;
 import astra.term.Brackets;
 import astra.term.Count;
 import astra.term.FormulaTerm;
 import astra.term.Funct;
+import astra.term.Head;
 import astra.term.ListSplitter;
 import astra.term.ListTerm;
 import astra.term.Operator;
 import astra.term.Performative;
 import astra.term.Primitive;
+import astra.term.Tail;
 import astra.term.Term;
 import astra.term.Variable;
 import astra.type.Type;
@@ -52,6 +55,7 @@ public abstract class AbstractEvaluateVisitor implements LogicVisitor {
 	
 	@SuppressWarnings("unchecked")
 	private static <T extends Term> Handler<Term> getTermHandler(Class<T> cls) {
+//		System.out.println("cls: " + cls.getCanonicalName());
 		return (Handler<Term>) termHandlers.get(cls);
 	}
 	
@@ -336,14 +340,53 @@ public abstract class AbstractEvaluateVisitor implements LogicVisitor {
 			@Override public Class<Count> getType() { return Count.class; }
 			@Override public Object handle(LogicVisitor visitor, Count count, boolean passByValue) {
 //				System.out.println("(AEV) Handling count: " + count);
-				Term c = count.term();
-				if (c instanceof Variable) {
-					c = (Term) count.term().accept(visitor);
-				}
+				Term c = (Term) count.term().accept(visitor);
 				if (c instanceof ListTerm) {
 					return Primitive.newPrimitive(((ListTerm) c).size());
 				}
 				return count;
+			}
+		});
+		addTermHandler(new Handler<Head>() {
+			@Override public Class<Head> getType() { return Head.class; }
+			@Override public Object handle(LogicVisitor visitor, Head head, boolean passByValue) {
+//				System.out.println("(AEV) Handling head: " + head);
+				Term c = (Term) head.term().accept(visitor);
+//				System.out.println("(AEV) processed: " + c);
+				if (c instanceof ListTerm) {
+					return ((ListTerm) c).get(0);
+				}
+				return head;
+			}
+		});
+		addTermHandler(new Handler<Tail>() {
+			@Override public Class<Tail> getType() { return Tail.class; }
+			@Override public Object handle(LogicVisitor visitor, Tail tail, boolean passByValue) {
+//				System.out.println("(AEV) Handling tail: " + tail);
+				Term c = (Term) tail.term().accept(visitor);
+				
+//				System.out.println("(AEV) processed: " + c);
+				if (c instanceof ListTerm) {
+					ListTerm tailList = new ListTerm();
+					for (int i=1;i<((ListTerm)c).size(); i++) {
+						tailList.add(((ListTerm) c).get(i));
+					}
+					return tailList;
+				}
+				return tail;
+			}
+		});
+		addTermHandler(new Handler<AtIndex>() {
+			@Override public Class<AtIndex> getType() { return AtIndex.class; }
+			@SuppressWarnings("unchecked")
+			@Override public Object handle(LogicVisitor visitor, AtIndex atIndex, boolean passByValue) {
+//				System.out.println("(AEV) Handling at_index: " + atIndex);
+				Term t = (Term) atIndex.term().accept(visitor);
+				Term i = (Term) atIndex.index().accept(visitor);
+				if (t instanceof ListTerm && i instanceof Primitive) {
+					return ((ListTerm) t).get(((Primitive<Integer>) i).value()); 
+				}
+				return atIndex;
 			}
 		});
 	}

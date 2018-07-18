@@ -14,20 +14,24 @@ public class ASTRAPartitionScanner extends RuleBasedPartitionScanner {
 	public final static String ASTRA_COMMENT = "__astra_comment";
 	public final static String ASTRA_STRING = "__astra_string";
 	public final static String ASTRA_KEYWORD = "__astra_keyword";
+	public final static String ASTRA_TYPE = "__astra_type";
 	public final static String ASTRA_PERFORMATIVE = "__astra_performative";
 	public final static String ASTRA_PUNCTUATION = "__astra_punctuation";
 	
-	String[] keywords = new String[] {"try", "recover", "if", "else", "rule",
+	static String[] keywords = new String[] {"try", "recover", "if", "else", "rule",
 			"import", "module", "foreach", "forall", "while", "wait", "initial",
-			"plan", "agent", "extends", "abstract", "string", "int", "long",
-			"float", "double", "char", "boolean", "list", "start",
+			"plan", "agent", "extends", "abstract", "start",
 			"stop", "active", "count_bindings", "function", "query", "send", 
-			"@message", "package", "synchronized", "true", "false", "speechact",
-			"funct", "formula","inference", "bind", "types", "maintain", "returns",
-			"count"
+			"@message", "package", "synchronized", "true", "false", 
+			"inference", "bind", "types", "maintain", "returns",
+			"count", "head", "tail", "at_index"
 	};
 	
-	String[] constants = new String[] {
+	static String[] types = new String[] {"string", "int", "long", "float", "double", 
+			"char", "boolean", "list", "speechact", "funct", "formula"
+	};
+	
+	static String[] constants = new String[] {
 			"accept-proposal", "agree", "cancel", "cfp", "confirm", "disconfirm",
 	  		"failure", "inform", "inform-if", "inform-ref", "not-understood", "propogate",
 	  		"propose", "proxy", "query-if", "query-ref", "refuse", "reject-proposal",
@@ -43,10 +47,22 @@ public class ASTRAPartitionScanner extends RuleBasedPartitionScanner {
 		IToken string = new Token(ASTRA_STRING);
 		IToken keyword = new Token(ASTRA_KEYWORD);
 		IToken performative = new Token(ASTRA_PERFORMATIVE);
+		IToken type = new Token(ASTRA_TYPE);
 		IToken punct = new Token(ASTRA_PUNCTUATION);
 		IToken other = new Token(IDocument.DEFAULT_CONTENT_TYPE);
 
-		// Add keywords
+		WordPredicateRule rule3 = new WordPredicateRule(new IWordDetector() {
+            public boolean isWordStart(char c) {
+            	if (c == '@') return true;
+            	return Character.isJavaIdentifierStart(c);
+            }
+            public boolean isWordPart(char c) {
+            	if (c == '-') return true;
+            	return Character.isJavaIdentifierPart(c); 
+            }
+        }, type, other);
+		
+		// Add types
 		WordPredicateRule rule = new WordPredicateRule(new IWordDetector() {
             public boolean isWordStart(char c) {
             	if (c == '@') return true;
@@ -57,7 +73,11 @@ public class ASTRAPartitionScanner extends RuleBasedPartitionScanner {
             	return Character.isJavaIdentifierPart(c); 
             }
         }, keyword, other);
-
+		
+        for (String t: types) {
+        	rule.addWord(t, keyword);
+        }
+        
         for (String kwd: keywords) {
         	rule.addWord(kwd, keyword);
         }

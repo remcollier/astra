@@ -48,9 +48,11 @@ import astra.ast.statement.UpdateStatement;
 import astra.ast.statement.WaitStatement;
 import astra.ast.statement.WhenStatement;
 import astra.ast.statement.WhileStatement;
+import astra.ast.term.AtIndexTerm;
 import astra.ast.term.Brackets;
 import astra.ast.term.CountTerm;
 import astra.ast.term.Function;
+import astra.ast.term.HeadTerm;
 import astra.ast.term.InlineVariableDeclaration;
 import astra.ast.term.ListSplitterTerm;
 import astra.ast.term.ListTerm;
@@ -58,6 +60,7 @@ import astra.ast.term.Literal;
 import astra.ast.term.ModuleTerm;
 import astra.ast.term.Operator;
 import astra.ast.term.QueryTerm;
+import astra.ast.term.TailTerm;
 import astra.ast.term.Variable;
 import astra.ast.tr.BlockAction;
 import astra.ast.tr.CartagoAction;
@@ -146,14 +149,19 @@ public interface IElementVisitor {
 	public Object visit(Brackets brackets, Object data) throws ParseException;
 	public Object visit(Function function, Object data) throws ParseException;
 	
+	// List Functionality
+	public Object visit(CountTerm countTerm, Object data) throws ParseException;
+	public Object visit(HeadTerm headTerm, Object data) throws ParseException;
+	public Object visit(TailTerm headTerm, Object data) throws ParseException;
+	public Object visit(ListSplitterTerm term, Object data) throws ParseException;
+	public Object visit(AtIndexTerm atIndexTerm, Object data) throws ParseException;
+	
 	// Types
 	public Object visit(BasicType basicType, Object data) throws ParseException;
 	public Object visit(ObjectType objectType, Object data) throws ParseException;
 	
 	// Ontology Stuff
 	public Object visit(FormulaDefinition formulaDefinition, Object data) throws ParseException;
-	public Object visit(ListSplitterTerm term, Object data) throws ParseException;
 	public Object visit(BindFormula formula, Object data) throws ParseException;
-	public Object visit(CountTerm countTerm, Object data) throws ParseException;
 	public Object visit(IsDoneFormula isDoneFormula, Object data) throws ParseException;
 }

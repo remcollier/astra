@@ -55,9 +55,11 @@ import astra.ast.statement.TryRecoverStatement;
 import astra.ast.statement.UpdateStatement;
 import astra.ast.statement.WaitStatement;
 import astra.ast.statement.WhileStatement;
+import astra.ast.term.AtIndexTerm;
 import astra.ast.term.Brackets;
 import astra.ast.term.CountTerm;
 import astra.ast.term.Function;
+import astra.ast.term.HeadTerm;
 import astra.ast.term.InlineVariableDeclaration;
 import astra.ast.term.ListSplitterTerm;
 import astra.ast.term.ListTerm;
@@ -65,6 +67,7 @@ import astra.ast.term.Literal;
 import astra.ast.term.ModuleTerm;
 import astra.ast.term.Operator;
 import astra.ast.term.QueryTerm;
+import astra.ast.term.TailTerm;
 import astra.ast.term.Variable;
 import astra.ast.tr.FunctionCallAction;
 import astra.ast.tr.TRModuleCallAction;
@@ -202,7 +205,7 @@ public class ASTRAParser {
 	 */
 	public RuleElement createRule(List<Token> tokens) throws ParseException {
 		Token first = tokens.get(0);
-		Token last = tokens.get(tokens.size() - 1);
+//		Token last = tokens.get(tokens.size() - 1);
 		List<Token> list = splitAt(tokens, new int[] {Token.COLON, Token.LEFT_BRACE});
 		Token tok = list.remove(list.size()-1);
 
@@ -450,7 +453,7 @@ public class ASTRAParser {
 		// HANDLE Variable Declaration (with Initialization)
 		Token tok = tokens.remove(0);
 		if (Token.isType(tok.type)) {
-			IType type = createType(tok, tokens);
+			IType type = new BasicType(Token.resolveType(tok.type));
 			Token tok2 = tokens.remove(0);
 			
 			if (tok2.type != Token.IDENTIFIER) {
@@ -1210,11 +1213,11 @@ public class ASTRAParser {
 			} else if (tok.type == Token.IDENTIFIER) {
 				return new Variable(tok.token, tok, tok, tokenizer.getSource(tok, tok));
 			} else {
-				System.out.println("token: " + tok.token);
+				throw new ParseException("Unexpected token in term list: " + tok.token, tok, tok);
 			}
 		} else {
 			if (Token.isType(tok.type)) {
-				IType type = createType(tok, tokens);
+				IType type = new BasicType(Token.resolveType(tok.type));
 				if (tokens.isEmpty()) throw new ParseException("Expected variable identifier", tok, tok);
 				Token tok2 = tokens.remove(0);
 				if (tok2.type != Token.IDENTIFIER) {
@@ -1228,9 +1231,48 @@ public class ASTRAParser {
 					if (getLast(tokens).type != Token.RIGHT_BRACKET)
 						throw new ParseException("Unexpected Tokens", tok2, getLast(tokens));
 					tokens.remove(tokens.size()-1);
-					List<ITerm> list2 = this.getTermList(tokens, false);
-					if (list.size() > 2) throw new ParseException("Malformed bind formula: count(<variable>|<list>)", first, last);
-					return new CountTerm(list2.get(0), first, last, tokenizer.getSource(first, last));
+					List<ITerm> terms = this.getTermList(tokens, false);
+					if (terms.size() != 1) throw new ParseException("Expected: count(<variable>|<list>)", first, last);
+					return new CountTerm(terms.get(0), first, last, tokenizer.getSource(first, last));
+				}
+			} else if (tok.type == Token.HEAD) {
+				Token tok2 = tokens.remove(0);
+				if (tok2.type == Token.LEFT_BRACKET) {
+					if (getLast(tokens).type != Token.RIGHT_BRACKET)
+						throw new ParseException("Unexpected Tokens", tok2, getLast(tokens));
+					tokens.remove(tokens.size()-1);
+					List<List<Token>> terms = this.getTermParts(tokens, false);
+					
+//					System.out.println("terms: " + terms);
+					if (terms.size() != 2) throw new ParseException("Expected: head(<list>, <type>)", first, last);
+					if (terms.get(1).size() != 1) throw new ParseException("Expected: head(<list>, <type>)", first, last);
+					return new HeadTerm(createTerm(terms.get(0)), new BasicType(Token.resolveType(terms.get(1).get(0).type)), first, last, tokenizer.getSource(first, last));
+				}
+			} else if (tok.type == Token.TAIL) {
+				Token tok2 = tokens.remove(0);
+				if (tok2.type == Token.LEFT_BRACKET) {
+					if (getLast(tokens).type != Token.RIGHT_BRACKET)
+						throw new ParseException("Unexpected Tokens", tok2, getLast(tokens));
+					tokens.remove(tokens.size()-1);
+					List<List<Token>> terms = this.getTermParts(tokens, false);
+					
+//					System.out.println("terms: " + terms);
+					if (terms.size() != 1) throw new ParseException("Expected: tail(<list>)", first, last);
+					return new TailTerm(createTerm(terms.get(0)), first, last, tokenizer.getSource(first, last));
+				}
+			} else if (tok.type == Token.AT_INDEX) {
+				Token tok2 = tokens.remove(0);
+				if (tok2.type == Token.LEFT_BRACKET) {
+					if (getLast(tokens).type != Token.RIGHT_BRACKET)
+						throw new ParseException("Unexpected Tokens", tok2, getLast(tokens));
+					tokens.remove(tokens.size()-1);
+					List<List<Token>> terms = this.getTermParts(tokens, false);
+					if (terms.size() != 3) throw new ParseException("Expected: at_index(<list>, <index>, <type>)", first, last);
+					return new AtIndexTerm(
+							createTerm(terms.get(0)), 
+							createTerm(terms.get(1)),
+							new BasicType(Token.resolveType(terms.get(2).get(0).type)), 
+							first, last, tokenizer.getSource(first, last));
 				}
 			} else if (tok.type == Token.LEFT_BRACKET) {
 				if (tokens.get(tokens.size()-1).type != Token.RIGHT_BRACKET) {
@@ -1361,9 +1403,16 @@ public class ASTRAParser {
 		List<ITerm> list = new LinkedList<ITerm>();
 		if (tokens.isEmpty()) return list;
 		
-		Token first = tokens.get(0);
-		Token last = tokens.get(tokens.size() - 1);
-		
+		List<List<Token>> termParts = getTermParts(tokens, ignoreLast);
+				
+		for (List<Token> termPart : termParts) {
+			list.add(createTerm(termPart));
+		}
+
+		return list;
+	}
+
+	private List<List<Token>> getTermParts(List<Token> tokens, boolean ignoreLast) throws ParseException {
 		List<List<Token>> termParts = new ArrayList<List<Token>>();
 		List<Token> term = new ArrayList<Token>();
 		
@@ -1382,7 +1431,7 @@ public class ASTRAParser {
 				}
 				Token t = bracketStack.pop();
 				if (BRACKET_PAIRINGS.get(t.type) != token.type)
-					throw new ParseException("Mismatched Brackets", first, last);  
+					throw new ParseException("Mismatched Bracket", t, t);  
 				term.add(token);
 			} else if (token.type == Token.COMMA && bracketStack.isEmpty()) {
 				if (term.isEmpty()) {
@@ -1405,29 +1454,24 @@ public class ASTRAParser {
 				termParts.add(term);
 			}
 		}
-		
-		for (List<Token> termPart : termParts) {
-			list.add(createTerm(termPart));
-		}
-
-		return list;
+		return termParts;
 	}
-
-	private IType createType(Token tok, List<Token> tokens) throws ParseException {
-		Token tok2 = tokens.remove(0);
-		
-		if (tok2.type == Token.LESS_THAN) {
-			String clazz = getQualifiedName(tokens);
-			tok2 = tokens.remove(0);
-			if (tok2.type != Token.GREATER_THAN) {
-				throw new ParseException("Invalid Type: Expected >, but got: " + tok2.token, tok, tok2);
-			}
-			return new ObjectType(tok.type, clazz);
-		} else {
-			tokens.add(0, tok2);
-		}
-		return new BasicType(Token.resolveType(tok.type));
-	}
+	
+//	private IType createType(Token tok, List<Token> tokens) throws ParseException {
+//		Token tok2 = tokens.remove(0);
+//		
+//		if (tok2.type == Token.LESS_THAN) {
+//			String clazz = getQualifiedName(tokens);
+//			tok2 = tokens.remove(0);
+//			if (tok2.type != Token.GREATER_THAN) {
+//				throw new ParseException("Invalid Type: Expected >, but got: " + tok2.token, tok, tok2);
+//			}
+//			return new ObjectType(tok.type, clazz);
+//		} else {
+//			tokens.add(0, tok2);
+//		}
+//		return new BasicType(Token.resolveType(tok.type));
+//	}
 	
 	private String getQualifiedName(List<Token> tokens) throws ParseException {
 		Token tok = tokens.get(0);
